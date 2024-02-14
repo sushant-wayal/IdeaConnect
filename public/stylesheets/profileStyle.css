@@ -1,0 +1,410 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif ;
+    font-family:cursive ;
+}
+
+::selection {
+    background-color: black;
+    color: white;
+}
+
+body {
+    background-image: url(../images/background/bodybg5.jpg);
+    background-size: cover;
+    padding-top: 10px;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+#menu {
+    height: 94vh;
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    padding-left: 20px;
+    border: 2px solid black;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    border-radius: 15px;
+}
+
+#more {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#perInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menuContent {
+    height: 25px;
+    width: 95%;
+    border: 2px solid black;
+    border-radius: 15px;
+    text-align: center;
+    padding-top: 5px;
+}
+
+#profile, #footer, #initialFooter {
+    border: 2px solid black;
+    width: 1040px;
+    position: relative;
+    left: 290px;
+    padding: 20px;
+    padding-bottom: 0px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+#initialFooter {
+    position: fixed;
+    bottom: 0px;
+    left: 290px;
+}
+
+#allInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+
+#dp {
+    height: 120px;
+    width: 120px;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+#counts {
+    display: flex;
+    gap: 10px;
+}
+
+.counts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 15px;
+    width: 90px;
+}
+
+#nameAndBio {
+    width: 270px;
+    height: 80px;
+    border: 2px solid black;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+#nameText {
+    border-bottom: 2px solid black;
+}
+
+#bioText {
+    overflow-y: scroll;
+    height: 75%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+#bioText::-webkit-scrollbar {
+    opacity: 0;
+}
+
+#followBtn, #messageBtn, #editProfileBtn, #newIdeaBtn {
+    position: absolute;
+    top: 130px;
+    height: 25px;
+    width: 90px;
+    background-color: gray;
+    border: 2px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#followBtn {
+    left: 660px;
+}
+
+#messageBtn {
+    left: 760px;
+}
+
+#editProfileBtn {
+    top: 0px;
+    right: 0px;
+}
+
+#newIdeaBtn {
+    top: 177.5px;
+    left: 750px;
+    height: 25px;
+    width: 150px;
+}
+
+#ideaType {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.ideaType {
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 150px;
+    text-align: center;
+}
+
+.idea {
+    height: 420px;
+    width: 270px;
+    border-radius: 15px;
+    border: 2px solid black;
+    display: inline-block;
+    margin-right: 7.5px;
+    margin-bottom: 10px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#ideas {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.title {
+    border-bottom: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 30px;
+    width: 100%;
+}
+
+.ideaProfile {
+    position: absolute;
+    height: 25px;
+    width: 25px;
+    left: 5px;
+    border-radius: 50%;
+    border: 1px solid gray;
+}
+
+.media {
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 1/1;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+}
+
+.category, .intrested {
+    position: absolute;
+    top: 40px;
+    height: 25px;
+    width: 90px;
+    border: 2px solid black;
+    background-color: gray;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    overflow-y: scroll;
+}
+
+.category::-webkit-scrollbar, .intrested::-webkit-scrollbar {
+    width: 0px;
+}
+
+.category {
+    left: 10px;
+}
+
+.intrested {
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ideaDescription {
+    height: 40px;
+    width: 265px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border-radius: 10px 10px 0px 0px;
+    padding-left: 5px;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ideaDescription::-webkit-scrollbar {
+    width: 0px;
+}
+
+.progressBar {
+    width: 255px;
+    border: 1px solid black;
+    cursor: pointer;
+    overflow-y: scroll;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progressBar::-webkit-scrollbar {
+    width: 0;
+}
+
+.likeCommentShare {
+    height: 30px;
+    width: 270px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 0px 0px 10px 10px;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.like, .comment, .share {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.likeImg, .commentImg, .shareImg {
+    height: 20px;
+    cursor: pointer;
+}
+
+.likeCount, .commentCount, .shareCount {
+    cursor: pointer;
+}
+
+.ideaUsername {
+    height: 20px;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.ideaDescription, .progressBar, .likeCommentShare, .ideaUsername {
+    position: absolute;
+}
+
+.ideaUsername {
+    bottom: 5px;
+}
+
+.likeCommentShare {
+    bottom: 25px;
+}
+
+.progressBar {
+    bottom: 55px;
+}
+
+.ideaDescription {
+    bottom: 65px;
+}
+
+#footer, #initialFooter {
+    height: 5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+#content {
+    display: flex;
+    gap: 20px;
+}
+
+.content {
+    text-decoration: none;
+    color: black;
+}
+
+.content:hover {
+    text-decoration: underline;
+}
+
+.currCategoryDiv {
+    display: inline-block;
+    border-radius: 250px;
+    background-color: black;
+    color: white;
+    margin-right: 10px;
+    margin-bottom: "10px";
+    padding: 5px;
+}
+
+.currStepText {
+    overflow: hidden;
+    white-space: normal;
+}
+
+.currStep {
+    display: flex;
+}
+
+.verticalProgressBar {
+    height: 50px;
+    width: 5px;                    
+    border-radius: 5px;
+    position: relative;
+    left: 5px;
+    background-color: black;
+}
+
+.intrestedUserDiv, .userDiv {
+    height: 30px;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+}
+
+.intrestedUserProfile, .userProfile {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+}
+
+.intrestedUsername, .username {
+    height: 30px;
+}

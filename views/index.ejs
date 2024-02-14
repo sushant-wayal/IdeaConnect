@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="stylesheets/indexStyle.css">
+  	<title> Idea Connect - Login </title>
+</head>
+<body>
+	<div id="navbar">
+		<img id="navlogo" src="images/icons/logofocus.png" alt="IdeaConnect">
+		<div id="nav">
+			<div id="signin">
+				<a id="signintext" class="content" href="/" > Sign In </a>
+			</div>
+			<div id="signup">
+				<a id="signuptext" class="content" href="createNewAccount"> Sign Up </a>
+			</div>
+		</div>
+	</div>
+	<div id="login">
+		<h3 id="logintext"> Log In </h3>
+		<form id="loginform" action="/login" method="post">
+			<div class="custom-input">
+			<input id="usernameinput" class="input" name="username" type="text" placeholder="Username">
+			</div>
+			<div class="custom-input">
+			<input id="passwordinput" class="input" name="password" type="password" placeholder="Password">
+			</div>
+			<img id="seehide" src="images/icons/see.png" alt="see">
+			<p id="msg"> <%= message %> </p>
+			<div id="completeRememberMe">
+				<input name="rememberMe" id="rememberMe" type="checkbox">
+				<p id="remembderMeText"> Remember Me </p>
+			</div>
+			<button id="loginbtn" type="submit"> Log in </button>
+		</form>
+		<a id="newaccount" href="createNewAccount"> <i> Create New Account </i> </a>
+	</div>
+	<div id="footer">
+		<div id="copyright">
+			© IdeaConnect | 2024
+		</div>
+		<div id="content">
+			<a class="content" href="/contactUs"> Contact Us </a>
+			<a class="content" href="/privacy"> Privacy </a>
+			<a class="content" href="/about"> About </a>
+		</div>
+	</div>
+	<script src="https://unpkg.com/gsap@3.9.0/dist/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js" integrity="sha512-EZI2cBcGPnmR89wTgVnN3602Yyi7muWo8y1B3a8WmIv1J9tYG+udH4LvmYjLiGp37yHB7FfaPBo8ly178m9g4Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="module" src="javascripts/uiEffects.js"></script>
+	<script src="javascripts/indexScript.js"></script>
+</body>
+</html>

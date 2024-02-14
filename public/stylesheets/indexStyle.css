@@ -1,0 +1,175 @@
+*{
+    font-family:Verdana, Geneva, Tahoma, sans-serif ;
+    font-family:cursive ;
+}
+
+::selection {
+    background-color: black;
+    color: white;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 25vh;
+    background-image: url(../images/background/bodybg5.jpg);
+    background-size: cover;
+}
+
+#navbar {
+    position: fixed;
+    top: 10px;
+    width: 98%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#navlogo {
+    height: 9vh;
+}
+
+#nav {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    width: 15%;
+}
+
+#signin, #signup {
+    cursor: pointer;
+    height: 100%;
+    width: 60%;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#signin {
+    border: 2px solid black;
+}
+
+#signin:hover #signintext, #signup:hover #signuptext {
+    color: white;
+}
+
+#title {
+    position: fixed;
+    top: -30px;
+    font-size: 90px;
+    font-weight: 200;
+}
+
+#login {
+    height: 52vh;
+    width: 20vw;
+    padding: 10px 15px 15px 15px;
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+#loginform {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    position: relative;
+    top: -70px;
+}
+
+#usernametext, #passwordtext {
+    margin: 0px;
+}
+
+#usernameinput, #passwordinput {
+    font-weight: 900;
+}
+
+.input {
+    border-radius: 20px;
+    border: 1px solid black;
+    height: 40px;
+    width: 94%;
+    padding-left: 6%;
+    opacity: 0.4;
+}
+
+.custom-input input::placeholder {
+    position: relative;
+    color: black;
+}
+
+#logintext {
+    position: relative;
+    top: -70px;
+    font-size: 40px;
+}
+
+#completeRememberMe {
+    display: flex;
+    gap: 10px;
+}
+
+#loginbtn {
+    width: 50%;
+    position: absolute;
+    left: 25%;
+    height: 20%;
+    top: 170px;
+    border-radius: 10px;
+    border: 0px;
+    cursor: pointer;
+}
+
+#newaccount {
+    color: black;
+    position: relative;
+    top: 10px;
+}
+
+#seehide {
+    position: absolute;
+    right: 5px;
+    top: 65px;
+    height: 25px;
+    cursor: pointer;
+}
+
+#msg {
+    position: absolute;
+    top: 90px;
+    left: 10px;
+    font-size: 12px;
+    color: red;
+    font-weight: 900;
+}
+
+#footer {
+    position: fixed;
+    bottom: 0px;
+    width: 98%;
+    height: 5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+#content {
+    display: flex;
+    gap: 20px;
+}
+
+.content {
+    text-decoration: none;
+    color: black;
+}
+
+.content:hover {
+    text-decoration: underline;
+}

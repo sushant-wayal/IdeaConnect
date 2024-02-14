@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheets/createNewAccountStyle.css">
+    <title>Idea Connect - Create Account</title>
+</head>
+<body>
+    <div id="navbar">
+		<img id="navlogo" src="images/icons/logofocus.png" alt="IdeaConnect">
+		<div id="nav">
+			<div id="signin">
+				<a id="signintext" class="content" href="/" > Sign In </a>
+			</div>
+			<div id="signup">
+				<a id="signuptext" class="content" href="createNewAccount"> Sign Up </a>
+			</div>
+		</div>
+	</div>
+    <form id="registerForm" action="/createNewAccount" method="post">
+        <div id="profilePhotoContainer" class="containers">
+            <img id="profilePhoto" src="images/uploads/<%= registerProfilePhoto %>" alt="Profile Photo">
+        </div>
+        <div id="name" class="containers">
+            <input id="firstInput" class="inputs" name="firstname" type="text" placeholder="First">
+            <input id="lastInput" class="inputs" name="lastname" type="text" placeholder="Last (optional)">
+        </div>
+        <div id="username" class="containers">
+            <input id="usernameInput" class="inputs" name="username" type="text" placeholder="Username">
+        </div>
+        <div id="password" class="containers">
+            <input id="passwordInput" class="inputs" name="password" type="password" placeholder="Password">
+            <img id="seehide" src="images/icons/see.png" alt="see">
+        </div>
+        <div id="personalInfo" class="containers">
+            <div id="gender">
+                <p id="genderText"> Gender : </p>
+                <label for="male" class="inputs">
+                    <input id="male" type="radio" value="male" name="gender"> Male
+                </label>
+                <label for="female" class="inputs">
+                    <input id="female" type="radio" value="female" name="gender"> Female
+                </label>
+                <label for="other" class="inputs">
+                    <input id="other" type="radio" value="other" name="gender"> other
+                </label>
+            </div>
+        </div>
+        <div id="DOBContainer" class="containers">
+            <p id="DOBText"> DOB : </p>
+            <input class="inputs" name="dob" type="date">
+        </div>
+        <div id="countriesContainer" class="containers">
+            <select class="inputs" id="countries">
+                <option id="defaultOption" disabled selected> Select the Country </option>
+            </select>
+        </div>
+        <div id="contact" class="containers">
+            <div id="phoneNumber">
+                <select id="countryCode" name="countryCode" class="inputs">
+                    <option id="defaultOptioncountrycode" disabled selected> Country Code </option>
+                </select>
+                <input id="phoneNumberInput" class="inputs" name="phoneNumber" type="number" placeholder="Phone Number">
+            </div>
+            <input id="email" class="inputs" name="email" type="email" placeholder="Email">
+        </div>
+        <div id="secret" class="containers">
+            <input id="secretInput" class="inputs" name="secret" type="text" placeholder="Nickname">
+        </div>
+        <div id="register" class="containers">
+            <button id="registerbtn" class="inputs"> Register </button>
+        </div>
+    </form>
+    <div id="footer">
+		<div id="copyright">
+			© IdeaConnect | 2024
+		</div>
+		<div id="content">
+			<a class="content" href="#"> Contact Us </a>
+			<a class="content" href="#"> Privacy </a>
+			<a class="content" href="#"> About </a>
+		</div>
+	</div>
+    <script src="https://unpkg.com/gsap@3.9.0/dist/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js" integrity="sha512-EZI2cBcGPnmR89wTgVnN3602Yyi7muWo8y1B3a8WmIv1J9tYG+udH4LvmYjLiGp37yHB7FfaPBo8ly178m9g4Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="javascripts/createNewAccountScript.js"></script>
+</body>
+</html>

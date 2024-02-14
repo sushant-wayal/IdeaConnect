@@ -1,0 +1,226 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif ;
+    font-family:cursive ;
+    background-color: transparent;
+}
+
+::selection {
+    background-color: black;
+    color: white;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: url(../images/background/bodybg5.jpg);
+    background-size: cover;
+    overflow-x: hidden;
+}
+
+#mainText {
+    font-size: 40px;
+    position: relative;
+    top: 20px;
+}
+
+#inputCategories {
+    height: 150px;
+    width: 200px;
+    border: 2px solid black;
+    padding: 10px;
+    overflow: scroll;
+    border-radius: 15px;
+}
+
+#inputCategories::-webkit-scrollbar {
+    width: 0;
+}
+
+#category {
+    display: inline-block;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    resize: none;
+    white-space: normal;
+    height: 95%;
+    width: 95%;
+}
+
+.categoryAdded {
+    display: inline-block;
+    border-radius: 150px;
+    padding: 5px;
+    background: gray;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#newIdea {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    top: 50px;
+    width: 550px;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 15px;
+    margin-bottom: 70px;
+}
+
+#mediaAndIdea {
+    display: flex;
+    justify-content: space-around;
+}
+
+#stepsAndCategories {
+    display: flex;
+    justify-content: space-around;
+}
+
+#media {
+    width: 40%;
+    height: 300px;
+    border: 2px solid black;
+    border-radius: 15px;
+    position: relative;
+}
+
+#title {
+    text-align: center;
+    height: 30px;
+    border-radius: 15px;
+}
+
+#idea {
+    height: 300px;
+    width: 40%;
+    border-radius: 15px;
+    padding: 5px;
+    border: 2px solid black;
+    resize: none;
+}
+
+#idea::-webkit-scrollbar {
+    width: 0px;
+}
+
+#addMedia {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    height: 20px;
+    width: 20px;
+    background-color: black;
+    color: gray;
+    border: 1px solid black;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#steps, #categories {
+    display: flex;
+    flex-direction: column;
+}
+
+#stepsText, #categoriesText {
+    margin-bottom: 10px;
+}
+
+.stepContainer {
+    display: flex;
+    gap: 10px;
+}
+
+.step {
+    border: none;
+    outline: none;
+    overflow: hidden;
+    white-space: normal;
+    width: 140px;
+}
+
+#title, #media, #idea {
+    background-color: gray;
+}
+
+::placeholder {
+    color: black;
+    opacity: 0.5;
+}
+
+.addStep, .removeStep {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background-color: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.progressBar {
+    height: 70px;
+    width: 5px;
+    background-color: gray;
+    border: 1px solid black;
+    border-radius: 5px;
+    position: relative;
+    left: 32.5px;
+}
+
+#publish {
+    height: 40px;
+    width: 80px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+}
+
+#footer {
+    width: 98%;
+    height: 5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+#content {
+    display: flex;
+    gap: 20px;
+}
+
+.content {
+    text-decoration: none;
+    color: black;
+}
+
+.content:hover {
+    text-decoration: underline;
+}
+
+.cross {
+    height: 20px;
+    width: 20px;
+    background-color: black;
+    color: gray;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}

@@ -1,0 +1,163 @@
+*{
+    font-family:Verdana, Geneva, Tahoma, sans-serif ;
+    font-family:cursive ;
+}
+
+::selection {
+    background-color: black;
+    color: white;
+}
+
+body {
+    background-image: url(../images/background/bodybg5.jpg);
+    background-size: cover;
+}
+
+#navbar {
+    position: fixed;
+    top: 10px;
+    width: 98%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#navlogo {
+    height: 9vh;
+}
+
+#nav {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    width: 15%;
+}
+
+#signin, #signup {
+    cursor: pointer;
+    height: 100%;
+    width: 60%;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#signup {
+    border: 2px solid black;
+}
+
+#signin:hover #signintext, #signup:hover #signuptext {
+    color: white;
+}
+
+#registerForm {
+    position: relative;
+    top: 13vh;
+    left: 30vw;
+    width: 40vw;
+    /* height: 115vh; */
+    display: flex;
+    gap: 30px;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow: visible;
+    padding-left: 20px;
+    padding-top: 20px;
+    border-radius: 30px;
+}
+
+#profilePhotoContainer, #register {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#profilePhoto {
+    height: 120px;
+    width: 120px;
+    border-radius: 50%;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+#genderText {
+    display: inline-block;
+}
+
+#passwordInput, #usernameInput {
+    width: 250px;
+}
+
+#seehide {
+    position: absolute;
+    height: 30px;
+    left: 250px;
+    cursor: pointer;
+}
+
+.containers {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.inputs {
+    height: 40px;
+    border-radius: 15px;
+    padding-left: 15px;
+}
+
+#registerbtn {
+    width: 10vw;
+}
+
+#footer {
+    /* position: fixed; */
+    bottom: 0px;
+    width: 98%;
+    height: 5vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-top: 90px;
+}
+
+#content {
+    display: flex;
+    gap: 20px;
+}
+
+.content {
+    text-decoration: none;
+    color: black;
+}
+
+.content:hover {
+    text-decoration: underline;
+}
+
+input[type="radio"] {
+    appearance: none;
+  
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+  
+    border: 2px solid #999;
+    transition: 0.2s all linear;
+    margin-right: 5px;
+  
+    position: relative;
+    top: 4px;
+    cursor: pointer;
+}
+  
+input[type="radio"]:checked {
+    border: 6px solid black;
+}
+
+label, select, button {
+    cursor: pointer;
+}

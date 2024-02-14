@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #dp {
+            height: 100px;
+            width: 100px;
+            border: 2px solid black;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <h1> Welcome to profile </h1>
+    <p> username : <%= username %> </p>
+    <p> followers : <%= followers %> </p>
+    <p> following : <%= following %> </p>
+    <a href="../follow?username=<%=username%>"> Follow </a>
+    <a href="../logout"> logout </a>
+    <a href="../createNewIdea"> New Idea </a>
+    <div id="dp">
+    </div>
+    <a href="../uploadImage"> Change Profile photo </a>
+    <h2> Posts </h2>
+    <% ideas.forEach(idea => { %>
+        <div>
+            <p> <%= idea.title %> </p>
+            <p> <%= idea.description %> </p>
+            <p> <%= idea.summary %> </p>
+        </div>
+    <% }) %>
+    <script>
+        document.getElementById("dp").style.backgroundImage = `url(../images/uploads/<%=filename%>)`;
+    </script>
+</body>
+</html>

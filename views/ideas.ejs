@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheets/ideaStyle.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="menu">
+        <div id="more">
+            <a href="../ideas" class="menuContent"> Feed </a>
+            <a href="../myIdeas" class="menuContent"> My Ideas </a>
+            <a href="../invitedIdeas" class="menuContent"> Invited Ideas </a>
+            <a href="../exploreIdeas" class="menuContent"> Explore Ideas </a>
+            <a href="../collaboratedIdeas" class="menuContent"> Collaborated Ideas </a>
+            <a href="../intrestedIdeas" class="menuContent"> Intrested Ideas </a>
+        </div>
+        <div id="perInfo">
+            <a href="logout" class="menuContent"> Logout </a>
+            <a href="/profile/<%= user.username %>" class="menuContent"> Profile </a>
+            <a href="../settings" class="menuContent"> Settings </a>
+        </div>
+    </div>
+    <div id="nav">
+
+    </div>
+    <div id="ideas">
+        <% if (allInfo.length == 0) { %>
+            Follow Someone with Ideas to see Ideas
+        <% } %>
+        <% allInfo.forEach( info => { %>
+            <div class="idea">
+                <p style="position: absolute; z-index: -1; opacity: 0;" data-same-user="false"> <%= info[0]._id %> </p>
+                <div class="title">
+                    <img src="../images/uploads/<%= info[1] %>" alt="Profile Photo" class="ideaProfile">
+                    <p class="titleText"> <%= info[0].title %> </p>
+                </div>
+                <img src="../images/uploads/<%= info[0].media %>" alt="Media" class="media">
+                <div class="category"> Category </div>
+                <% if (info[2]) { %>
+                    <button class="intrested"> Intrested </button>
+                <% } else { %>
+                    <a class="intrested" href="/makeIntrest/<%= user._id %>/<%= info[0]._id %>"> Intrested ? </a>
+                <% } %>
+                <p class="ideaDescription">
+                    <%= info[0].description %>
+                </p>
+                <div class="progressBar" data-progress="<%= (info[0].progress/info[0].steps.length)*100 %>"></div>
+                <div class="likeCommentShare">
+                    <div class="like">
+                        <img src="../images/icons/like.png" alt="Like" class="likeImg" data-user-id="<%= user._id %>" data-idea-id="<%= info[0]._id %>">
+                        <p class="likeCount" data-idea-id="<%= info[0]._id %>"> <%= info[0].likes %> </p>
+                    </div>
+                    <div class="comment">
+                        <img src="../images/icons/comment.png" alt="Comment" class="commentImg">
+                        <p class="commentCount"> <%= info[0].noOfComments %> </p>
+                    </div>
+                    <div class="share">
+                        <img src="../images/icons/share.png" alt="Share" class="shareImg">
+                        <p class="shareCount"> <%= info[0].noOfShare %> </p>
+                    </div>
+                </div>
+                <p class="ideaUsername"> <%= info[0].createdBy %> </p>
+            </div>
+        <% }) %>
+    </div>
+    <script src="https://unpkg.com/gsap@3.9.0/dist/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js" integrity="sha512-EZI2cBcGPnmR89wTgVnN3602Yyi7muWo8y1B3a8WmIv1J9tYG+udH4LvmYjLiGp37yHB7FfaPBo8ly178m9g4Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="javascripts/ideaEffect.js"></script>
+</body>
+</html>

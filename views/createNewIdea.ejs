@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheets/createNewIdeaStyle.css">
+    <title> Create New Idea </title>
+</head>
+<body>
+    <p id="mainText"> Publish New Idea </p>
+    <form id="newIdea" action="/createNewIdea" method="post">
+        <input id="title" name="ideatitle" type="text" placeholder="Title">
+        <div id="mediaAndIdea">
+            <div id="media" style="background-image: url(images/uploads/<%= ideaMedia %>); background-size: cover;">
+                <div id="addMedia">
+                    +
+                </div>
+            </div>
+            <textarea name="idea" id="idea" placeholder="Describe Your Idea....."></textarea>
+        </div>
+        <div id="stepsAndCategories">
+            <div id="steps">
+                <p id="stepsText"> Steps </p>
+                <div id="startStep" class="stepContainer">
+                    <div id="startAddStep" class="addStep">
+                        <p> + </p>
+                    </div>
+                    <input type="checkbox" id="startCheckbox" name="startCheckbox" class="checkbox">
+                    <input type="text" id="startStepInput" name="startStepInput" value="Start" class="step">
+                    <div id="startRemoveStep" class="removeStep">
+                        <p> - </p>
+                    </div>
+                </div>
+                <div id="progressBar1" class="progressBar"></div>
+                <div id="completeStep" class="stepContainer">
+                    <div id="completeAddStep" class="addStep">
+                        <p> + </p>
+                    </div>
+                    <input type="checkbox" id="completeCheckbox" name="completeCheckbox" class="checkbox">
+                    <input type="text" id="completeStepInput" name="completeStepInput" value="Complete" class="step">
+                    <div id="completeRemoveStep" class="removeStep">
+                        <p> - </p>
+                    </div>
+                </div>
+            </div>
+            <div id="categories">
+                <p id="categoriesText"> Categories </p>
+                <div id="inputCategories">
+                    <textarea id="category"></textarea>
+                </div>
+            </div>
+        </div>
+        <button type="submit" id="publish"> Publish </button>
+    </form>
+    <div id="footer">
+		<div id="copyright">
+			© IdeaConnect | 2024
+		</div>
+		<div id="content">
+			<a class="content" href="/contactUs"> Contact Us </a>
+			<a class="content" href="/privacy"> Privacy </a>
+			<a class="content" href="/about"> About </a>
+		</div>
+	</div>
+    <script src="javascripts/createNewIdeaScript.js"></script>
+</body>
+</html>
