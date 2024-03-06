@@ -4,7 +4,10 @@ import { Chat } from "../models/chat.model.js";
 
 const messanging = () => {
     io.on("connection", (socket) => {
-        console.log(`user id :${socket.id}`);
+        socket.on("joinRoom",(room) => {
+            socket.join(room);
+        })
+
         socket.on('sendMessage', async (data) => {
             const newMessage = await Message.create(data);
             const chat = await Chat.findById(data.reciver);
@@ -13,14 +16,15 @@ const messanging = () => {
             await chat.save({ validateBeforeSave: false});
             const room = data.reciver;
             socket.to(room).emit("reciveMessage",{room, message: newMessage});
-            console.log("Message is",data.message);
-            console.log("Room is",data.room);
         });
-    
-        socket.on("joinRoom",(room) => {
-            socket.join(room);
-            console.log("Room",room)
-        })
+
+        socket.on('typing', (data) => {
+            const room = data.reciver;
+            socket.to(room).emit("reciveTyping",{
+                room,
+                message: data.message,
+            });
+        });
     
         socket.on('disconnect', () => {
             console.log('User disconnected');

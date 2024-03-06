@@ -9,6 +9,7 @@ const chatSchema = new mongoose.Schema({
         profileImage: String,
         firstName: String,
         lastName: String,
+        username: String,
     }],
     lastMessage: {
         type: String,

@@ -14,6 +14,7 @@ const Chats = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [username, setUsername] = useState("");
+    const [originalUsername, setOriginalUsername] = useState("");
     const [currChat, setCurrChat] = useState({});
     const [message, setMessage] = useState("");
     const [userId, setUserId] = useState("");
@@ -44,6 +45,7 @@ const Chats = () => {
             setFirstName(firstName);
             setLastName(lastName);
             setUsername(username);
+            setOriginalUsername(username);
         }
         setCurrChat(chat);
         const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/messages/${chat._id}`,{
@@ -73,6 +75,7 @@ const Chats = () => {
             message,
         });
         setMessage("");
+        typing("");
     }
     useEffect(() => {
         socket.on("reciveMessage", (data) => {
@@ -80,7 +83,27 @@ const Chats = () => {
                 setMessages(prev => [...prev,data.message]);
             }
         })
+        socket.on("reciveTyping", (data) => {
+            if (data.room == currChat._id) {
+                console.log(data.message);
+                if (data.message.length > 0) {
+                    setUsername(data.message);
+                } else {
+                    // setMessage("");
+                    setUsername(originalUsername);
+                }
+            }
+        })
     },[socket, currChat])
+    const typing = (msg) => {
+        socket.emit("typing",{
+            sender: userId,
+            reciver: currChat._id,
+            messageType: "text",
+            // message: msg,
+            message: msg.length > 0 ? "Typing..." : "",
+        });
+    }
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-60 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -155,7 +178,10 @@ const Chats = () => {
                         })}
                     </div>
                     <div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5">
-                        <input value={message} onChange={(e) => setMessage(e.target.value)} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..."/>
+                        <input value={message} onChange={(e) => {
+                            setMessage(e.target.value);
+                            typing(e.target.value);
+                        }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..."/>
                         <button onClick={send} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center"><p>Send</p></button>
                     </div>
                 </div>
