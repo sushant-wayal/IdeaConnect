@@ -10,6 +10,10 @@ const chatSchema = new mongoose.Schema({
         firstName: String,
         lastName: String,
         username: String,
+        unread: {
+            type: Number,
+            default: 0,
+        },
     }],
     lastMessage: {
         type: String,

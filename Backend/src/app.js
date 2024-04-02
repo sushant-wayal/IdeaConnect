@@ -42,6 +42,8 @@ const io = new Server(server, {
     }
 });
 
+// import socket namespaces
+
 import "./sockets/messaging.js";
 import { messanging } from './sockets/messaging.js';
 
@@ -49,6 +51,8 @@ const PORT = process.env.WEBSOCKET_PORT || 3001;
 server.listen(PORT, () => {
     console.log(`WebSocket Server running on port ${PORT}`);
 });
+
+// using socket namespaces
 
 messanging();
 

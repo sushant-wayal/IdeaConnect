@@ -1,6 +1,6 @@
 import { RiChatVoiceLine, RiVideoChatLine } from "@remixicon/react";
 import axios from "axios"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
 
@@ -8,6 +8,7 @@ const socket = io.connect("http://localhost:3001");
 
 const Chats = () => {
     const chats = useLoaderData();
+    const [unreadNotifications, setUnreadNotifications] = useState([]);
     const [messages, setMessages] = useState([]);
     const [show, setShow] = useState(false);
     const [profileImage, setProfileImage] = useState("");
@@ -18,6 +19,14 @@ const Chats = () => {
     const [currChat, setCurrChat] = useState({});
     const [message, setMessage] = useState("");
     const [userId, setUserId] = useState("");
+    const sendRef = useRef(null);
+    const msgInput = useRef(null);
+    useEffect(() => {
+        setUnreadNotifications([]);
+        for (let chat of chats) {
+            setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == userId.toString())]?.unread])
+        }
+    },[chats, userId])
     useEffect(() => {
         const getUserId = async () => {
             const { data: { data } } = await axios.get("http://localhost:3000/api/v1/users/activeUser", {
@@ -30,6 +39,11 @@ const Chats = () => {
             }
         };
         getUserId();
+        msgInput.current.addEventListener("keyup", (e) => {
+            if (e.key == "Enter") {
+                sendRef.current.click();
+            }
+        });
     })
     const openChat = async (chat) => {
         document.querySelector("#messages").style.backgroundImage = "none";
@@ -54,6 +68,11 @@ const Chats = () => {
             },
         });
         setMessages(data.messages);
+        socket.emit("allRead",{
+            reciver: chat._id,
+            userId,
+        })
+        setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     }
     useEffect(() => {
         let messageEle = document.querySelector("#message");
@@ -61,6 +80,9 @@ const Chats = () => {
     },[messages])
     let id = 0;
     const send = () => {
+        if (message.length == 0) {
+            return;
+        }
         id++;
         setMessages(prev => [...prev,{
             messageType:"text",
@@ -81,6 +103,12 @@ const Chats = () => {
         socket.on("reciveMessage", (data) => {
             if (data.room == currChat._id) {
                 setMessages(prev => [...prev,data.message]);
+                socket.emit("allRead",{
+                    reciver: currChat._id,
+                    userId,
+                })
+            } else {
+                setUnreadNotifications(prev => prev.map((unread, ind) => chats[ind]._id == data.room ? ++unread : unread));
             }
         })
         socket.on("reciveTyping", (data) => {
@@ -117,7 +145,7 @@ const Chats = () => {
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    {chats.map(chat => {
+                    {chats.map((chat,ind) => {
                         const { members } = chat;
                         let profileImage;
                         let firstName;
@@ -131,8 +159,13 @@ const Chats = () => {
                             firstName = members[activeUser].firstName;
                             lastName = members[activeUser].lastName;
                         }
-                        return <div onClick={() => openChat(chat)} key={chat._id} className="py-2 px-1 flex justify-start gap-5 border-b-[1px] border-black border-solid cursor-pointer">
-                            <img className="h-10 aspect-square object-cover rounded-full" src={profileImage}/>
+                        return <div onClick={() => openChat(chat)} key={chat._id} className="py-2 px-1 flex justify-start gap-5 border-b-[1px] border-black border-solid cursor-pointer relative">
+                            <div className="h-10 aspect-square object-cover rounded-full relative">
+                                <img className="h-full w-full rounded-full" src={profileImage}/>
+                                <div className={`absolute -right-1 -top-1 ${unreadNotifications[ind] == 0 ? "hidden" : "flex"} justify-center items-center h-5 aspect-square rounded-full bg-black text-white p-2`}>
+                                    <p>{unreadNotifications[ind] >= 10 ? "9+" : unreadNotifications[ind]}</p>
+                                </div>
+                            </div>
                             <div className="flex flex-col justify-between">
                                 <p className="font-semibold">{firstName} {lastName}</p>
                                 <p className="text-sm">{chat.lastMessage}</p>
@@ -181,8 +214,8 @@ const Chats = () => {
                         <input value={message} onChange={(e) => {
                             setMessage(e.target.value);
                             typing(e.target.value);
-                        }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..."/>
-                        <button onClick={send} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center"><p>Send</p></button>
+                        }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..." ref={msgInput}/>
+                        <button onClick={send} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><p>Send</p></button>
                     </div>
                 </div>
             </div>
