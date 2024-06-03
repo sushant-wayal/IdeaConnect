@@ -46,6 +46,9 @@ const io = new Server(server, {
 
 import "./sockets/messaging.js";
 import { messanging } from './sockets/messaging.js';
+import "./sockets/signalling.js";
+import { signalling } from './sockets/signalling.js';
+
 
 const PORT = process.env.WEBSOCKET_PORT || 3001;
 server.listen(PORT, () => {
@@ -55,6 +58,7 @@ server.listen(PORT, () => {
 // using socket namespaces
 
 messanging();
+signalling();
 
 export { 
     app,

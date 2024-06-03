@@ -1,8 +1,10 @@
 import { RiChatVoiceLine, RiVideoChatLine } from "@remixicon/react";
 import axios from "axios"
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
+import peer from "../../../services/peer.js";
+import ReactPlayer from "react-player";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -21,6 +23,10 @@ const Chats = () => {
     const [userId, setUserId] = useState("");
     const sendRef = useRef(null);
     const msgInput = useRef(null);
+    const [onVideoCall, setOnVideoCall] = useState(false);
+    const [localStream, setLocalStream] = useState();
+    const [gotVideoCall, setGotVideoCall] = useState(false);
+    const [gotOffer, setGotOffer] = useState(null);
     useEffect(() => {
         setUnreadNotifications([]);
         for (let chat of chats) {
@@ -113,7 +119,6 @@ const Chats = () => {
         })
         socket.on("reciveTyping", (data) => {
             if (data.room == currChat._id) {
-                console.log(data.message);
                 if (data.message.length > 0) {
                     setUsername(data.message);
                 } else {
@@ -132,6 +137,70 @@ const Chats = () => {
             message: msg.length > 0 ? "Typing..." : "",
         });
     }
+    const makeVideoCall = useCallback(async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        const offer = await peer.createOffer();
+        socket.emit("makeCall",{reciver: currChat._id, offer});
+        setLocalStream(stream);
+        setOnVideoCall(true);
+    }, [currChat])
+    const answerVideoCall = useCallback(async (offer) => {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        setLocalStream(stream);
+        const answer = await peer.createAnswer(offer);
+        socket.emit("answerCall",{reciver: currChat._id, answer});
+    },[currChat, gotOffer]);
+    const sendStreams = useCallback(async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        for (const track of stream.getTracks()) {
+          peer.peer.addTrack(track, stream);
+        }
+    }, []);
+    useEffect(() => {
+        peer.peer.addEventListener("track", async ({streams}) => {
+          document.querySelector("#remoteStream").srcObject = streams[0];
+        });
+      }, []);
+    const answerCallEvent = useCallback(async ({offer}) => {
+        setGotVideoCall(true);
+        setGotOffer(offer);
+    },[]);
+    const answerResponseEvent = useCallback(async ({answer}) => {
+        await peer.setAnswer(answer);
+        sendStreams();
+    },[]);
+    const handleNegoNeeded = useCallback(async () => {
+        const offer = await peer.createOffer();
+        socket.emit("negotiationNeeded", { reciver: currChat._id, offer});
+    }, [currChat, socket]);
+    useEffect(() => {
+        peer.peer.addEventListener("negotiationneeded", handleNegoNeeded);
+        return () => {
+          peer.peer.removeEventListener("negotiationneeded", handleNegoNeeded);
+        };
+    }, [handleNegoNeeded]);
+    const handleNegoNeedIncomming = useCallback(async ({ offer }) => {
+        const answer = await peer.createAnswer(offer);
+        socket.emit("negotiationDone", { reciver: currChat._id, answer});
+    },[socket, currChat]);
+    const handleNegoNeedFinal = useCallback(async ({ answer }) => {
+        await peer.setAnswer(answer);
+    }, []);
+    useEffect(() => {
+        socket.on("reciveCall", answerCallEvent)
+        socket.on("reciveAnswer", answerResponseEvent)
+        socket.on("negotiationNeeded", handleNegoNeedIncomming);
+        socket.on("negotiationFinal",handleNegoNeedFinal);
+        return () => {
+            socket.off("reciveCall", answerCallEvent)
+            socket.off("reciveAnswer", answerResponseEvent)
+            socket.off("negotiationNeeded", handleNegoNeedIncomming);
+            socket.off("negotiationFinal", handleNegoNeedFinal);
+        }
+    },[socket, answerCallEvent, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
+    useEffect(() => {
+        document.querySelector("#localStream").srcObject = localStream;
+    },[localStream]);
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-60 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -185,11 +254,16 @@ const Chats = () => {
                             </div>
                         </div>
                         <div className="flex justify-center gap-5 items-center">
-                            <RiVideoChatLine className="scale-x-110"/>
-                            <RiChatVoiceLine className="scale-x-110"/>
+                            {localStream && <button className="cursor-pointer" onClick={sendStreams}>Send Stream</button>}
+                            <RiVideoChatLine onClick={() => {
+                                if (gotVideoCall) answerVideoCall(gotOffer);
+                                else makeVideoCall();
+                                setOnVideoCall(prev => !prev);
+                            }} color={onVideoCall ? "red" : gotVideoCall ? "green" : "black"} className="scale-x-110 cursor-pointer"/>
+                            <RiChatVoiceLine  className="scale-x-110"/>
                         </div>
                     </div>
-                    <div id="message" className="flex-grow w-full overflow-scroll p-2">
+                    <div id="message" className={`${onVideoCall ? "hidden" : ""} flex-grow w-full overflow-scroll p-2`}>
                         {messages.map(message => {
                             let align = "start";
                             if (userId.toString() == message.sender.toString()) {
@@ -209,6 +283,10 @@ const Chats = () => {
                                     </div>
                             }
                         })}
+                    </div>
+                    <div className={`${onVideoCall ? "" : "hidden"} flex-grow w-full overflow-scroll p-2 relative`}>
+                        <video id="remoteStream" autoPlay playsInline muted className="top-0 left-0 h-[175%] w-[100%] overflow-x-hidden"/>
+                        <video id="localStream" autoPlay playsInline muted className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"/>
                     </div>
                     <div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5">
                         <input value={message} onChange={(e) => {
