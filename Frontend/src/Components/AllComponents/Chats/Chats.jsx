@@ -237,6 +237,12 @@ const Chats = () => {
         setAudio(audioTrack.enabled);
         peer.peer.getSenders().find(sender => sender.track.kind == "audio").replaceTrack(audioTrack);
     }
+    useEffect(() => {
+        document.addEventListener("beforunload", leaveCall);
+        return () => {
+            document.removeEventListener("beforunload", leaveCall);
+        }
+    },[])
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-60 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -273,7 +279,7 @@ const Chats = () => {
                             </div>
                             <div className="flex flex-col justify-between">
                                 <p className="font-semibold">{firstName} {lastName}</p>
-                                <p className="text-sm">{chat.lastMessage}</p>
+                                <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage}</p>
                             </div>
                         </div>
                     })}
