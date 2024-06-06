@@ -36,6 +36,19 @@ class PeerService {
       await this.peer.setRemoteDescription(new RTCSessionDescription(answer))
     }
   }
+  
+  async disconnect() {
+    if (this.peer) {
+      this.peer.close()
+      this.peer.getSenders().forEach(sender => sender.track.stop());
+      this.peer.getReceivers().forEach(receiver => {
+        if (receiver.track) {
+          receiver.track.stop();
+        }
+      });
+      this.peer = null
+    }
+  }
 }
 
 export default new PeerService()

@@ -1,10 +1,9 @@
-import { RiChatVoiceLine, RiVideoChatLine } from "@remixicon/react";
+import { RiChatVoiceLine, RiVideoChatLine, RiVideoOnLine, RiVideoOffFill, RiMicFill, RiMicOffFill, RiPhoneFill } from "@remixicon/react";
 import axios from "axios"
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
 import peer from "../../../services/peer.js";
-import ReactPlayer from "react-player";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -27,6 +26,15 @@ const Chats = () => {
     const [localStream, setLocalStream] = useState();
     const [gotVideoCall, setGotVideoCall] = useState(false);
     const [gotOffer, setGotOffer] = useState(null);
+    const [video, setVideo] = useState(false);
+    const [audio, setAudio] = useState(false);
+    const mediaConstraints = {
+        video : {
+            width: { min: 640, ideal: 3040, max: 3040 },
+            height: { min: 480, ideal: 1080, max: 1080 },
+        },
+        audio : true,
+    }
     useEffect(() => {
         setUnreadNotifications([]);
         for (let chat of chats) {
@@ -138,20 +146,20 @@ const Chats = () => {
         });
     }
     const makeVideoCall = useCallback(async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         const offer = await peer.createOffer();
         socket.emit("makeCall",{reciver: currChat._id, offer});
         setLocalStream(stream);
         setOnVideoCall(true);
     }, [currChat])
     const answerVideoCall = useCallback(async (offer) => {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         setLocalStream(stream);
         const answer = await peer.createAnswer(offer);
         socket.emit("answerCall",{reciver: currChat._id, answer});
     },[currChat, gotOffer]);
     const sendStreams = useCallback(async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         for (const track of stream.getTracks()) {
           peer.peer.addTrack(track, stream);
         }
@@ -186,21 +194,49 @@ const Chats = () => {
     const handleNegoNeedFinal = useCallback(async ({ answer }) => {
         await peer.setAnswer(answer);
     }, []);
+    const leaveCall = useCallback(async () => {
+        if (localStream) localStream.getTracks().forEach(track => track.stop());
+        setLocalStream(null);
+        setOnVideoCall(false);
+    },[localStream]);
     useEffect(() => {
         socket.on("reciveCall", answerCallEvent)
         socket.on("reciveAnswer", answerResponseEvent)
         socket.on("negotiationNeeded", handleNegoNeedIncomming);
         socket.on("negotiationFinal",handleNegoNeedFinal);
+        socket.on("leaveCall", leaveCall);
         return () => {
             socket.off("reciveCall", answerCallEvent)
             socket.off("reciveAnswer", answerResponseEvent)
             socket.off("negotiationNeeded", handleNegoNeedIncomming);
             socket.off("negotiationFinal", handleNegoNeedFinal);
+            socket.off("leaveCall", leaveCall);
         }
     },[socket, answerCallEvent, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
     useEffect(() => {
         document.querySelector("#localStream").srcObject = localStream;
+        if (!localStream) return;
+        const videoTrack = localStream.getTracks().find(track => track.kind == "video");
+        if (videoTrack) {
+            setVideo(videoTrack.enabled);
+        }
+        const audioTrack = localStream.getTracks().find(track => track.kind == "audio");
+        if (audioTrack) {
+            setAudio(audioTrack.enabled);
+        }
     },[localStream]);
+    const toggleVideo = () => {
+        const videoTrack = localStream.getTracks().find(track => track.kind == "video");
+        videoTrack.enabled = !videoTrack.enabled;
+        setVideo(videoTrack.enabled);
+        peer.peer.getSenders().find(sender => sender.track.kind == "video").replaceTrack(videoTrack);
+    }
+    const toggleAudio = () => {
+        const audioTrack = localStream.getTracks().find(track => track.kind == "audio");
+        audioTrack.enabled = !audioTrack.enabled;
+        setAudio(audioTrack.enabled);
+        peer.peer.getSenders().find(sender => sender.track.kind == "audio").replaceTrack(audioTrack);
+    }
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-60 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -284,9 +320,26 @@ const Chats = () => {
                             }
                         })}
                     </div>
-                    <div className={`${onVideoCall ? "" : "hidden"} flex-grow w-full overflow-scroll p-2 relative`}>
-                        <video id="remoteStream" autoPlay playsInline muted className="top-0 left-0 h-[175%] w-[100%] overflow-x-hidden"/>
-                        <video id="localStream" autoPlay playsInline muted className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"/>
+                    <div className={`${onVideoCall ? "" : "hidden"} flex-grow w-full overflow-hidden p-2 relative`}>
+                        <video id="remoteStream" autoPlay playsInline className="top-0 left-0 h-full w-full scale-[1.81]"/>
+                        <video id="localStream" autoPlay playsInline className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"/>
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-10 pb-5">
+                            <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
+                                <RiVideoOnLine size={36} onClick={toggleVideo} className={`${video ? "" : "hidden"}`} />
+                                <RiVideoOffFill size={36} onClick={toggleVideo} className={`${video ? "hidden" : ""}`}/>
+                            </div>
+                            <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
+                                <RiMicFill size={36} onClick={toggleAudio} className={`${audio ? "" : "hidden"}`}/>
+                                <RiMicOffFill size={36} onClick={toggleAudio} className={`${audio ? "hidden" : ""}`}/>
+                            </div>
+                            <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
+                                <RiPhoneFill size={36} color="red" onClick={() => {
+                                    peer.disconnect();
+                                    leaveCall();
+                                    socket.emit("leaveCall", {reciver: currChat._id});
+                                }}/>
+                            </div>
+                        </div>
                     </div>
                     <div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5">
                         <input value={message} onChange={(e) => {
