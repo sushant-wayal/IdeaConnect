@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#ideas::-webkit-scrollbar {
+  width: 0px;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}

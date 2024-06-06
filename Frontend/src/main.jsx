@@ -10,10 +10,10 @@ import {
 	Profile,
 	SignIn, 
 	SignUp,
-} from './Components/index.js'
-import { fecthData } from './Components/AllComponents/SignUp/SignUp.jsx'
-import { getFeed } from './Components/AllComponents/Ideas/Ideas.jsx'
-import { getChats } from './Components/AllComponents/Chats/Chats.jsx'
+} from './components/index.js'
+import { fecthData } from './components/Pages/SignUp.jsx'
+import { getFeed } from './components/Pages/Ideas.jsx'
+import { getChats } from './components/Pages/Chats.jsx'
 
 const router = createBrowserRouter(
 	createRoutesFromChildren(

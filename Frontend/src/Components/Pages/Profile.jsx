@@ -1,10 +1,9 @@
 import { Link, useParams } from "react-router-dom"
-import SideNav from "../SideNav/SideNav";
-import Footer from "../Footer/Footer";
+import SideNav from "../Components/SideNav";
+import Footer from "../Components/Footer";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import "./Profile.css"
-import Idea from "../Idea/Idea";
+import Idea from "../Components/Idea";
 
 const Profile = () => {
     const { username } = useParams();

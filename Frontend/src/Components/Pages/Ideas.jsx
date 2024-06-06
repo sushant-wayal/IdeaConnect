@@ -1,8 +1,7 @@
-import Idea from "../Idea/Idea";
-import SideNav from "../SideNav/SideNav";
-import TopNav from "../TopNav/TopNav";
-import "./Ideas.css"
-import Footer from "../Footer/Footer";
+import Idea from "../Components/Idea";
+import SideNav from "../Components/SideNav";
+import TopNav from "../Components/TopNav";
+import Footer from "../Components/Footer";
 import axios from "axios";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { useEffect } from "react";

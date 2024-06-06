@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Footer from "../Footer/Footer"
-import SideNav from "../SideNav/SideNav"
+import Footer from "../Components/Footer"
+import SideNav from "../Components/SideNav"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";

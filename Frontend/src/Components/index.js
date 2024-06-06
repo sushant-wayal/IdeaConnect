@@ -1,14 +1,14 @@
-import SignInUpNav from "./AllComponents/SignInUpNav/SignInUpNav";
-import SignIn from "./AllComponents/SignIn/SignIn";
-import Footer from "./AllComponents/Footer/Footer";
-import SignUp from "./AllComponents/SignUp/SignUp";
-import Ideas from "./AllComponents/Ideas/Ideas";
-import SideNav from "./AllComponents/SideNav/SideNav";
-import TopNav from "./AllComponents/TopNav/TopNav";
-import Idea from "./AllComponents/Idea/Idea";
-import Profile from "./AllComponents/Profile/Profile";
-import NewIdea from "./AllComponents/NewIdea/NewIdea";
-import Chats from "./AllComponents/Chats/Chats";
+import SignInUpNav from "./Components/SignInUpNav";
+import SignIn from "./Pages/SignIn";
+import Footer from "./Components/Footer";
+import SignUp from "./Pages/SignUp";
+import Ideas from "./Pages/Ideas";
+import SideNav from "./Components/SideNav";
+import TopNav from "./Components/TopNav";
+import Idea from "./Components/Idea";
+import Profile from "./Pages/Profile";
+import NewIdea from "./Pages/NewIdea";
+import Chats from "./Pages/Chats";
 
 export {
     SignInUpNav,

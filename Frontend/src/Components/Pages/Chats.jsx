@@ -3,7 +3,7 @@ import axios from "axios"
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
-import peer from "../../../services/peer.js";
+import peer from "../../services/peer.js";
 
 const socket = io.connect("http://localhost:3001");
 
