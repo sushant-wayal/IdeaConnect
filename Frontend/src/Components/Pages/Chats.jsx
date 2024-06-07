@@ -24,8 +24,8 @@ const Chats = () => {
     const msgInput = useRef(null);
     const [onVideoCall, setOnVideoCall] = useState(false);
     const [localStream, setLocalStream] = useState();
-    const [gotVideoCall, setGotVideoCall] = useState(false);
-    const [gotOffer, setGotOffer] = useState(null);
+    const [gotVideoCall, setGotVideoCall] = useState(null);
+    // const [gotOffer, setGotOffer] = useState(null);
     const [video, setVideo] = useState(false);
     const [audio, setAudio] = useState(false);
     const mediaConstraints = {
@@ -36,6 +36,7 @@ const Chats = () => {
         audio : true,
     }
     useEffect(() => {
+        console.log("unread 1");
         setUnreadNotifications([]);
         for (let chat of chats) {
             setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == userId.toString())]?.unread])
@@ -86,6 +87,7 @@ const Chats = () => {
             reciver: chat._id,
             userId,
         })
+        console.log("unread 2");
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     }
     useEffect(() => {
@@ -113,29 +115,29 @@ const Chats = () => {
         setMessage("");
         typing("");
     }
+    const reciveMessage = useCallback((data) => {
+        if (data.room == currChat._id) {
+            setMessages(prev => [...prev,data.message]);
+            socket.emit("allRead",{
+                reciver: currChat._id,
+                userId,
+            })
+        } else setUnreadNotifications(prev => prev.map((unread, ind) => chats[ind]._id == data.room ? unread+1 : unread));
+    },[currChat])
+    const reciveTyping = useCallback((data) => {
+        if (data.room == currChat._id) {
+            if (data.message.length > 0) setUsername(data.message);
+            else setUsername(originalUsername);
+        }
+    },[])
     useEffect(() => {
-        socket.on("reciveMessage", (data) => {
-            if (data.room == currChat._id) {
-                setMessages(prev => [...prev,data.message]);
-                socket.emit("allRead",{
-                    reciver: currChat._id,
-                    userId,
-                })
-            } else {
-                setUnreadNotifications(prev => prev.map((unread, ind) => chats[ind]._id == data.room ? ++unread : unread));
-            }
-        })
-        socket.on("reciveTyping", (data) => {
-            if (data.room == currChat._id) {
-                if (data.message.length > 0) {
-                    setUsername(data.message);
-                } else {
-                    // setMessage("");
-                    setUsername(originalUsername);
-                }
-            }
-        })
-    },[socket, currChat])
+        socket.on("reciveMessage", reciveMessage)
+        socket.on("reciveTyping", reciveTyping)
+        return () => {
+            socket.off("reciveMessage", reciveMessage)
+            socket.off("reciveTyping", reciveTyping)
+        }
+    },[socket, currChat, reciveMessage, reciveTyping])
     const typing = (msg) => {
         socket.emit("typing",{
             sender: userId,
@@ -152,12 +154,12 @@ const Chats = () => {
         setLocalStream(stream);
         setOnVideoCall(true);
     }, [currChat])
-    const answerVideoCall = useCallback(async (offer) => {
-        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        setLocalStream(stream);
-        const answer = await peer.createAnswer(offer);
-        socket.emit("answerCall",{reciver: currChat._id, answer});
-    },[currChat, gotOffer]);
+    // const answerVideoCall = useCallback(async (offer) => {
+    //     const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    //     setLocalStream(stream);
+    //     const answer = await peer.createAnswer(offer);
+    //     socket.emit("answerCall",{reciver: currChat._id, answer});
+    // },[currChat, gotOffer]);
     const sendStreams = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         for (const track of stream.getTracks()) {
@@ -169,10 +171,14 @@ const Chats = () => {
           document.querySelector("#remoteStream").srcObject = streams[0];
         });
       }, []);
-    const answerCallEvent = useCallback(async ({offer}) => {
-        setGotVideoCall(true);
-        setGotOffer(offer);
-    },[]);
+    const answerVideoCall = useCallback(async ({offer, reciver}) => {
+        setGotVideoCall(reciver);
+        // setGotOffer(offer);
+        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        setLocalStream(stream);
+        const answer = await peer.createAnswer(offer);
+        socket.emit("answerCall",{reciver: currChat._id, answer});
+    },[currChat]);
     const answerResponseEvent = useCallback(async ({answer}) => {
         await peer.setAnswer(answer);
         sendStreams();
@@ -198,21 +204,22 @@ const Chats = () => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         setLocalStream(null);
         setOnVideoCall(false);
+        setGotVideoCall(null);
     },[localStream]);
     useEffect(() => {
-        socket.on("reciveCall", answerCallEvent)
+        socket.on("reciveCall", answerVideoCall)
         socket.on("reciveAnswer", answerResponseEvent)
         socket.on("negotiationNeeded", handleNegoNeedIncomming);
         socket.on("negotiationFinal",handleNegoNeedFinal);
         socket.on("leaveCall", leaveCall);
         return () => {
-            socket.off("reciveCall", answerCallEvent)
+            socket.off("reciveCall", answerVideoCall)
             socket.off("reciveAnswer", answerResponseEvent)
             socket.off("negotiationNeeded", handleNegoNeedIncomming);
             socket.off("negotiationFinal", handleNegoNeedFinal);
             socket.off("leaveCall", leaveCall);
         }
-    },[socket, answerCallEvent, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
+    },[socket, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
     useEffect(() => {
         document.querySelector("#localStream").srcObject = localStream;
         if (!localStream) return;
@@ -296,9 +303,11 @@ const Chats = () => {
                             </div>
                         </div>
                         <div className="flex justify-center gap-5 items-center">
-                            {localStream && <button className="cursor-pointer" onClick={sendStreams}>Send Stream</button>}
+                            {/* {localStream && <button className="cursor-pointer" onClick={sendStreams}>Send Stream</button>} */}
                             <RiVideoChatLine onClick={() => {
-                                if (gotVideoCall) answerVideoCall(gotOffer);
+                                if (gotVideoCall) {
+                                    if (currChat._id == gotVideoCall) sendStreams();
+                                }
                                 else makeVideoCall();
                                 setOnVideoCall(prev => !prev);
                             }} color={onVideoCall ? "red" : gotVideoCall ? "green" : "black"} className="scale-x-110 cursor-pointer"/>

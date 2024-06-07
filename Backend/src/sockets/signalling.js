@@ -6,7 +6,7 @@ const signalling = () => {
       console.log('User disconnected');
     });
     socket.on("makeCall", ({reciver, offer}) => {
-      socket.to(reciver).emit("reciveCall", {offer});
+      socket.to(reciver).emit("reciveCall", {offer, reciver});
     })
     socket.on("answerCall", ({reciver, answer}) => {
       socket.to(reciver).emit("reciveAnswer", {answer});
