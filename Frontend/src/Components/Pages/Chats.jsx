@@ -12,7 +12,7 @@ import {
     useCallback,
     useEffect,
     useRef,
-    useState
+    useState,
 } from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
@@ -41,6 +41,7 @@ const Chats = () => {
     const [video, setVideo] = useState(false);
     const [audio, setAudio] = useState(false);
     const [videoCallRequested, setVideoCallRequested] = useState([]);
+    const [videoCallStatus, setVideoCallStatus] = useState(null);
     const mediaConstraints = {
         video : {
             width: { min: 640, ideal: 3040, max: 3040 },
@@ -164,14 +165,17 @@ const Chats = () => {
     }
     const requestVideoCall = useCallback(() => {
         setOnVideoCall(true);
+        setVideoCallStatus("Calling");
         socket.emit("requestCall",{reciver: currChat._id});
     },[currChat]);
     const acceptVideoCall = useCallback((id) => {
         setOnVideoCall(true);
+        setVideoCallStatus("Ringing")
         setVideoCallRequested(prev => prev.map(_val => false));
         socket.emit("acceptVideoCall",{reciver: id });
     },[]);
     const makeVideoCall = useCallback(async () => {
+        setVideoCallStatus("Ringing")
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         const offer = await peer.createOffer();
         socket.emit("makeCall",{reciver: currChat._id, offer});
@@ -179,16 +183,15 @@ const Chats = () => {
         setOnVideoCall(true);
     }, [currChat])
     const sendStreams = useCallback(async () => {
-        console.log("sending streams");
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         for (const track of stream.getTracks()) {
           peer.peer.addTrack(track, stream);
         }
-        console.log("streams sent")
     }, []);
     useEffect(() => {
         peer.peer.addEventListener("track", ({streams}) => {
-          document.querySelector("#remoteStream").srcObject = streams[0];
+            setVideoCallStatus("connected");
+            document.querySelector("#remoteStream").srcObject = streams[0];
         });
       }, []);
     const answerVideoCall = useCallback(async ({offer, reciver}) => {
@@ -218,7 +221,8 @@ const Chats = () => {
     },[socket, currChat]);
     const handleNegoNeedFinal = useCallback(async ({ answer }) => {
         await peer.setAnswer(answer);
-    }, []);
+        socket.emit("requestStream", { reciver: currChat._id });
+    }, [currChat, socket]);
     const leaveCall = useCallback(() => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         setLocalStream(null);
@@ -245,7 +249,7 @@ const Chats = () => {
             socket.off("negotiationFinal", handleNegoNeedFinal);
             socket.off("leaveCall", leaveCall);
         }
-    },[socket, videoCallRequestEvent, makeVideoCall, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
+    },[socket, videoCallRequestEvent, makeVideoCall, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal, leaveCall])
     useEffect(() => {
         document.querySelector("#localStream").srcObject = localStream;
         if (!localStream) return;
@@ -304,7 +308,7 @@ const Chats = () => {
                             lastName = members[activeUser].lastName;
                         }
                         return (
-                            <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center">
+                            <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center relative">
                                 <div className="py-2 px-1 flex justify-start gap-5 relative">
                                     <div className="h-10 aspect-square object-cover rounded-full relative">
                                         <img className="h-full w-full rounded-full" src={profileImage}/>
@@ -314,10 +318,10 @@ const Chats = () => {
                                     </div>
                                     <div className="flex flex-col justify-between">
                                         <p className="font-semibold">{firstName} {lastName}</p>
-                                        <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage}</p>
+                                        <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage.length > 15 ? chat.lastMessage.slice(0,12)+"..." : chat.lastMessage}</p>
                                     </div>
                                 </div>
-                                <p onClick={() => acceptVideoCall(chat._id)} className={`${videoCallRequested[ind] ? "" : "hidden"}`}>Video</p>
+                                <RiVideoOnLine onClick={() => acceptVideoCall(chat._id)} color="green" className={`${videoCallRequested[ind] ? "" : "hidden"} absolute left-[90%] -translate-x-1/2 animate-connecting-md bg-[rgba(0,255,0,0.7)] rounded-full`}/>
                             </div>
                         )
                     })}
@@ -334,7 +338,7 @@ const Chats = () => {
                             </div>
                         </div>
                         <div className="flex justify-center gap-5 items-center">
-                            <RiVideoChatLine onClick={() => {
+                            <RiVideoChatLine id="videoCallIcon" onClick={() => {
                                 if (gotVideoCall) {
                                     if (currChat._id == gotVideoCall) sendStreams();
                                 }
@@ -365,7 +369,13 @@ const Chats = () => {
                         })}
                     </div>
                     <div className={`${onVideoCall ? "" : "hidden"} flex-grow w-full overflow-hidden p-2 relative`}>
-                        <video id="remoteStream" autoPlay playsInline className="top-0 left-0 h-full w-full scale-[1.81]"/>
+                        <div className={`h-full w-full ${(videoCallStatus && (videoCallStatus != "connected")) ? "flex" : "hidden"} flex-col gap-2 justify-center items-center`}>
+                            <div className="h-1/4 aspect-square flex justify-center items-center relative">
+                                <img src={profileImage} className="aspect-square rounded-full h-full animate-connecting-lg" />
+                                <p className="text-lg font-semibold absolute -bottom-12">{videoCallStatus}...</p>
+                            </div>
+                        </div>
+                        <video id="remoteStream" autoPlay playsInline className={`${videoCallStatus == "connected" ? "" : "hidden" } top-0 left-0 h-full w-full scale-[1.81]`}/>
                         <video id="localStream" autoPlay playsInline className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"/>
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-10 pb-5">
                             <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
