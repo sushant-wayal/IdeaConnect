@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { 
-    publishIdea,
-    updateProgress,
-    checkLike,
-    likeIdea,
-    likedBy,
-    intrested,
-    include
+  publishIdea,
+  updateProgress,
+  checkLike,
+  likeIdea,
+  likedBy,
+  intrested,
+  include
 } from "../controllers/idea.controllers.js";
 import { isLoggedIn } from "../middlewares/authenticate.middleware.js";
 

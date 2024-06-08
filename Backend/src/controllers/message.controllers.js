@@ -3,8 +3,8 @@ import { Chat } from '../models/chat.model.js';
 import { Message } from '../models/message.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
-const getMessages = asyncHandler(async (req, res) => {
-    const { chatId } = req.params
+export const getMessages = asyncHandler(async (req, res) => {
+  const { chatId } = req.params
 	const chat = await Chat.findById(chatId);
 	let messages = [];
 	for (let messageId of chat.messages) {
@@ -12,11 +12,7 @@ const getMessages = asyncHandler(async (req, res) => {
 		messages.push(message);
 	}
 	return res.status(200).json(new ApiResponse(200, { 
-        authenticated: true,
-        messages,
-    }, 'Messages fetched successfully'));
+    authenticated: true,
+    messages,
+  }, 'Messages fetched successfully'));
 });
-
-export {
-    getMessages,
-};

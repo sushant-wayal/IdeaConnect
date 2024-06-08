@@ -4,8 +4,8 @@ import { Idea } from '../models/idea.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { Group } from '../models/group.model.js';
 
-const publishIdea = asyncHandler(async (req, res) => {
-    const currUser = await User.findOne({
+export const publishIdea = asyncHandler(async (req, res) => {
+  	const currUser = await User.findOne({
 		username: req.body.username,
 	})
 	const newIdea = await Idea.create({
@@ -23,43 +23,41 @@ const publishIdea = asyncHandler(async (req, res) => {
 	await currUser.save({ validateBeforeSave: false});
 	await newIdea.save({ validateBeforeSave: false});
 	res.status(201).json(new ApiResponse(201, {
-        success: true,
-    } ,'Idea published successfully'));
+    success: true,
+  } ,'Idea published successfully'));
 });
 
-const updateProgress = asyncHandler(async (req, res) => {
-    const { ideaId, newProgress } = req.params;
+export const updateProgress = asyncHandler(async (req, res) => {
+  const { ideaId, newProgress } = req.params;
 	const idea = await Idea.findById(ideaId);
 	idea.progress = newProgress;
 	await idea.save({ validateBeforeSave: false});
 	res.status(201).json(new ApiResponse(201, {
-        success: true,
-    } ,'Progress updated successfully'));
+  	success: true,
+  } ,'Progress updated successfully'));
 });
 
-const checkLike = asyncHandler(async (req, res) => {
-    const { ideaId, username } = req.params;
+export const checkLike = asyncHandler(async (req, res) => {
+  const { ideaId, username } = req.params;
 	const idea = await Idea.findById(ideaId);
 	for (let user of idea.likedBy) {
 		const userData = await User.findById(user);
 		if (userData.username == username) {
 			return res.status(201).json(new ApiResponse(201, {
-                liked: true,
-            } ,'You have already liked this idea'));
+      	liked: true,
+      } ,'You have already liked this idea'));
 		}
 	}
 	res.status(201).json(new ApiResponse(201, {
-        liked: false,
-    } ,'You have not liked this idea'));
+    liked: false,
+  } ,'You have not liked this idea'));
 });
 
-const likeIdea = asyncHandler(async (req, res) => {
-    const { ideaId, username } = req.params;
-    const idea = await Idea.findById(ideaId);
-    const user = await User.findOne({
-        username,
-    });
-    let liked = false;
+export const likeIdea = asyncHandler(async (req, res) => {
+  const { ideaId, username } = req.params;
+  const idea = await Idea.findById(ideaId);
+  const user = await User.findOne({ username });
+  let liked = false;
 	for (let user of idea.likedBy) {
 		const userData = await User.findById(user);
 		if (userData.username == username) {
@@ -77,24 +75,24 @@ const likeIdea = asyncHandler(async (req, res) => {
 	}
 	idea.save({ validateBeforeSave: false});
     res.status(201).json(new ApiResponse(201, {
-        liked,
-        success: true,
+      liked,
+      success: true,
     } ,'Idea liked successfully'));
 });
 
-const likedBy = asyncHandler(async (req, res) => {
-    const { ideaId } = req.params;
+export const likedBy = asyncHandler(async (req, res) => {
+  const { ideaId } = req.params;
 	const idea = await Idea.findById(ideaId);
 	let likedBy= [];
 	for (let user of idea.likedBy) {
 		likedBy.push(await User.findById(user));
 	}
 	res.status(201).json(new ApiResponse(201, {
-        likedBy,
-    } ,'List of users who liked this idea'));
+    likedBy,
+  } ,'List of users who liked this idea'));
 });
 
-const intrested = asyncHandler(async (req, res) => {
+export const intrested = asyncHandler(async (req, res) => {
 	const { ideaId } = req.params;
 	const idea = await Idea.findById(ideaId);
 	const { id } = req.user;
@@ -124,7 +122,7 @@ const intrested = asyncHandler(async (req, res) => {
 	} ,'Idea intrested successfully'));
 });
 
-const include = asyncHandler(async (req, res) => {
+export const include = asyncHandler(async (req, res) => {
 	const { ideaId, userId } = req.params;
 	const idea = await Idea.findById(ideaId);
 	idea.includedUsers.unshift(userId);
@@ -151,13 +149,3 @@ const include = asyncHandler(async (req, res) => {
 		success: true,
 	} ,'User included successfully'));
 });
-
-export {
-    publishIdea,
-    updateProgress,
-    checkLike,
-    likeIdea,
-    likedBy,
-		intrested,
-		include
-};

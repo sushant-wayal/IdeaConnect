@@ -1,18 +1,17 @@
 import { Router } from "express";
 import { 
-    registerUser,
-    login,
-    activeUser,
-    feed,
-    Profile,
-    userInfo,
-    follow,
-    isFollowing,
-    getIdeas,
-    logout
+  registerUser,
+  login,
+  activeUser,
+  feed,
+  Profile,
+  userInfo,
+  follow,
+  isFollowing,
+  getIdeas,
+  logout
 } from "../controllers/user.controllers.js";
 import { isLoggedIn } from "../middlewares/authenticate.middleware.js";
-
 
 const router = Router();
 

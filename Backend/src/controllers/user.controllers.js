@@ -5,12 +5,12 @@ import { Chat } from '../models/chat.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
 const cookieOptions = {
-  	httpOnly: true,
-  	secure: true,
+  httpOnly: true,
+  secure: true,
 };
 
-const createAccessAndRefreshToken = async (userId) => {
-  	const user = await User.findById(userId);
+export const createAccessAndRefreshToken = async (userId) => {
+  const user = await User.findById(userId);
 	const accessToken = user.getAccessToken();
 	const refreshToken = user.getRefreshToken();
 	user.refreshToken = refreshToken;
@@ -18,7 +18,7 @@ const createAccessAndRefreshToken = async (userId) => {
 	return { accessToken, refreshToken };
 }
 
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
 	const {
 		username,
 		firstName,
@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
 	}, 'User created successfully'));
 });
 
-const login = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
 	const { username, password } = req.body;
 	const user = await User.findOne({ username });
 	const isPasswordValid = await user.isPasswordValid(password);
@@ -77,25 +77,25 @@ const login = asyncHandler(async (req, res) => {
 	}, 'Login successful'));
 });
 
-const logout = asyncHandler(async (req, res) => {
+export const logout = asyncHandler(async (req, res) => {
 	res.clearCookie('accessToken', cookieOptions);
-  	res.clearCookie('refreshToken', cookieOptions);
-  	return res.
-	status(200).
-	json(new ApiResponse(200, null, 'Logout successful'));
+  res.clearCookie('refreshToken', cookieOptions);
+  return res.
+		status(200).
+		json(new ApiResponse(200, null, 'Logout successful'));
 });
 
-const activeUser = asyncHandler(async (req, res) => {
+export const activeUser = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user.id).select('-password -__v -refreshToken');
 	return res.
-	status(200).
-	json(new ApiResponse(200, {
-		authenticated: true,
-		user,
-	}, 'User is active'));
+		status(200).
+		json(new ApiResponse(200, {
+			authenticated: true,
+			user,
+		}, 'User is active'));
 });
 
-const feed = asyncHandler(async (req, res) => {
+export const feed = asyncHandler(async (req, res) => {
 	const currUser = await User.findById(req.user.id).select('-password -__v -refreshToken');
 	let ideas = [];
 	for (let following of currUser.followingList) {
@@ -126,20 +126,20 @@ const feed = asyncHandler(async (req, res) => {
 	}, 'User feed retrieved successfully'));
 });
 
-const Profile = asyncHandler(async (req, res) => {
+export const Profile = asyncHandler(async (req, res) => {
   const user = await User.findOne({
     username: req.params.username
   }).select('-password -__v -refreshToken');
   return res.status(200).json(new ApiResponse(200, user, 'User is active'));
 });
 
-const userInfo = asyncHandler(async (req, res) => {
+export const userInfo = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.userId).select('-password -__v -refreshToken');
   return res.status(200).json(new ApiResponse(200, user, 'User is active'));
 });
 
-const follow = asyncHandler(async (req, res) => {
-  	const { followingUsername } = req.params;
+export const follow = asyncHandler(async (req, res) => {
+  const { followingUsername } = req.params;
 	const { id } = req.user;
 	const followingUser = await User.findOne({username: followingUsername});
 	const user = await User.findById(id);
@@ -197,7 +197,7 @@ const follow = asyncHandler(async (req, res) => {
   }, 'User is active'));
 });
 
-const isFollowing = asyncHandler(async (req, res) => {
+export const isFollowing = asyncHandler(async (req, res) => {
 	const { followingList } = await User.findOne({
 		username: req.params.activeUsername,
 	})
@@ -214,7 +214,7 @@ const isFollowing = asyncHandler(async (req, res) => {
 	}, 'User is active'));
 })
 
-const getIdeas = asyncHandler(async (req, res) => {
+export const getIdeas = asyncHandler(async (req, res) => {
   const currUser = await User.findOne({
 		username: req.params.username,
 	});
@@ -245,16 +245,3 @@ const getIdeas = asyncHandler(async (req, res) => {
     ideas,
   }, 'User is active'));
 });
-
-export { 
-  registerUser,
-  login,
-  activeUser,
-  feed,
-  Profile,
-  userInfo,
-  follow,
-  isFollowing,
-  getIdeas,
-  logout,
-}
