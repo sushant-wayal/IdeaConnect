@@ -85,6 +85,18 @@ const userSchema = new Schema({
             ref: "Chat",
         },
     ],
+    groups: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Group",
+        },
+    ],
+    intrestedIdeas: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Idea",
+        },
+    ],
     refreshToken: String,
 }, { timestamps: true });
 

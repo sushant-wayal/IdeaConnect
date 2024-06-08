@@ -22,6 +22,10 @@ const ideaSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     }],
+    includedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    }],
     media: String,
     description: {
         type: String,

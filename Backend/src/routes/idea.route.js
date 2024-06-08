@@ -6,6 +6,7 @@ import {
     likeIdea,
     likedBy,
     intrested,
+    include
 } from "../controllers/idea.controllers.js";
 import { isLoggedIn } from "../middlewares/authenticate.middleware.js";
 
@@ -17,5 +18,6 @@ router.route("/checkLike/:ideaId/:username").get(checkLike);
 router.route("/likeIdea/:ideaId/:username").get(likeIdea);
 router.route("/likedBy/:ideaId").get(likedBy);
 router.route("/intrested/:ideaId").get(isLoggedIn,intrested);
+router.route("/include/:ideaId/:userId").get(isLoggedIn,include);
 
 export default router;

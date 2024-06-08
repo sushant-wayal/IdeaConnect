@@ -288,7 +288,7 @@ const Chats = () => {
                         Chats
                     </p>
                     <div className="rounded-full relative">
-                        <input className="rounded-full w-40 bg-transparent border-2 border-black border-solid pl-8" type="search"/>
+                        <input placeholder="Search Chats" className="rounded-full w-40 bg-transparent border-2 border-black border-solid pl-8" type="search"/>
                         <p className="absolute top-1/2 -translate-y-1/2 left-2">🔎</p>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import { asyncHandler } from '../utils/AsyncHandler.js';
 import { User } from '../models/user.model.js';
 import { Idea } from '../models/idea.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { Group } from '../models/group.model.js';
 
 const publishIdea = asyncHandler(async (req, res) => {
     const currUser = await User.findOne({
@@ -97,6 +98,7 @@ const intrested = asyncHandler(async (req, res) => {
 	const { ideaId } = req.params;
 	const idea = await Idea.findById(ideaId);
 	const { id } = req.user;
+	const user = await User.findById(id);
 	let alreadyIntrested = false;
 	for (let intrestedUserId of idea.intrestedUser) {
 		if (intrestedUserId.toString() == id.toString()) {
@@ -107,16 +109,47 @@ const intrested = asyncHandler(async (req, res) => {
 	if (alreadyIntrested) {
 		idea.intrested--;
 		idea.intrestedUser.splice(idea.intrestedUser.indexOf(id),1);
+		user.intrestedIdeas.splice(user.intrestedIdeas.indexOf(ideaId),1);
 	}
 	else {
 		idea.intrested++;
 		idea.intrestedUser.unshift(id);
+		user.intrestedIdeas.unshift(ideaId);
 	}
 	await idea.save({ validateBeforeSave: false});
+	await user.save({ validateBeforeSave: false});
 	res.status(201).json(new ApiResponse(201, {
 		alreadyIntrested,
 		success: true,
 	} ,'Idea intrested successfully'));
+});
+
+const include = asyncHandler(async (req, res) => {
+	const { ideaId, userId } = req.params;
+	const idea = await Idea.findById(ideaId);
+	idea.includedUsers.unshift(userId);
+	await idea.save({ validateBeforeSave: false});
+	const group = await Group.findOne({ ideaId });
+	if (group) {
+		group.members.push({ userId });
+		await group.save({ validateBeforeSave: false});
+	} else {
+		const { id } = req.user;
+		const newGroup = await Group.create({
+			ideaId,
+			name: idea.title,
+			members: [{ userId: id }, { userId }],
+		});
+		const user = await User.findById(id);
+		user.groups.unshift(newGroup._id);
+		await user.save({ validateBeforeSave: false});
+	}
+	const includedUser = await User.findById(userId);
+	includedUser.groups.unshift(newGroup._id);
+	await includedUser.save({ validateBeforeSave: false});
+	res.status(201).json(new ApiResponse(201, {
+		success: true,
+	} ,'User included successfully'));
 });
 
 export {
@@ -125,5 +158,6 @@ export {
     checkLike,
     likeIdea,
     likedBy,
-	intrested
+		intrested,
+		include
 };

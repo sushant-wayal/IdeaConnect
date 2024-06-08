@@ -91,14 +91,24 @@ const Idea = ({ thisIdea }) => {
                     const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/users/userInfo/${intrestedUser}`);
                     const { profileImage, username } = data;
                     let thisUser = document.createElement("div");
-                    thisUser.classList.add("flex","px-2","py-1","gap-3","items-center");
-                    let profileImg = document.createElement("img");
-                    profileImg.classList.add("h-7","w-7","rounded-full");
-                    profileImg.src = profileImage;
-                    thisUser.append(profileImg);
-                    let userName = document.createElement("p");
-                    userName.innerText = username;
-                    thisUser.append(userName);
+                    const include = async (e) => {
+                        e.stopPropagation();
+                        await axios.get(`http://localhost:3000/api/v1/ideas/include/${idea._id}/${intrestedUser}`, {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                            },
+                        });
+                        thisUser.remove();
+                    }
+                    thisUser.innerHTML = `
+                        <div class="flex px-2 py-1 gap-3 items-center">
+                            <img class="h-7 w-7 rounded-full" src="${profileImage}" alt="profile"/>
+                            <p class="text-lg font-medium">${username}</p>
+                        </div>
+                        ${localStorage.getItem("accessToken") ? `<button id="includeButton${intrestedUser}"  class="bg-black text-white rounded-xl px-2 py-1">Include</button>` : ``}
+                    `;
+                    thisUser.classList.add("flex","px-2","py-1","gap-3","items-center","justify-between");
+                    thisUser.querySelector(`#includeButton${intrestedUser}`).addEventListener("click",include);
                     intrestEle.append(thisUser);
                 }
                 seeing = true;
