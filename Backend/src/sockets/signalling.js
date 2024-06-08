@@ -5,6 +5,12 @@ const signalling = () => {
     socket.on('disconnect', () => {
       console.log('User disconnected');
     });
+    socket.on("requestCall", ({reciver}) => {
+      socket.to(reciver).emit("callRequested", { reciver });
+    })
+    socket.on("acceptVideoCall", ({reciver}) => {
+      socket.to(reciver).emit("videoCallAccepted");
+    })
     socket.on("makeCall", ({reciver, offer}) => {
       socket.to(reciver).emit("reciveCall", {offer, reciver});
     })

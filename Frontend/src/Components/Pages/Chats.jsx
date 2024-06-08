@@ -1,6 +1,19 @@
-import { RiChatVoiceLine, RiVideoChatLine, RiVideoOnLine, RiVideoOffFill, RiMicFill, RiMicOffFill, RiPhoneFill } from "@remixicon/react";
+import {
+    RiChatVoiceLine,
+    RiVideoChatLine,
+    RiVideoOnLine,
+    RiVideoOffFill,
+    RiMicFill,
+    RiMicOffFill,
+    RiPhoneFill
+} from "@remixicon/react";
 import axios from "axios"
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import { useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
 import peer from "../../services/peer.js";
@@ -25,9 +38,9 @@ const Chats = () => {
     const [onVideoCall, setOnVideoCall] = useState(false);
     const [localStream, setLocalStream] = useState();
     const [gotVideoCall, setGotVideoCall] = useState(null);
-    // const [gotOffer, setGotOffer] = useState(null);
     const [video, setVideo] = useState(false);
     const [audio, setAudio] = useState(false);
+    const [videoCallRequested, setVideoCallRequested] = useState([]);
     const mediaConstraints = {
         video : {
             width: { min: 640, ideal: 3040, max: 3040 },
@@ -38,8 +51,10 @@ const Chats = () => {
     useEffect(() => {
         console.log("unread 1");
         setUnreadNotifications([]);
+        setVideoCallRequested([]);
         for (let chat of chats) {
             setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == userId.toString())]?.unread])
+            setVideoCallRequested(prev => [...prev,false]);
         }
     },[chats, userId])
     useEffect(() => {
@@ -147,6 +162,15 @@ const Chats = () => {
             message: msg.length > 0 ? "Typing..." : "",
         });
     }
+    const requestVideoCall = useCallback(() => {
+        setOnVideoCall(true);
+        socket.emit("requestCall",{reciver: currChat._id});
+    },[currChat]);
+    const acceptVideoCall = useCallback((id) => {
+        setOnVideoCall(true);
+        setVideoCallRequested(prev => prev.map(_val => false));
+        socket.emit("acceptVideoCall",{reciver: id });
+    },[]);
     const makeVideoCall = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         const offer = await peer.createOffer();
@@ -154,26 +178,21 @@ const Chats = () => {
         setLocalStream(stream);
         setOnVideoCall(true);
     }, [currChat])
-    // const answerVideoCall = useCallback(async (offer) => {
-    //     const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    //     setLocalStream(stream);
-    //     const answer = await peer.createAnswer(offer);
-    //     socket.emit("answerCall",{reciver: currChat._id, answer});
-    // },[currChat, gotOffer]);
     const sendStreams = useCallback(async () => {
+        console.log("sending streams");
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         for (const track of stream.getTracks()) {
           peer.peer.addTrack(track, stream);
         }
+        console.log("streams sent")
     }, []);
     useEffect(() => {
-        peer.peer.addEventListener("track", async ({streams}) => {
+        peer.peer.addEventListener("track", ({streams}) => {
           document.querySelector("#remoteStream").srcObject = streams[0];
         });
       }, []);
     const answerVideoCall = useCallback(async ({offer, reciver}) => {
         setGotVideoCall(reciver);
-        // setGotOffer(offer);
         const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         setLocalStream(stream);
         const answer = await peer.createAnswer(offer);
@@ -200,26 +219,33 @@ const Chats = () => {
     const handleNegoNeedFinal = useCallback(async ({ answer }) => {
         await peer.setAnswer(answer);
     }, []);
-    const leaveCall = useCallback(async () => {
+    const leaveCall = useCallback(() => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         setLocalStream(null);
         setOnVideoCall(false);
         setGotVideoCall(null);
     },[localStream]);
+    const videoCallRequestEvent = useCallback(({ reciver }) => {
+        setVideoCallRequested(prev => prev.map((val, ind) => chats[ind]._id == reciver ? true : val));
+    },[]);
     useEffect(() => {
+        socket.on("callRequested", videoCallRequestEvent);
+        socket.on("videoCallAccepted", makeVideoCall)
         socket.on("reciveCall", answerVideoCall)
         socket.on("reciveAnswer", answerResponseEvent)
         socket.on("negotiationNeeded", handleNegoNeedIncomming);
         socket.on("negotiationFinal",handleNegoNeedFinal);
         socket.on("leaveCall", leaveCall);
         return () => {
+            socket.off("callRequested", videoCallRequestEvent);
+            socket.off("videoCallAccepted", makeVideoCall)
             socket.off("reciveCall", answerVideoCall)
             socket.off("reciveAnswer", answerResponseEvent)
             socket.off("negotiationNeeded", handleNegoNeedIncomming);
             socket.off("negotiationFinal", handleNegoNeedFinal);
             socket.off("leaveCall", leaveCall);
         }
-    },[socket, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
+    },[socket, videoCallRequestEvent, makeVideoCall, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal])
     useEffect(() => {
         document.querySelector("#localStream").srcObject = localStream;
         if (!localStream) return;
@@ -277,18 +303,23 @@ const Chats = () => {
                             firstName = members[activeUser].firstName;
                             lastName = members[activeUser].lastName;
                         }
-                        return <div onClick={() => openChat(chat)} key={chat._id} className="py-2 px-1 flex justify-start gap-5 border-b-[1px] border-black border-solid cursor-pointer relative">
-                            <div className="h-10 aspect-square object-cover rounded-full relative">
-                                <img className="h-full w-full rounded-full" src={profileImage}/>
-                                <div className={`absolute -right-1 -top-1 ${unreadNotifications[ind] == 0 ? "hidden" : "flex"} justify-center items-center h-5 aspect-square rounded-full bg-black text-white p-2`}>
-                                    <p>{unreadNotifications[ind] >= 10 ? "9+" : unreadNotifications[ind]}</p>
+                        return (
+                            <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center">
+                                <div className="py-2 px-1 flex justify-start gap-5 relative">
+                                    <div className="h-10 aspect-square object-cover rounded-full relative">
+                                        <img className="h-full w-full rounded-full" src={profileImage}/>
+                                        <div className={`absolute -right-1 -top-1 ${unreadNotifications[ind] == 0 ? "hidden" : "flex"} justify-center items-center h-5 aspect-square rounded-full bg-black text-white p-2`}>
+                                            <p>{unreadNotifications[ind] >= 10 ? "9+" : unreadNotifications[ind]}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col justify-between">
+                                        <p className="font-semibold">{firstName} {lastName}</p>
+                                        <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage}</p>
+                                    </div>
                                 </div>
+                                <p onClick={() => acceptVideoCall(chat._id)} className={`${videoCallRequested[ind] ? "" : "hidden"}`}>Video</p>
                             </div>
-                            <div className="flex flex-col justify-between">
-                                <p className="font-semibold">{firstName} {lastName}</p>
-                                <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage}</p>
-                            </div>
-                        </div>
+                        )
                     })}
                 </div>
             </div>
@@ -303,13 +334,11 @@ const Chats = () => {
                             </div>
                         </div>
                         <div className="flex justify-center gap-5 items-center">
-                            {/* {localStream && <button className="cursor-pointer" onClick={sendStreams}>Send Stream</button>} */}
                             <RiVideoChatLine onClick={() => {
                                 if (gotVideoCall) {
                                     if (currChat._id == gotVideoCall) sendStreams();
                                 }
-                                else makeVideoCall();
-                                setOnVideoCall(prev => !prev);
+                                else requestVideoCall();
                             }} color={onVideoCall ? "red" : gotVideoCall ? "green" : "black"} className="scale-x-110 cursor-pointer"/>
                             <RiChatVoiceLine  className="scale-x-110"/>
                         </div>
