@@ -107,7 +107,7 @@ const Idea = ({ thisIdea }) => {
                         </div>
                         ${localStorage.getItem("accessToken") ? `<button id="includeButton${intrestedUser}"  class="bg-black text-white rounded-xl px-2 py-1">Include</button>` : ``}
                     `;
-                    thisUser.classList.add("flex","px-2","py-1","gap-3","items-center","justify-between");
+                    thisUser.classList.add("flex","px-2","py-1","gap-3","items-center","justify-between","border-b-2","border-b-black","border-b-solid");
                     thisUser.querySelector(`#includeButton${intrestedUser}`).addEventListener("click",include);
                     intrestEle.append(thisUser);
                 }
@@ -169,7 +169,7 @@ const Idea = ({ thisIdea }) => {
             setIntrested(!data.alreadyIntrested);
         }
         intrestRef.current.addEventListener("click",handleClick);
-        // return () => intrestRef.current.removeEventListener("click",handleClick);
+        return () => intrestRef.current?.removeEventListener("click",handleClick);
     },[]);
     useEffect(() => {
         const progressEle = progressRef.current;

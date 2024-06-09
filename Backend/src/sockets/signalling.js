@@ -11,6 +11,9 @@ const signalling = () => {
     socket.on("acceptVideoCall", ({reciver}) => {
       socket.to(reciver).emit("videoCallAccepted");
     })
+    socket.on("rejectCall", ({reciver}) => {
+      socket.to(reciver).emit("callRejected", { chatId: reciver });
+    })
     socket.on("makeCall", ({reciver, offer}) => {
       socket.to(reciver).emit("reciveCall", {offer, reciver});
     })

@@ -19,7 +19,7 @@ app.use(cookieParser());
 import userRoutes from './routes/user.route.js';
 import imageUpload from './routes/image.route.js';
 import ideaRoutes from './routes/idea.route.js';
-import chatRoutes from './routes/chat.route.js';
+import chatRoutes from './routes/chatAndGroup.route.js';
 import messageRoutes from './routes/message.route.js';
 
 // use routes

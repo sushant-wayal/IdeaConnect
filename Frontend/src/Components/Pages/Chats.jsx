@@ -50,7 +50,6 @@ const Chats = () => {
         audio : true,
     }
     useEffect(() => {
-        console.log("unread 1");
         setUnreadNotifications([]);
         setVideoCallRequested([]);
         for (let chat of chats) {
@@ -103,13 +102,17 @@ const Chats = () => {
             reciver: chat._id,
             userId,
         })
-        console.log("unread 2");
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     }
     useEffect(() => {
         let messageEle = document.querySelector("#message");
         messageEle.scrollTop = messageEle.scrollHeight;
     },[messages])
+    const moveToTop = (array, ind) => {
+        const ele = array[ind];
+        array.splice(ind,1);
+        array.unshift(ele);
+    }
     let id = 0;
     const send = () => {
         if (message.length == 0) {
@@ -130,6 +133,17 @@ const Chats = () => {
         });
         setMessage("");
         typing("");
+        const ind = chats.findIndex(chat => chat._id == currChat._id);
+        chats[ind].lastMessage = message;
+        moveToTop(chats,ind);
+        setUnreadNotifications(prev => {
+            moveToTop(prev, ind);
+            return prev;
+        })
+        setVideoCallRequested(prev => {
+            moveToTop(prev, ind);
+            return prev;
+        })
     }
     const reciveMessage = useCallback((data) => {
         if (data.room == currChat._id) {
@@ -138,7 +152,18 @@ const Chats = () => {
                 reciver: currChat._id,
                 userId,
             })
-        } else setUnreadNotifications(prev => prev.map((unread, ind) => chats[ind]._id == data.room ? unread+1 : unread));
+        } else setUnreadNotifications(prev => {
+            let temp = prev.map((unread, ind) => chats[ind]._id == data.room ? ++unread : unread);
+            const ind = chats.findIndex(chat => chat._id == data.room);
+            moveToTop(chats,ind);
+            moveToTop(temp, ind);
+            setVideoCallRequested(prev => {
+                moveToTop(prev, ind);
+                return prev;
+            })
+            return temp;
+        });
+        chats[chats.findIndex(chat => chat._id == data.room)].lastMessage = data.message.message;
     },[currChat])
     const reciveTyping = useCallback((data) => {
         if (data.room == currChat._id) {
@@ -228,13 +253,28 @@ const Chats = () => {
         setLocalStream(null);
         setOnVideoCall(false);
         setGotVideoCall(null);
+        setVideoCallStatus(null);
     },[localStream]);
     const videoCallRequestEvent = useCallback(({ reciver }) => {
-        setVideoCallRequested(prev => prev.map((val, ind) => chats[ind]._id == reciver ? true : val));
+        setVideoCallRequested(prev => {
+            let temp = prev.map((val, ind) => chats[ind]._id == reciver ? true : val)
+            const ind = chats.findIndex(chat => chat._id == reciver);
+            moveToTop(chats,ind);
+            moveToTop(temp, ind);
+            setUnreadNotifications(prev => {
+                moveToTop(prev, ind);
+                return prev;
+            })
+            return temp;
+        });
+    },[]);
+    const handleCallRejected = useCallback(({ chatId }) => {
+        setVideoCallRequested(prev => prev.map((val,ind) => chats[ind]._id == chatId ? false : val));
     },[]);
     useEffect(() => {
         socket.on("callRequested", videoCallRequestEvent);
         socket.on("videoCallAccepted", makeVideoCall)
+        socket.on("callRejected", handleCallRejected);
         socket.on("reciveCall", answerVideoCall)
         socket.on("reciveAnswer", answerResponseEvent)
         socket.on("negotiationNeeded", handleNegoNeedIncomming);
@@ -243,13 +283,14 @@ const Chats = () => {
         return () => {
             socket.off("callRequested", videoCallRequestEvent);
             socket.off("videoCallAccepted", makeVideoCall)
+            socket.off("callRejected", handleCallRejected);
             socket.off("reciveCall", answerVideoCall)
             socket.off("reciveAnswer", answerResponseEvent)
             socket.off("negotiationNeeded", handleNegoNeedIncomming);
             socket.off("negotiationFinal", handleNegoNeedFinal);
             socket.off("leaveCall", leaveCall);
         }
-    },[socket, videoCallRequestEvent, makeVideoCall, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal, leaveCall])
+    },[socket, videoCallRequestEvent, makeVideoCall, handleCallRejected, answerVideoCall, answerResponseEvent, handleNegoNeedIncomming, handleNegoNeedFinal, leaveCall])
     useEffect(() => {
         document.querySelector("#localStream").srcObject = localStream;
         if (!localStream) return;
@@ -388,9 +429,12 @@ const Chats = () => {
                             </div>
                             <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
                                 <RiPhoneFill size={36} color="red" onClick={() => {
-                                    peer.disconnect();
+                                    if (!localStream) socket.emit("rejectCall", {reciver: currChat._id});
+                                    else {
+                                        peer.disconnect();
+                                        socket.emit("leaveCall", {reciver: currChat._id});
+                                    }
                                     leaveCall();
-                                    socket.emit("leaveCall", {reciver: currChat._id});
                                 }}/>
                             </div>
                         </div>
@@ -418,7 +462,7 @@ export const getChats = async () => {
     });
     let chats = [];
     if (data.authenticated) {
-        chats = data.chats;
+        chats = data.chatsAndGroups;
     }
     for (let chat of chats) {
         socket.emit("joinRoom",chat._id);
