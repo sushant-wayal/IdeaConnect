@@ -126,24 +126,29 @@ export const include = asyncHandler(async (req, res) => {
 	const { ideaId, userId } = req.params;
 	const idea = await Idea.findById(ideaId);
 	idea.includedUsers.unshift(userId);
+	idea.intrestedUser.splice(idea.intrestedUser.indexOf(userId),1);
+	idea.intrested--;
 	await idea.save({ validateBeforeSave: false});
 	const group = await Group.findOne({ ideaId });
+	const includedUser = await User.findById(userId);
 	if (group) {
 		group.members.push({ userId });
 		await group.save({ validateBeforeSave: false});
+		includedUser.groups.unshift(group._id);
 	} else {
 		const { id } = req.user;
 		const newGroup = await Group.create({
 			ideaId,
 			name: idea.title,
+			profileImage: idea.media,
 			members: [{ userId: id }, { userId }],
 		});
 		const user = await User.findById(id);
 		user.groups.unshift(newGroup._id);
 		await user.save({ validateBeforeSave: false});
+		includedUser.groups.unshift(newGroup._id);
 	}
-	const includedUser = await User.findById(userId);
-	includedUser.groups.unshift(newGroup._id);
+	includedUser.intrestedIdeas.splice(includedUser.intrestedIdeas.indexOf(ideaId),1);
 	await includedUser.save({ validateBeforeSave: false});
 	res.status(201).json(new ApiResponse(201, {
 		success: true,

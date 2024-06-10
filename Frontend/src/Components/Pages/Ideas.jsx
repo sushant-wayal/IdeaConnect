@@ -29,6 +29,7 @@ const Ideas = () => {
                             idea: val.idea,
                             profileImage: val.profileImage,
                             intrested: val.intrested,
+                            included: val.included,
                             ideaOf: val.ideaOf,
                         }}/>
                     ))}

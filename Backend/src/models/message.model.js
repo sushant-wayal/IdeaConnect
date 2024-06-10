@@ -5,9 +5,18 @@ const messageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  receiver: {
+  senderUsername: String,
+  // receiver: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  // },
+  chat: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Chat",
+  },
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Group",
   },
   messageType: {
     type: String,

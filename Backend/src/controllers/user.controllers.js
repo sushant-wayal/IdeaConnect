@@ -110,10 +110,18 @@ export const feed = asyncHandler(async (req, res) => {
 					break;
 				}
 			}
+			let included = false;
+			for (let includedUser of currIdea.includedUsers) {
+				if (includedUser.toString() == currUser._id.toString()) {
+					included = true;
+					break;
+				}
+			}
 			ideas.push({
 				idea: currIdea,
 				profileImage: ideaOf.profileImage,
 				intrested: intrested,
+				included: included,
 				ideaOf: ideaOf.username,
 				ideaId: idea,
 			});

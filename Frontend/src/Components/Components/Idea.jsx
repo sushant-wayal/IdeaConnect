@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 const Idea = ({ thisIdea }) => {
-    const { idea, profileImage, ideaOf } = thisIdea;
+    const { idea, profileImage, ideaOf, included } = thisIdea;
     const [intrested, setIntrested] = useState(thisIdea.intrested);
     const [username,setUsername] = useState("");
     const categoryRef = useRef(null);
@@ -99,6 +99,7 @@ const Idea = ({ thisIdea }) => {
                             },
                         });
                         thisUser.remove();
+                        idea.intrested--;
                     }
                     thisUser.innerHTML = `
                         <div class="flex px-2 py-1 gap-3 items-center">
@@ -118,7 +119,7 @@ const Idea = ({ thisIdea }) => {
                     intrestEle.removeChild(intrestEle.firstChild);
                 }
                 let p = document.createElement("p");
-                p.innerText = username == ideaOf ? `${idea.intrested} Intrested` : intrested ? "Intrested" : "Intrested ?";
+                p.innerText = username == ideaOf ? `${idea.intrested} Intrested` : intrested ? "Intrested" : included ? "Included" : "Intrested ?";
                 intrestEle.append(p);
                 gsap.to(intrestEle,{
                     height: 35,
@@ -159,7 +160,7 @@ const Idea = ({ thisIdea }) => {
         return () => descriptionEle.removeEventListener("click",handleClick);
     },[idea.description]);
     useEffect(() => {
-        if (ideaOf == username) return;
+        if (ideaOf == username && !included) return;
         const handleClick = async () => {
             const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/intrested/${idea._id}`, {
                 headers: {
@@ -354,8 +355,8 @@ const Idea = ({ thisIdea }) => {
                 <div ref={categoryRef} className="category absolute top-2 left-2 px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer">
                     <p>Category</p>
                 </div>
-                <div ref={intrestRef} id="intrest" className="absolute top-2 right-2 px-2 py-1 bg-gray-600 rounded-xl cursor-pointer flex flex-col gap-2">
-                    <p>{username == ideaOf ? `${idea.intrested} Intrested` : intrested ? "Intrested" : "Intrested ?"}</p>
+                <div ref={intrestRef} id="intrest" className={`absolute top-2 right-2 px-2 py-1 bg-gray-600 rounded-xl ${included ? "text-white" : "cursor-pointer"} flex flex-col gap-2`}>
+                    <p>{username == ideaOf ? `${idea.intrested} Intrested` : intrested ? "Intrested" : included ? "Included" : "Intrested ?"}</p>
                 </div>
             </div>
             <div className="flex flex-col gap-0 absolute w-[95%] sm:w-[285px] bottom-7">

@@ -33,6 +33,7 @@ const Chats = () => {
     const [currChat, setCurrChat] = useState({});
     const [message, setMessage] = useState("");
     const [userId, setUserId] = useState("");
+    const [activeUsername, setActiveUsername] = useState("");
     const sendRef = useRef(null);
     const msgInput = useRef(null);
     const [onVideoCall, setOnVideoCall] = useState(false);
@@ -66,6 +67,7 @@ const Chats = () => {
             });
             if (data.authenticated) {
                 setUserId(data.user._id);
+                setActiveUsername(data.user.username);
             }
         };
         getUserId();
@@ -79,7 +81,7 @@ const Chats = () => {
         document.querySelector("#messages").style.backgroundImage = "none";
         setShow(true);
         const { members } = chat;
-        if (members.length == 2) {
+        if (!chat.name) {
             let activeUser = 0;
             if (members[0].userId.toString() == userId.toString()) {
                 activeUser = 1;
@@ -90,9 +92,20 @@ const Chats = () => {
             setLastName(lastName);
             setUsername(username);
             setOriginalUsername(username);
+        } else {
+            const { profileImage, name } = chat;
+            setProfileImage(profileImage);
+            setFirstName(name);
+            setLastName("");
+            setUsername("");
+            setOriginalUsername("");
         }
         setCurrChat(chat);
-        const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/messages/${chat._id}`,{
+        let chatType = "chat";
+        if (chat.name) {
+            chatType = "group";
+        }
+        const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/messages/${chat._id}?chatType=${chatType}`,{
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
@@ -101,6 +114,7 @@ const Chats = () => {
         socket.emit("allRead",{
             reciver: chat._id,
             userId,
+            group: chat.name ? true : false,
         })
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     }
@@ -121,15 +135,18 @@ const Chats = () => {
         id++;
         setMessages(prev => [...prev,{
             messageType:"text",
+            senderUsername: activeUsername,
             message: message,
             sender: userId,
             _id: id,
         }])
         socket.emit("sendMessage",{
             sender: userId,
-            reciver: currChat._id, 
+            reciver: currChat._id,
+            senderUsername: activeUsername,
             messageType: "text", 
             message,
+            group: currChat.name ? true : false,
         });
         setMessage("");
         typing("");
@@ -145,16 +162,17 @@ const Chats = () => {
             return prev;
         })
     }
-    const reciveMessage = useCallback((data) => {
-        if (data.room == currChat._id) {
-            setMessages(prev => [...prev,data.message]);
+    const reciveMessage = useCallback(({ room, message }) => {
+        if (room == currChat._id) {
+            setMessages(prev => [...prev, message]);
             socket.emit("allRead",{
                 reciver: currChat._id,
                 userId,
+                group: currChat.name ? true : false,
             })
         } else setUnreadNotifications(prev => {
-            let temp = prev.map((unread, ind) => chats[ind]._id == data.room ? ++unread : unread);
-            const ind = chats.findIndex(chat => chat._id == data.room);
+            let temp = prev.map((unread, ind) => chats[ind]._id == room ? ++unread : unread);
+            const ind = chats.findIndex(chat => chat._id == room);
             moveToTop(chats,ind);
             moveToTop(temp, ind);
             setVideoCallRequested(prev => {
@@ -163,14 +181,14 @@ const Chats = () => {
             })
             return temp;
         });
-        chats[chats.findIndex(chat => chat._id == data.room)].lastMessage = data.message.message;
+        chats[chats.findIndex(chat => chat._id == room)].lastMessage = message.message;
     },[currChat])
-    const reciveTyping = useCallback((data) => {
-        if (data.room == currChat._id) {
-            if (data.message.length > 0) setUsername(data.message);
+    const reciveTyping = useCallback(({ room, message }) => {
+        if (room == currChat._id) {
+            if (message.length > 0) setUsername(message);
             else setUsername(originalUsername);
         }
-    },[])
+    },[currChat])
     useEffect(() => {
         socket.on("reciveMessage", reciveMessage)
         socket.on("reciveTyping", reciveTyping)
@@ -185,7 +203,7 @@ const Chats = () => {
             reciver: currChat._id,
             messageType: "text",
             // message: msg,
-            message: msg.length > 0 ? "Typing..." : "",
+            message: msg.length > 0 ? `${currChat.name ? `${activeUsername} is ` : "" }Typing...` : "",
         });
     }
     const requestVideoCall = useCallback(() => {
@@ -339,7 +357,7 @@ const Chats = () => {
                         let profileImage;
                         let firstName;
                         let lastName;
-                        if (members.length == 2) {
+                        if (!chat.name) {
                             let activeUser = 0;
                             if (members[0].userId.toString() == userId.toString()) {
                                 activeUser = 1;
@@ -347,6 +365,10 @@ const Chats = () => {
                             profileImage = members[activeUser].profileImage;
                             firstName = members[activeUser].firstName;
                             lastName = members[activeUser].lastName;
+                        } else {
+                            profileImage = chat.profileImage;
+                            firstName = chat.name;
+                            lastName = "";
                         }
                         return (
                             <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center relative">
@@ -389,14 +411,15 @@ const Chats = () => {
                         </div>
                     </div>
                     <div id="message" className={`${onVideoCall ? "hidden" : ""} flex-grow w-full overflow-scroll p-2`}>
-                        {messages.map(message => {
+                        {messages.map((message, ind) => {
                             let align = "start";
                             if (userId.toString() == message.sender.toString()) {
                                 align = "end";
                             }
                             if (message.messageType == "text") {
-                                return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
                                         <p className={`max-w-96 rounded-2xl text-wrap text-white bg-black p-2`}>{message.message}</p>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "image") {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
