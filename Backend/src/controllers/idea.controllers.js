@@ -154,3 +154,118 @@ export const include = asyncHandler(async (req, res) => {
 		success: true,
 	} ,'User included successfully'));
 });
+
+export const myIdeas = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const ideas = [];
+	for (let ideaId of user.ideas) {
+		const idea = await Idea.findById(ideaId);
+		ideas.push({
+			idea,
+			profileImage: user.profileImage,
+			intrested: false,
+			included: false,
+			ideaOf: user.username,
+			ideaId
+		});
+	}
+	res.status(201).json(new ApiResponse(201, {
+		ideas,
+		authenticated: true,
+	} ,'List of ideas published by user'));
+});
+
+export const exploreIdeas = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const likedIdeas = await Idea.find({ likedBy: id }).select("categories");
+	const categories = new Set();
+	for (let idea of likedIdeas) {
+		for (let category of idea.categories) {
+			categories.add(category);
+		}
+	}
+	const ideaIds = new Set();
+	for (let category of categories) {
+		const ideas = await Idea.find({ categories: category });
+		for (let idea of ideas) {
+			if (idea.ideaOf.toString() == id.toString()) continue;
+			ideaIds.add(idea._id.toString());
+		}
+	}
+	const ideas = [];
+	for (let ideaId of ideaIds) {
+		const idea = await Idea.findById(ideaId);
+		const ideaOf = await User.findById(idea.ideaOf);
+		const intrested = idea.intrestedUser.includes(id);
+		const included = false;
+		for (let groupId of user.groups) {
+			const group = await Group.findById(groupId);
+			if (group.ideaId.toString() == ideaId.toString()) {
+				included = true;
+				break;
+			}
+		}
+		ideas.push({
+			idea,
+			profileImage: ideaOf.profileImage,
+			intrested,
+			included,
+			ideaOf: ideaOf.username,
+			ideaId
+		});
+	}
+	res.status(201).json(new ApiResponse(201, {
+		ideas,
+		authenticated: true,
+	} ,'List of ideas to explore by user'));
+});
+
+export const collaboratedIdeas = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const ideas = [];
+	for (let groupId of user.groups) {
+		const group = await Group.findById(groupId);
+		const idea = await Idea.findById(group.ideaId);
+		const ideaOf = await User.findById(idea.ideaOf);
+		if (ideaOf._id.toString() == id.toString()) continue;
+		ideas.push({
+			idea,
+			profileImage: ideaOf.profileImage,
+			intrested: false,
+			included: true,
+			ideaOf: ideaOf.username,
+			ideaId: idea._id
+		});
+	}
+	res.status(201).json(new ApiResponse(201, {
+		ideas,
+		authenticated: true,
+	} ,'List of ideas collaborated by user'));
+});
+
+export const intrestedIdeas = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const ideas = [];
+	for (let ideaId of user.intrestedIdeas) {
+		const idea = await Idea.findById(ideaId);
+		const ideaOf = await User.findById(idea.ideaOf);
+		const intrested = true;
+		const included = false;
+		ideas.push({
+			idea,
+			profileImage: ideaOf.profileImage,
+			intrested,
+			included,
+			ideaOf: ideaOf.username,
+			ideaId
+		});
+	}
+	res.status(201).json(new ApiResponse(201, {
+		ideas,
+		authenticated: true,
+	} ,'List of ideas intrested by user'));
+});

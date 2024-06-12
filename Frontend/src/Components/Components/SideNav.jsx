@@ -40,7 +40,6 @@ const SideNav = () => {
                     <button onClick={() => setSeeing(false)} className="text-left lg:hidden">X</button>
                     <NavLink className={({isActive}) => active(isActive)} to="/ideas"> Feed </NavLink>
                     <NavLink className={({isActive}) => active(isActive)} to="/myIdeas"> My <p className="hidden xl:inline-block">Ideas</p> </NavLink>
-                    <NavLink className={({isActive}) => active(isActive)} to="/invitedIdeas"> Invited <p className="hidden xl:inline-block">Ideas</p> </NavLink>
                     <NavLink className={({isActive}) => active(isActive)} to="/exploreIdeas"> Explore <p className="hidden xl:inline-block">Ideas</p> </NavLink>
                     <NavLink className={({isActive}) => active(isActive)} to="/collaboratedIdeas"> Collaborated <p className="hidden xl:inline-block">Ideas</p> </NavLink>
                     <NavLink className={({isActive}) => active(isActive)} to="/intrestedIdeas"> Intrested <p className="hidden xl:inline-block">Ideas</p> </NavLink>

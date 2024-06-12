@@ -8,5 +8,7 @@ export const isLoggedIn = async (req, res, next) => {
 		req.user = decoded;
 		return next();
 	}
-  return res.status(401).json(new ApiResponse(401, null, 'You are not logged in'));
+  return res.status(401).json(new ApiResponse(401, {
+		authenticated: false,
+	}, 'You are not logged in'));
 };

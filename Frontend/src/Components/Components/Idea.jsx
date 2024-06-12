@@ -365,7 +365,7 @@ const Idea = ({ thisIdea }) => {
                 </p>
                 <div ref={progressRef} className="w-full h-2 border-2 border-black border-solid flex flex-col px-2 gap-2 cursor-pointer" style={{background: `linear-gradient(to right, black 0%, black ${(ideaProgress/idea.steps.length)*100}%, transparent ${(ideaProgress/idea.steps.length)*100}%, transparent 100%`}}></div>
                 <div className="flex justify-around border-2 border-black border-solid border-t-0 rounded-b-2xl p-1">
-                    <div className="flex gap-1 justify-center items-center">
+                    <div className="flex gap-1 justify-center items-center cursor-pointer">
                         <img onClick={likeIdea} className="h-4 w-4" src={`../../../../images/like${isLiked ? "d" : ""}.svg`}/>
                         <p ref={likeRef}>{noOfLikes}</p>
                     </div>

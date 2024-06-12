@@ -9,6 +9,10 @@ import Idea from "./Components/Idea";
 import Profile from "./Pages/Profile";
 import NewIdea from "./Pages/NewIdea";
 import Chats from "./Pages/Chats";
+import MyIdeas from "./Pages/MyIdeas";
+import ExploreIdeas from "./Pages/ExploreIdeas";
+import CollaboratedIdeas from "./Pages/CollaboratedIdeas";
+import IntrestedIdeas from "./Pages/IntrestedIdeas";
 
 export {
     SignInUpNav,
@@ -22,4 +26,8 @@ export {
     Profile,
     NewIdea,
     Chats,
+    MyIdeas,
+    ExploreIdeas,
+    CollaboratedIdeas,
+    IntrestedIdeas
 }

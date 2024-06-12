@@ -5,15 +5,25 @@ import './global.css'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromChildren } from 'react-router-dom'
 import { 
 	Chats,
+	CollaboratedIdeas,
+	ExploreIdeas,
 	Ideas,
+	IntrestedIdeas,
+	MyIdeas,
 	NewIdea,
 	Profile,
 	SignIn, 
 	SignUp,
 } from './components/index.js'
-import { fecthData } from './components/Pages/SignUp.jsx'
-import { getFeed } from './components/Pages/Ideas.jsx'
-import { getChats } from './components/Pages/Chats.jsx'
+import {
+	fecthData,
+	getChats,
+	getCollaboratedIdeas,
+	getExploreIdeas,
+	getFeed,
+	getIntrestedIdeas,
+	getMyIdeas
+} from './components/dataLoaders.js'
 
 const router = createBrowserRouter(
 	createRoutesFromChildren(
@@ -21,6 +31,10 @@ const router = createBrowserRouter(
 			<Route path="" element={<SignIn/>}/>
 			<Route loader={fecthData} path="/signUp" element={<SignUp/>}/>
 			<Route loader={getFeed} path="/ideas" element={<Ideas/>}/>
+			<Route loader={getMyIdeas} path='/myIdeas' element={<MyIdeas/>}/>
+			<Route loader={getExploreIdeas} path="/exploreIdeas" element={<ExploreIdeas/>}/>
+			<Route loader={getCollaboratedIdeas} path="/collaboratedIdeas" element={<CollaboratedIdeas/>}/>
+			<Route loader={getIntrestedIdeas} path="/intrestedIdeas" element={<IntrestedIdeas/>}/>
 			<Route path="/profile/:username" element={<Profile/>}/>
 			<Route path="/newIdea" element={<NewIdea/>}/>
 			<Route loader={getChats} path="/chats" element={<Chats/>}/>
