@@ -4,8 +4,9 @@ import { useState } from "react";
 
 const App = () => {
 	const [ideas, setIdeas] = useState([]);
+	const [originalIdeas, setOriginalIdeas] = useState([]);
 	return (
-		<IdeasProvider value={{ideas, setIdeas}}>
+		<IdeasProvider value={{ ideas, setIdeas, originalIdeas, setOriginalIdeas }}>
 			<Outlet/>
 		</IdeasProvider>
 	)

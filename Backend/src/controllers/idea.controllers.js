@@ -269,3 +269,35 @@ export const intrestedIdeas = asyncHandler(async (req, res) => {
 		authenticated: true,
 	} ,'List of ideas intrested by user'));
 });
+
+export const searchIdeas = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const { query } = req.params;
+	const ideas = await Idea.find({ title: { $regex: query, $options: 'i' } });
+	const result = [];
+	for (let idea of ideas) {
+		const ideaOf = await User.findById(idea.ideaOf);
+		const intrested = idea.intrestedUser.includes(req.user.id);
+		let included = false;
+		for (let groupId of user.groups) {
+			const group = await Group.findById(groupId);
+			if (group.ideaId.toString() == idea._id.toString()) {
+				included = true;
+				break;
+			}
+		}
+		result.push({
+			idea,
+			profileImage: ideaOf.profileImage,
+			intrested,
+			included,
+			ideaOf: ideaOf.username,
+			ideaId: idea._id
+		});
+	}
+	res.status(201).json(new ApiResponse(201, {
+		ideas: result,
+		authenticated: true,
+	} ,'List of ideas matching search query'));
+});

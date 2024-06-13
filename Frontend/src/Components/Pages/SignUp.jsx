@@ -173,12 +173,12 @@ const SignUp = () => {
 
 export default SignUp
 
-export const fecthData = async () => {
-    const { data } = await axios.get("https://restcountries.com/v3/all");
-    let countries = [];
-	data.forEach(country => {
-		countries.push(country.name.common);
-	})
-	countries = countries.sort();
-    return countries;
-}
+// export const fecthData = async () => {
+//     const { data } = await axios.get("https://restcountries.com/v3/all");
+//     let countries = [];
+// 	data.forEach(country => {
+// 		countries.push(country.name.common);
+// 	})
+// 	countries = countries.sort();
+//     return countries;
+// }

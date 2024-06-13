@@ -4,6 +4,8 @@ import {
 } from "react";
 
 const IdeasContext = createContext({
+  originalIdeas: [],
+  setOriginalIdeas: () => {},
   ideas: [],
   setIdeas: () => {}
 })
