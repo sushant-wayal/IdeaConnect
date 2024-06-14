@@ -170,6 +170,7 @@ export const myIdeas = asyncHandler(async (req, res) => {
 			ideaId
 		});
 	}
+	ideas.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
 	res.status(201).json(new ApiResponse(201, {
 		ideas,
 		authenticated: true,
@@ -216,6 +217,7 @@ export const exploreIdeas = asyncHandler(async (req, res) => {
 			ideaId
 		});
 	}
+	ideas.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
 	res.status(201).json(new ApiResponse(201, {
 		ideas,
 		authenticated: true,
@@ -240,6 +242,7 @@ export const collaboratedIdeas = asyncHandler(async (req, res) => {
 			ideaId: idea._id
 		});
 	}
+	ideas.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
 	res.status(201).json(new ApiResponse(201, {
 		ideas,
 		authenticated: true,
@@ -264,6 +267,7 @@ export const intrestedIdeas = asyncHandler(async (req, res) => {
 			ideaId
 		});
 	}
+	ideas.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
 	res.status(201).json(new ApiResponse(201, {
 		ideas,
 		authenticated: true,
@@ -296,6 +300,7 @@ export const searchIdeas = asyncHandler(async (req, res) => {
 			ideaId: idea._id
 		});
 	}
+	result.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
 	res.status(201).json(new ApiResponse(201, {
 		ideas: result,
 		authenticated: true,
