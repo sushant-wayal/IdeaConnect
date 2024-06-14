@@ -14,6 +14,7 @@ import {
 	Profile,
 	SignIn, 
 	SignUp,
+	SpecificCategoryIdeas,
 } from './components/index.js'
 import {
 	fecthData,
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
 			<Route loader={getExploreIdeas} path="/exploreIdeas" element={<ExploreIdeas/>}/>
 			<Route loader={getCollaboratedIdeas} path="/collaboratedIdeas" element={<CollaboratedIdeas/>}/>
 			<Route loader={getIntrestedIdeas} path="/intrestedIdeas" element={<IntrestedIdeas/>}/>
+			<Route path="/ideas/category/:category" element={<SpecificCategoryIdeas/>}/>
 			<Route path="/profile/:username" element={<Profile/>}/>
 			<Route path="/newIdea" element={<NewIdea/>}/>
 			<Route loader={getChats} path="/chats" element={<Chats/>}/>

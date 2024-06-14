@@ -13,6 +13,7 @@ import MyIdeas from "./Pages/MyIdeas";
 import ExploreIdeas from "./Pages/ExploreIdeas";
 import CollaboratedIdeas from "./Pages/CollaboratedIdeas";
 import IntrestedIdeas from "./Pages/IntrestedIdeas";
+import SpecificCategoryIdeas from "./Pages/SpecificCategory";
 
 export {
     SignInUpNav,
@@ -29,5 +30,6 @@ export {
     MyIdeas,
     ExploreIdeas,
     CollaboratedIdeas,
-    IntrestedIdeas
+    IntrestedIdeas,
+    SpecificCategoryIdeas
 }

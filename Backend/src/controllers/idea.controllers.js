@@ -274,6 +274,39 @@ export const intrestedIdeas = asyncHandler(async (req, res) => {
 	} ,'List of ideas intrested by user'));
 });
 
+export const specificCategoryIdeas = asyncHandler(async (req, res) => {
+	const { category } = req.params;
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const ideas = await Idea.find({ categories: category });
+	const result = [];
+	for (let idea of ideas) {
+		const ideaOf = await User.findById(idea.ideaOf);
+		const intrested = idea.intrestedUser.includes(id);
+		let included = false;
+		for (let groupId of user.groups) {
+			const group = await Group.findById(groupId);
+			if (group.ideaId.toString() == idea._id.toString()) {
+				included = true;
+				break;
+			}
+		}
+		result.push({
+			idea,
+			profileImage: ideaOf.profileImage,
+			intrested,
+			included,
+			ideaOf: ideaOf.username,
+			ideaId: idea._id
+		});
+	}
+	result.sort((a,b) => b.idea.createdAt-a.idea.createdAt);
+	res.status(201).json(new ApiResponse(201, {
+		ideas: result,
+		authenticated: true,
+	} ,'List of ideas of specific category'));
+});
+
 export const searchIdeas = asyncHandler(async (req, res) => {
 	const { id } = req.user;
 	const user = await User.findById(id);

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const headers = {
+export const headers = {
   Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
 }
 

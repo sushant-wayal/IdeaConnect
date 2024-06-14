@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { useNavigate } from "react-router-dom";
 
 const Idea = ({ thisIdea }) => {
     const { idea, profileImage, ideaOf, included } = thisIdea;
@@ -14,6 +15,7 @@ const Idea = ({ thisIdea }) => {
     const [noOfLikes, setNoOfLikes] = useState(idea.likes);
     const [isLiked,setIsLiked] = useState(false);
     const likeRef = useRef(null);
+    const navigate = useNavigate();
     useEffect(() =>{
         const checkLike = async () => {
             const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/checkLike/${idea._id}/${username}`);
@@ -52,6 +54,7 @@ const Idea = ({ thisIdea }) => {
                     thisCategory.classList.add("bg-black","text-white","inline-block","mr-2","mb-2","p-2","rounded-3xl");
                     thisCategory.innerText = i;
                     categoryEle.append(thisCategory);
+                    thisCategory.addEventListener("click",() => navigate(`/ideas/category/${i}`));
                 }
                 seeing = true;
             }
