@@ -5,7 +5,7 @@ import { RiMenu3Line } from "@remixicon/react"
 
 const SideNav = () => {
     const active = (isActive) => {
-        let style = "p-1 border-2 border-black border-solid rounded-full text-center w-full";
+        let style = "p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105";
         if (isActive) {
             style += " bg-black text-white";
         }
@@ -46,7 +46,7 @@ const SideNav = () => {
                     <NavLink className={({isActive}) => active(isActive)} to="/chats"> Chats </NavLink>
                 </div>
                 <div className="flex flex-col justify-center gap-5 w-full">
-                    <button onClick={logout} className="p-1 border-2 border-black border-solid rounded-full text-center w-full"> Logout </button>
+                    <button onClick={logout} className="p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105"> Logout </button>
                     <NavLink className={({isActive}) => active(isActive)} to={`/profile/${username}`}> Profile </NavLink>
                     <NavLink className={({isActive}) => active(isActive)} to="/settings"> Settings </NavLink>
                 </div>

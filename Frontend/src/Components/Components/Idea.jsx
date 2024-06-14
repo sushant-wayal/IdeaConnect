@@ -355,10 +355,10 @@ const Idea = ({ thisIdea }) => {
             </div>
             <div className="w-full rounded-xl relative h-[330px] sm:h-[280px] flex-shrink">
                 <img className="w-full h-full rounded-xl flex-shrink" src={idea.media} alt="media"/>
-                <div ref={categoryRef} className="category absolute top-2 left-2 px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer">
+                <div ref={categoryRef} className="category absolute top-2 left-2 px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer hover:scale-105">
                     <p>Category</p>
                 </div>
-                <div ref={intrestRef} id="intrest" className={`absolute top-2 right-2 px-2 py-1 bg-gray-600 rounded-xl ${included ? "text-white" : "cursor-pointer"} flex flex-col gap-2`}>
+                <div ref={intrestRef} id="intrest" className={`absolute top-2 right-2 px-2 py-1 bg-gray-600 rounded-xl ${included ? "text-white" : "cursor-pointer"} flex flex-col gap-2 hover:scale-105`}>
                     <p>{username == ideaOf ? `${idea.intrested} Intrested` : intrested ? "Intrested" : included ? "Included" : "Intrested ?"}</p>
                 </div>
             </div>

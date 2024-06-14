@@ -5,7 +5,8 @@ import {
     RiVideoOffFill,
     RiMicFill,
     RiMicOffFill,
-    RiPhoneFill
+    RiPhoneFill,
+    RiHome5Line
 } from "@remixicon/react";
 import axios from "axios"
 import {
@@ -14,7 +15,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { useLoaderData } from "react-router-dom"
+import { Link, useLoaderData } from "react-router-dom"
 import io from "socket.io-client";
 import peer from "../../services/peer.js";
 
@@ -341,8 +342,9 @@ const Chats = () => {
     },[])
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
-            <div className="h-full w-60 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
+            <div className="h-full w-72 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
                 <div className="border-b-2 border-black border-solid pb-1 flex justify-between items-center">
+                    <Link to="/ideas" className="hover:scale-105"><RiHome5Line/></Link>
                     <p className="text-xl font-semibold">
                         Chats
                     </p>
@@ -371,7 +373,7 @@ const Chats = () => {
                             lastName = "";
                         }
                         return (
-                            <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center relative">
+                            <div onClick={() => openChat(chat)} key={chat._id} className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center relative hover:scale-105">
                                 <div className="py-2 px-1 flex justify-start gap-5 relative">
                                     <div className="h-10 aspect-square object-cover rounded-full relative">
                                         <img className="h-full w-full rounded-full" src={profileImage}/>
@@ -394,20 +396,21 @@ const Chats = () => {
                 <div className={`${show ? "flex" : "hidden"} flex-col h-full`}>
                     <div className="py-2 px-5 flex justify-between items-center border-b-[1px] border-black border-solid">
                         <div className="flex justify-center gap-3">
-                            <img className="h-10 aspect-square object-cover rounded-full" src={profileImage}/>
+                            <Link to={currChat.name ? "" : `/profile/${username}`} className="h-10 rounded-full">
+                                <img className="h-full aspect-square object-cover rounded-full" src={profileImage}/>
+                            </Link>
                             <div className="flex flex-col justify-between">
                                 <p className="font-semibold">{firstName} {lastName}</p>
                                 <p className="text-sm">{username}</p>
                             </div>
                         </div>
-                        <div className="flex justify-center gap-5 items-center">
-                            <RiVideoChatLine id="videoCallIcon" onClick={() => {
+                        <div className={`${currChat.name ? "hidden" : "flex"} justify-center gap-5 items-center hover:scale-110`}>
+                            <RiVideoChatLine id="videoCallIcon" size={30} onClick={() => {
                                 if (gotVideoCall) {
                                     if (currChat._id == gotVideoCall) sendStreams();
                                 }
                                 else requestVideoCall();
                             }} color={onVideoCall ? "red" : gotVideoCall ? "green" : "black"} className="scale-x-110 cursor-pointer"/>
-                            <RiChatVoiceLine  className="scale-x-110"/>
                         </div>
                     </div>
                     <div id="message" className={`${onVideoCall ? "hidden" : ""} flex-grow w-full overflow-scroll p-2`}>
