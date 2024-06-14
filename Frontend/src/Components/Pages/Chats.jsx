@@ -1,5 +1,4 @@
 import {
-    RiChatVoiceLine,
     RiVideoChatLine,
     RiVideoOnLine,
     RiVideoOffFill,
@@ -23,6 +22,7 @@ const socket = io.connect("http://localhost:3001");
 
 const Chats = () => {
     const chats = useLoaderData();
+    const [displayChats, setDisplayChats] = useState(chats);
     const [unreadNotifications, setUnreadNotifications] = useState([]);
     const [messages, setMessages] = useState([]);
     const [show, setShow] = useState(false);
@@ -37,6 +37,7 @@ const Chats = () => {
     const [activeUsername, setActiveUsername] = useState("");
     const sendRef = useRef(null);
     const msgInput = useRef(null);
+    const [chatSearch, setChatSearch] = useState("");
     const [onVideoCall, setOnVideoCall] = useState(false);
     const [localStream, setLocalStream] = useState();
     const [gotVideoCall, setGotVideoCall] = useState(null);
@@ -207,6 +208,22 @@ const Chats = () => {
             message: msg.length > 0 ? `${currChat.name ? `${activeUsername} is ` : "" }Typing...` : "",
         });
     }
+    useEffect(() => {
+        const toSearch = chatSearch.trim().replace(/ +/g," ").toLowerCase();
+        if (toSearch.length == 0) setDisplayChats(chats);
+        else {
+            setDisplayChats(chats.filter(chat => {
+                if (chat.name) return chat.name.toLowerCase().includes(toSearch);
+                else {
+                    let thisUser = 0;
+                    if (chat.members[0].userId.toString() == userId.toString()) thisUser = 1;
+                    thisUser = chat.members[thisUser];
+                    const matchString = thisUser.firstName.toLowerCase()+" "+thisUser.lastName.toLowerCase()+":"+thisUser.username.toLowerCase();
+                    return matchString.includes(toSearch);
+                }
+            }));
+        };
+    },[chatSearch, chats])
     const requestVideoCall = useCallback(() => {
         setOnVideoCall(true);
         setVideoCallStatus("Calling");
@@ -349,12 +366,12 @@ const Chats = () => {
                         Chats
                     </p>
                     <div className="rounded-full relative">
-                        <input placeholder="Search Chats" className="rounded-full w-40 bg-transparent border-2 border-black border-solid pl-8" type="search"/>
+                        <input value={chatSearch} onChange={(e) => setChatSearch(e.target.value)} placeholder="Search Chats" className="rounded-full w-40 bg-transparent border-2 border-black border-solid pl-8" type="search"/>
                         <p className="absolute top-1/2 -translate-y-1/2 left-2">🔎</p>
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    {chats.map((chat,ind) => {
+                    {displayChats.map((chat,ind) => {
                         const { members } = chat;
                         let profileImage;
                         let firstName;
