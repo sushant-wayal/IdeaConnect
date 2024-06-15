@@ -140,7 +140,7 @@ export const include = asyncHandler(async (req, res) => {
 		const newGroup = await Group.create({
 			ideaId,
 			name: idea.title,
-			profileImage: idea.media,
+			profileImage: idea.media[idea.media.findIndex(media => media.type == 'image')].src,
 			members: [{ userId: id }, { userId }],
 		});
 		const user = await User.findById(id);

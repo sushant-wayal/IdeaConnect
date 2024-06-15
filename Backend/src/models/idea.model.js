@@ -26,7 +26,20 @@ const ideaSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   }],
-  media: String,
+  media: [{
+    src: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    alt: {
+      type: String,
+      required: true,
+    }
+  }],
   description: {
     type: String,
     required: true,

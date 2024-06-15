@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
+import MultiMedia from "./MultiMedia";
 
 const Idea = ({ thisIdea }) => {
     const { idea, profileImage, ideaOf, included } = thisIdea;
@@ -354,7 +355,16 @@ const Idea = ({ thisIdea }) => {
                 </p>
             </div>
             <div className="w-full rounded-xl relative h-[330px] sm:h-[280px] flex-shrink">
-                <img className="w-full h-full rounded-xl flex-shrink" src={idea.media} alt="media"/>
+                <MultiMedia
+                    medias={idea.media}
+                    start={0}
+                    id={idea._id}
+                    navigationSize={16}
+                    soundSize={30}
+                    wrapperClassName="w-full h-full flex-shrink"
+                    containerClassName="rounded-xl"
+                />
+                {/* <img className="w-full h-full rounded-xl flex-shrink" src={idea.media} alt="media"/> */}
                 <div ref={categoryRef} className="category absolute top-2 left-2 px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer hover:scale-105">
                     <p>Category</p>
                 </div>
