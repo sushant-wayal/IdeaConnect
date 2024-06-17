@@ -159,6 +159,7 @@ const NewIdea = () => {
         input.accept = "image/*,video/*";
         document.body.append(input);
         input.onchange = fileChange;
+        input.style.display = "none";
         input.click();
     }
     const [title,setTitle] = useState("");

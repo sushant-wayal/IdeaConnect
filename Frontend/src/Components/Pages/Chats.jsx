@@ -5,7 +5,8 @@ import {
     RiMicFill,
     RiMicOffFill,
     RiPhoneFill,
-    RiHome5Line
+    RiHome5Line,
+    RiAttachment2
 } from "@remixicon/react";
 import axios from "axios"
 import {
@@ -58,6 +59,7 @@ const Chats = () => {
     const sendIdea = query.get("shareIdea");
     const [sent, setSent] = useState(false);
     const [ideaMessages, setIdeaMessages] = useState(new Map());
+    const [media, setMedia] = useState(null);
     useEffect(() => {
         setUnreadNotifications([]);
         setVideoCallRequested([]);
@@ -198,8 +200,18 @@ const Chats = () => {
             return prev;
         })
     }
-    const reciveMessage = useCallback(({ room, message }) => {
+    const reciveMessage = useCallback(async ({ room, message }) => {
         if (room == currChat._id) {
+            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${message.message}`,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+            setIdeaMessages(prev => {
+                const newMap = new Map(prev);
+                newMap.set(sendIdea, data);
+                return newMap;
+            });
             setMessages(prev => [...prev, message]);
             socket.emit("allRead",{
                 reciver: currChat._id,
@@ -217,7 +229,13 @@ const Chats = () => {
             })
             return temp;
         });
-        chats[chats.findIndex(chat => chat._id == room)].lastMessage = message.message;
+        const ind = chats.findIndex(chat => chat._id == room);
+        if (message.messageType == "text") chats[ind].lastMessage = message.message;
+        else if (message.messageType == "idea") chats[ind].lastMessage = "Shared an Idea";
+        else if (message.messageType == "image") chats[ind].lastMessage = "Sent an Image";
+        else if (message.messageType == "video") chats[ind].lastMessage = "Sent a Video";
+        else if (message.messageType == "audio") chats[ind].lastMessage = "Sent an Audio";
+        else if (message.messageType == "document") chats[ind].lastMessage = "Shared a Document";
     },[currChat])
     const reciveTyping = useCallback(({ room, message }) => {
         if (room == currChat._id) {
@@ -391,6 +409,36 @@ const Chats = () => {
             document.removeEventListener("beforunload", leaveCall);
         }
     },[])
+    const upload = async () => {
+        let formData = new FormData();
+        formData.append("file",file);
+        const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        });
+        if (data.success) setMedia(data.data.url);
+        else console.log("Check BackEnd");
+    }
+    const fileChange = async (e) => {
+        const file = e.target.files[0];
+        setMedia(file);
+        setMessage("Selected "+file.name);
+        msgInput.current.disabled = true;
+        // let formData = new FormData();
+        // formData.append("file",e.target.files[0]);
+        // await upload(formData);
+        // document.querySelector("#media").remove();
+    }
+    const selectMedia = () => {
+        let input = document.createElement("input");
+        input.type = "file";
+        input.id = "media";
+        document.body.append(input);
+        input.onchange = fileChange;
+        input.style.display = "none";
+        input.click();
+    }
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-72 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -478,18 +526,22 @@ const Chats = () => {
                             } else if (message.messageType == "image") {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
                                         <img src={message.message}/>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "video") {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
                                         <video src={message.message} muted/>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "audio") {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
                                         <audio src={message.message} controls/>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "idea") {
                                 return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
                                         <Idea thisIdea={ideaMessages.get(message.message)}/>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             }
                         })}
@@ -524,11 +576,12 @@ const Chats = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5">
+                    <div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5 items-center">
                         <input value={message} onChange={(e) => {
                             setMessage(e.target.value);
                             typing(e.target.value);
                         }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..." ref={msgInput}/>
+                        <RiAttachment2 size={30} onClick={selectMedia} className="cursor-pointer"/>
                         <button onClick={() => send(currChat, message, "text")} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><p>Send</p></button>
                     </div>
                 </div>
