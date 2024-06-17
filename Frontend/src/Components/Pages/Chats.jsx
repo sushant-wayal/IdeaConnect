@@ -6,7 +6,9 @@ import {
     RiMicOffFill,
     RiPhoneFill,
     RiHome5Line,
-    RiAttachment2
+    RiAttachment2,
+    RiDownloadLine,
+    RiLoaderLine
 } from "@remixicon/react";
 import axios from "axios"
 import {
@@ -60,6 +62,7 @@ const Chats = () => {
     const [sent, setSent] = useState(false);
     const [ideaMessages, setIdeaMessages] = useState(new Map());
     const [media, setMedia] = useState(null);
+    const [sending, setSending] = useState(false);
     useEffect(() => {
         setUnreadNotifications([]);
         setVideoCallRequested([]);
@@ -139,7 +142,13 @@ const Chats = () => {
             group: chat.name ? true : false,
         })
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
+        setMessages(data.messages);
         if (sendIdea && !sent) {
+            await axios.get(`http://localhost:3000/api/v1/ideas/share/${sendIdea}`,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            });
             const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${sendIdea}`,{
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -150,14 +159,15 @@ const Chats = () => {
                 newMap.set(sendIdea, data);
                 return newMap;
             });
-            setSent(true);
             send(chat, sendIdea, "idea");
         }
-        setMessages(data.messages);
     }
     useEffect(() => {
         let messageEle = document.querySelector("#message");
-        messageEle.scrollTop = messageEle.scrollHeight;
+        messageEle.scrollTo({
+            top: messageEle.scrollHeight,
+            behavior: "smooth",
+        });
     },[messages])
     const moveToTop = (array, ind) => {
         const ele = array[ind];
@@ -170,13 +180,6 @@ const Chats = () => {
             return;
         }
         id++;
-        setMessages(prev => [...prev,{
-            messageType,
-            senderUsername: activeUsername,
-            message: thisMessage,
-            sender: userId,
-            _id: id,
-        }])
         socket.emit("sendMessage",{
             sender: userId,
             reciver: thisChat._id,
@@ -185,6 +188,13 @@ const Chats = () => {
             message: thisMessage,
             group: thisChat.name ? true : false,
         });
+        setMessages(prev => [...prev,{
+            messageType,
+            senderUsername: activeUsername,
+            message: thisMessage,
+            sender: userId,
+            _id: id,
+        }]);
         setMessage("");
         typing("");
         const ind = chats.findIndex(chat => chat._id == thisChat._id);
@@ -202,16 +212,18 @@ const Chats = () => {
     }
     const reciveMessage = useCallback(async ({ room, message }) => {
         if (room == currChat._id) {
-            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${message.message}`,{
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                },
-            });
-            setIdeaMessages(prev => {
-                const newMap = new Map(prev);
-                newMap.set(sendIdea, data);
-                return newMap;
-            });
+            if (message.messageType == "idea") {
+                const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${message.message}`,{
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                });
+                setIdeaMessages(prev => {
+                    const newMap = new Map(prev);
+                    newMap.set(sendIdea, data);
+                    return newMap;
+                });
+            }
             setMessages(prev => [...prev, message]);
             socket.emit("allRead",{
                 reciver: currChat._id,
@@ -411,13 +423,16 @@ const Chats = () => {
     },[])
     const upload = async () => {
         let formData = new FormData();
-        formData.append("file",file);
+        formData.append("file",media);
         const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         });
-        if (data.success) setMedia(data.data.url);
+        if (data.success) return {
+            url: data.data.url,
+            type: data.data.type,
+        };
         else console.log("Check BackEnd");
     }
     const fileChange = async (e) => {
@@ -425,10 +440,6 @@ const Chats = () => {
         setMedia(file);
         setMessage("Selected "+file.name);
         msgInput.current.disabled = true;
-        // let formData = new FormData();
-        // formData.append("file",e.target.files[0]);
-        // await upload(formData);
-        // document.querySelector("#media").remove();
     }
     const selectMedia = () => {
         let input = document.createElement("input");
@@ -524,18 +535,87 @@ const Chats = () => {
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "image") {
-                                return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
-                                        <img src={message.message}/>
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
+                                        <div className="max-w-96 relative">
+                                            <RiDownloadLine
+                                                size={30}
+                                                color="white"
+                                                className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
+                                                onClick={async () => {
+                                                    try {
+                                                        const response = await fetch(message.message);
+                                                        const blob = await response.blob();
+                                                        const url = URL.createObjectURL(blob);
+                                                        let a = document.createElement("a");
+                                                        a.href = url;
+                                                        a.download = currChat.name ? `${currChat.name}-${message._id}` : `${username}-${message._id}`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        document.body.removeChild(a);
+                                                        URL.revokeObjectURL(url);
+                                                    } catch (error) {
+                                                        console.error("Failed to download image", error);
+                                                    }
+                                                }}
+                                            />
+                                            <img className="w-full rounded-2xl" src={message.message}/>
+                                        </div>
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "video") {
-                                return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
-                                        <video src={message.message} muted/>
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
+                                        <div className="max-w-96 relative">
+                                            <RiDownloadLine
+                                                size={30}
+                                                color="white"
+                                                className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
+                                                onClick={async () => {
+                                                    try {
+                                                        const response = await fetch(message.message);
+                                                        const blob = await response.blob();
+                                                        const url = URL.createObjectURL(blob);
+                                                        let a = document.createElement("a");
+                                                        a.href = url;
+                                                        a.download = currChat.name ? `${currChat.name}-${message._id}` : `${username}-${message._id}`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        document.body.removeChild(a);
+                                                        URL.revokeObjectURL(url);
+                                                    } catch (error) {
+                                                        console.error("Failed to download image", error);
+                                                    }
+                                                }}
+                                            />
+                                            <video controls className="w-full rounded-2xl" src={message.message}/>
+                                        </div>
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "audio") {
-                                return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
-                                        <audio src={message.message} controls/>
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
+                                        <div className="w-72 relative">
+                                            <RiDownloadLine
+                                                size={30}
+                                                color="white"
+                                                className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
+                                                onClick={async () => {
+                                                    try {
+                                                        const response = await fetch(message.message);
+                                                        const blob = await response.blob();
+                                                        const url = URL.createObjectURL(blob);
+                                                        let a = document.createElement("a");
+                                                        a.href = url;
+                                                        a.download = currChat.name ? `${currChat.name}-${message._id}` : `${username}-${message._id}`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        document.body.removeChild(a);
+                                                        URL.revokeObjectURL(url);
+                                                    } catch (error) {
+                                                        console.error("Failed to download image", error);
+                                                    }
+                                                }}
+                                            />
+                                            <audio controls className="w-full rounded-2xl" src={message.message}/>
+                                        </div>
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
                             } else if (message.messageType == "idea") {
@@ -582,7 +662,18 @@ const Chats = () => {
                             typing(e.target.value);
                         }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..." ref={msgInput}/>
                         <RiAttachment2 size={30} onClick={selectMedia} className="cursor-pointer"/>
-                        <button onClick={() => send(currChat, message, "text")} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><p>Send</p></button>
+                        <button onClick={async () => {
+                            if (sending) return;
+                            setSending(true);
+                            if (!media) send(currChat, message, "text");
+                            else {
+                                const { url, type } = await upload();
+                                send(currChat, url, type);
+                                msgInput.current.disabled = false;
+                                setMedia(null);
+                            }
+                            setSending(false);
+                        }} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><RiLoaderLine className={`${sending ? "" : "hidden"} animate-spin`}/><p>{sending ? "Sending" : "Send"}</p></button>
                     </div>
                 </div>
             </div>

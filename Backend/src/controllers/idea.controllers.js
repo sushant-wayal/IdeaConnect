@@ -155,6 +155,18 @@ export const include = asyncHandler(async (req, res) => {
 	} ,'User included successfully'));
 });
 
+export const share = asyncHandler(async (req, res) => {
+	const { ideaId } = req.params;
+	const { id } = req.user;
+	const idea = await Idea.findById(ideaId);
+	idea.sharedBy.unshift(id);
+	idea.noOfShare++;
+	await idea.save({ validateBeforeSave: false});
+	res.status(201).json(new ApiResponse(201, {
+		success: true,
+	} ,'Idea shared successfully'));
+});
+
 export const myIdeas = asyncHandler(async (req, res) => {
 	const { id } = req.user;
 	const user = await User.findById(id);
