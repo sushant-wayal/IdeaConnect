@@ -429,6 +429,7 @@ const Chats = () => {
                 "Content-Type": "multipart/form-data",
             }
         });
+        console.log("data",data);
         if (data.success) return {
             url: data.data.url,
             type: data.data.type,
@@ -438,6 +439,12 @@ const Chats = () => {
     const fileChange = async (e) => {
         const file = e.target.files[0];
         setMedia(file);
+        const extension = file.name.split(".")[file.name.split(".").length-1];
+        if (extension == "pdf") {
+            setMedia(null);
+            alert("PDFs are not supported");
+            return;
+        }
         setMessage("Selected "+file.name);
         msgInput.current.disabled = true;
     }
@@ -623,6 +630,38 @@ const Chats = () => {
                                         <Idea thisIdea={ideaMessages.get(message.message)}/>
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
+                            } else {
+                                const urlSplit = message.message.split("/");
+                                const fileName = urlSplit[urlSplit.length-1];
+                                return (
+                                    <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
+                                        <div className="bg-gray-600 rounded-md flex justify-center items-center p-2 gap-4">
+                                            <RiDownloadLine
+                                                size={30}
+                                                color="white"
+                                                className={`${message.senderUsername == activeUsername ? "hidden" : ""} p-1 cursor-pointer bg-black rounded-md`}
+                                                onClick={async () => {
+                                                    try {
+                                                        const response = await fetch(message.message);
+                                                        const blob = await response.blob();
+                                                        const url = URL.createObjectURL(blob);
+                                                        let a = document.createElement("a");
+                                                        a.href = url;
+                                                        a.download = currChat.name ? `${currChat.name}-${message._id}` : `${username}-${message._id}`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        document.body.removeChild(a);
+                                                        URL.revokeObjectURL(url);
+                                                    } catch (error) {
+                                                        console.error("Failed to download image", error);
+                                                    }
+                                                }}
+                                            />
+                                            <p className="font-semibold text-md text-wrap">{`${message.senderUsername == activeUsername ? "Shared " : ""}${fileName}`}</p>
+                                        </div>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
+                                    </div>
+                                )
                             }
                         })}
                     </div>
@@ -668,6 +707,7 @@ const Chats = () => {
                             if (!media) send(currChat, message, "text");
                             else {
                                 const { url, type } = await upload();
+                                console.log("type", type);
                                 send(currChat, url, type);
                                 msgInput.current.disabled = false;
                                 setMedia(null);

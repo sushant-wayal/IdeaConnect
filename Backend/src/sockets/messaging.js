@@ -13,7 +13,7 @@ const messanging = () => {
       socket.join(room);
     })
     socket.on('sendMessage', async ({ sender, reciver, messageType, message, senderUsername, group }) => {
-      console.log("send message");
+      console.log("send message", messageType);
       let chatId = !group ? reciver : null;
       let groupId = group ? reciver : null;
       const newMessage = await Message.create({
@@ -30,7 +30,7 @@ const messanging = () => {
       else if (messageType == "image") chatOrGroup.lastMessage = senderUsername+": Sent an Image";
       else if (messageType == "video") chatOrGroup.lastMessage = senderUsername+": Sent a Video";
       else if (messageType == "audio") chatOrGroup.lastMessage = senderUsername+": Sent an Audio";
-      else if (messageType == "file") chatOrGroup.lastMessage = senderUsername+": Sent a File";
+      else if (messageType == "document") chatOrGroup.lastMessage = senderUsername+": Sent a Document";
       else if (messageType == "idea") chatOrGroup.lastMessage = senderUsername+": Sent an Idea";
       for (let member of chatOrGroup.members) {
         if (member.userId.toString() !== sender.toString()) {
