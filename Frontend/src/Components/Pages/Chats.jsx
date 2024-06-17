@@ -138,7 +138,6 @@ const Chats = () => {
         })
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
         if (sendIdea && !sent) {
-            send(chat, sendIdea, "idea");
             const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${sendIdea}`,{
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -149,8 +148,8 @@ const Chats = () => {
                 newMap.set(sendIdea, data);
                 return newMap;
             });
-            setTimeout(() => {},0); // temperory fix
             setSent(true);
+            send(chat, sendIdea, "idea");
         }
         setMessages(data.messages);
     }
