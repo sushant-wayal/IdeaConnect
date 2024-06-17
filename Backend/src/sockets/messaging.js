@@ -2,7 +2,6 @@ import { io } from "../app.js";
 import{ Message } from "../models/message.model.js";
 import { Chat } from "../models/chat.model.js";
 import { Group } from "../models/group.model.js";
-import { User } from "../models/user.model.js";
 
 const getChatOrGroup = async (id, group) => {
   if (group) return await Group.findById(id);
@@ -14,6 +13,7 @@ const messanging = () => {
       socket.join(room);
     })
     socket.on('sendMessage', async ({ sender, reciver, messageType, message, senderUsername, group }) => {
+      console.log("send message");
       let chatId = !group ? reciver : null;
       let groupId = group ? reciver : null;
       const newMessage = await Message.create({
@@ -26,7 +26,12 @@ const messanging = () => {
       });
       const chatOrGroup = await getChatOrGroup(reciver, group);
       chatOrGroup.messages.push(newMessage._id);
-      chatOrGroup.lastMessage = senderUsername+": "+message;
+      if (messageType == "text") chatOrGroup.lastMessage = senderUsername+": "+message;
+      else if (messageType == "image") chatOrGroup.lastMessage = senderUsername+": Sent an Image";
+      else if (messageType == "video") chatOrGroup.lastMessage = senderUsername+": Sent a Video";
+      else if (messageType == "audio") chatOrGroup.lastMessage = senderUsername+": Sent an Audio";
+      else if (messageType == "file") chatOrGroup.lastMessage = senderUsername+": Sent a File";
+      else if (messageType == "idea") chatOrGroup.lastMessage = senderUsername+": Sent an Idea";
       for (let member of chatOrGroup.members) {
         if (member.userId.toString() !== sender.toString()) {
           member.unread += 1;

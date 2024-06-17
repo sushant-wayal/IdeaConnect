@@ -14,9 +14,10 @@ import {
     useRef,
     useState,
 } from "react";
-import { Link, useLoaderData } from "react-router-dom"
+import { Link, useLoaderData, useLocation } from "react-router-dom"
 import io from "socket.io-client";
 import peer from "../../services/peer.js";
+import Idea from "../Components/Idea.jsx";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -52,6 +53,11 @@ const Chats = () => {
         },
         audio : true,
     }
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const sendIdea = query.get("shareIdea");
+    const [sent, setSent] = useState(false);
+    const [ideaMessages, setIdeaMessages] = useState(new Map());
     useEffect(() => {
         setUnreadNotifications([]);
         setVideoCallRequested([]);
@@ -112,13 +118,41 @@ const Chats = () => {
                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
         });
-        setMessages(data.messages);
+        for (let message of data.messages) {
+            if (message.messageType == "idea") {
+                const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${message.message}`,{
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                });
+                setIdeaMessages(prev => {
+                    prev.set(message.message, data);
+                    return prev;
+                });
+            }
+        }
         socket.emit("allRead",{
             reciver: chat._id,
             userId,
             group: chat.name ? true : false,
         })
         setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
+        if (sendIdea && !sent) {
+            send(chat, sendIdea, "idea");
+            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/ideas/specificIdea/${sendIdea}`,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+            setIdeaMessages(prev => {
+                const newMap = new Map(prev);
+                newMap.set(sendIdea, data);
+                return newMap;
+            });
+            setTimeout(() => {},0); // temperory fix
+            setSent(true);
+        }
+        setMessages(data.messages);
     }
     useEffect(() => {
         let messageEle = document.querySelector("#message");
@@ -130,30 +164,31 @@ const Chats = () => {
         array.unshift(ele);
     }
     let id = 0;
-    const send = () => {
-        if (message.length == 0) {
+    const send = (thisChat, thisMessage, messageType) => {
+        if (thisMessage.length == 0) {
             return;
         }
         id++;
         setMessages(prev => [...prev,{
-            messageType:"text",
+            messageType,
             senderUsername: activeUsername,
-            message: message,
+            message: thisMessage,
             sender: userId,
             _id: id,
         }])
         socket.emit("sendMessage",{
             sender: userId,
-            reciver: currChat._id,
+            reciver: thisChat._id,
             senderUsername: activeUsername,
-            messageType: "text", 
-            message,
-            group: currChat.name ? true : false,
+            messageType: messageType, 
+            message: thisMessage,
+            group: thisChat.name ? true : false,
         });
         setMessage("");
         typing("");
-        const ind = chats.findIndex(chat => chat._id == currChat._id);
-        chats[ind].lastMessage = message;
+        const ind = chats.findIndex(chat => chat._id == thisChat._id);
+        if (messageType == "text") chats[ind].lastMessage = message;
+        else if (messageType == "idea") chats[ind].lastMessage = "Shared an Idea";
         moveToTop(chats,ind);
         setUnreadNotifications(prev => {
             moveToTop(prev, ind);
@@ -400,7 +435,7 @@ const Chats = () => {
                                     </div>
                                     <div className="flex flex-col justify-between">
                                         <p className="font-semibold">{firstName} {lastName}</p>
-                                        <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage.length > 15 ? chat.lastMessage.slice(0,12)+"..." : chat.lastMessage}</p>
+                                        <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage.length > 21 ? chat.lastMessage.slice(0,18)+"..." : chat.lastMessage}</p>
                                     </div>
                                 </div>
                                 <RiVideoOnLine onClick={() => acceptVideoCall(chat._id)} color="green" className={`${videoCallRequested[ind] ? "" : "hidden"} absolute left-[90%] -translate-x-1/2 animate-connecting-md bg-[rgba(0,255,0,0.7)] rounded-full`}/>
@@ -445,9 +480,17 @@ const Chats = () => {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
                                         <img src={message.message}/>
                                     </div>
-                            } else {
+                            } else if (message.messageType == "video") {
                                 return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
                                         <video src={message.message} muted/>
+                                    </div>
+                            } else if (message.messageType == "audio") {
+                                return <div key={message._id} className={`flex ${align == "start" ? "justify-start" : "justify-end"} mb-1`}>
+                                        <audio src={message.message} controls/>
+                                    </div>
+                            } else if (message.messageType == "idea") {
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
+                                        <Idea thisIdea={ideaMessages.get(message.message)}/>
                                     </div>
                             }
                         })}
@@ -487,7 +530,7 @@ const Chats = () => {
                             setMessage(e.target.value);
                             typing(e.target.value);
                         }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..." ref={msgInput}/>
-                        <button onClick={send} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><p>Send</p></button>
+                        <button onClick={() => send(currChat, message, "text")} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><p>Send</p></button>
                     </div>
                 </div>
             </div>

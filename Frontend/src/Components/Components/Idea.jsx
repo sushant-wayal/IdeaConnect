@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MultiMedia from "./MultiMedia";
 
 const Idea = ({ thisIdea }) => {
@@ -364,7 +364,6 @@ const Idea = ({ thisIdea }) => {
                     wrapperClassName="w-full h-full flex-shrink"
                     containerClassName="rounded-xl"
                 />
-                {/* <img className="w-full h-full rounded-xl flex-shrink" src={idea.media} alt="media"/> */}
                 <div ref={categoryRef} className="category absolute top-2 left-2 px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer hover:scale-105">
                     <p>Category</p>
                 </div>
@@ -387,7 +386,7 @@ const Idea = ({ thisIdea }) => {
                         <p>{idea.noOfComments}</p>
                     </div>
                     <div className="flex gap-1 justify-center items-center">
-                        <img className="h-4 w-4" src="../../../../images/share.svg"/>
+                        <Link to={`/chats?shareIdea=${idea._id}`}><img className="h-4 w-4" src="../../../../images/share.svg"/></Link>
                         <p>{idea.noOfShare}</p>
                     </div>
                 </div>

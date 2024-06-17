@@ -12,7 +12,8 @@ import {
   collaboratedIdeas,
   intrestedIdeas,
   specificCategoryIdeas,
-  searchIdeas
+  searchIdeas,
+  specificIdea
 } from "../controllers/idea.controllers.js";
 import { isLoggedIn } from "../middlewares/authenticate.middleware.js";
 
@@ -31,5 +32,6 @@ router.route("/collaboratedIdeas").get(isLoggedIn, collaboratedIdeas);
 router.route("/intrestedIdeas").get(isLoggedIn, intrestedIdeas);
 router.route("/category/:category").get(isLoggedIn, specificCategoryIdeas);
 router.route("/search/:query").get(isLoggedIn, searchIdeas);
+router.route("/specificIdea/:ideaId").get(isLoggedIn, specificIdea);
 
 export default router;

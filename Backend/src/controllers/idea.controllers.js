@@ -339,3 +339,29 @@ export const searchIdeas = asyncHandler(async (req, res) => {
 		authenticated: true,
 	} ,'List of ideas matching search query'));
 });
+
+export const specificIdea = asyncHandler(async (req, res) => {
+	const { id } = req.user;
+	const user = await User.findById(id);
+	const { ideaId } = req.params;
+	console.log("ideaId",ideaId);
+	const idea = await Idea.findById(ideaId);
+	const ideaOf = await User.findById(idea.ideaOf);
+	const intrested = idea.intrestedUser.includes(id);
+	let included = false;
+	for (let groupId of user.groups) {
+		const group = await Group.findById(groupId);
+		if (group.ideaId.toString() == ideaId.toString()) {
+			included = true;
+			break;
+		}
+	}
+	res.status(201).json(new ApiResponse(201, {
+		idea,
+		profileImage: ideaOf.profileImage,
+		intrested,
+		included,
+		ideaOf: ideaOf.username,
+		ideaId
+	} ,'Specific Idea'));
+});

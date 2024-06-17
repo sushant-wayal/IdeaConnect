@@ -87,7 +87,6 @@ const Profile = () => {
                         </div>
                         {activeUsername == username ?
                         <>
-                            <Link className="absolute top-2 right-2 bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl">Edit Profile</Link>
                             <Link className="absolute top-36 right-1 lg:top-48 lg:right-1/4 bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl" to="/newIdea">New Idea</Link>
                         </>
                         :
