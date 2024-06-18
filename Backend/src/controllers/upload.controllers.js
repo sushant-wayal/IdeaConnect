@@ -9,6 +9,7 @@ export const uploadImage = asyncHandler(async (req, res) => {
   if (result.resource_type == "video" && result.is_audio == true) result.resource_type = "audio";
   if (result.resource_type == "raw") result.resource_type = "document";
   if (result.resource_type == "image" && result.format == "pdf") result.resource_type = "document";
+  if (result.format == "webm") result.resource_type = "audio";
   console.log("upload url",result.url, "type", result.resource_type);
   return res.status(201).json(new ApiResponse(201, {
     url: result.url,

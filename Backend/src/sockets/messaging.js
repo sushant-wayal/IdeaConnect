@@ -32,6 +32,7 @@ const messanging = () => {
       else if (messageType == "audio") chatOrGroup.lastMessage = senderUsername+": Sent an Audio";
       else if (messageType == "document") chatOrGroup.lastMessage = senderUsername+": Sent a Document";
       else if (messageType == "idea") chatOrGroup.lastMessage = senderUsername+": Sent an Idea";
+      else if (messageType == "voice") chatOrGroup.lastMessage = senderUsername+": Sent a Voice Message";
       for (let member of chatOrGroup.members) {
         if (member.userId.toString() !== sender.toString()) {
           member.unread += 1;

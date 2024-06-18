@@ -32,7 +32,6 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
     setMuted(prev => prev.map((val, ind) => ind == index ? !val : val));
   }
   useEffect(() => {
-    console.log("medias", medias);
     moveTo(0, start);
   },[start]);
   return (

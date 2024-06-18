@@ -8,7 +8,10 @@ import {
     RiHome5Line,
     RiAttachment2,
     RiDownloadLine,
-    RiLoaderLine
+    RiLoaderLine,
+    RiMicLine,
+    RiPlayCircleFill,
+    RiPauseCircleFill
 } from "@remixicon/react";
 import axios from "axios"
 import {
@@ -49,6 +52,12 @@ const Chats = () => {
     const [audio, setAudio] = useState(false);
     const [videoCallRequested, setVideoCallRequested] = useState([]);
     const [videoCallStatus, setVideoCallStatus] = useState(null);
+    const [sent, setSent] = useState(false);
+    const [ideaMessages, setIdeaMessages] = useState(new Map());
+    const [media, setMedia] = useState(null);
+    const [sending, setSending] = useState(false);
+    const [listening, setListening] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState(null);
     const mediaConstraints = {
         video : {
             width: { min: 640, ideal: 3040, max: 3040 },
@@ -59,10 +68,6 @@ const Chats = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const sendIdea = query.get("shareIdea");
-    const [sent, setSent] = useState(false);
-    const [ideaMessages, setIdeaMessages] = useState(new Map());
-    const [media, setMedia] = useState(null);
-    const [sending, setSending] = useState(false);
     useEffect(() => {
         setUnreadNotifications([]);
         setVideoCallRequested([]);
@@ -160,6 +165,7 @@ const Chats = () => {
                 return newMap;
             });
             send(chat, sendIdea, "idea");
+            setSent(true);
         }
     }
     useEffect(() => {
@@ -196,6 +202,7 @@ const Chats = () => {
             _id: id,
         }]);
         setMessage("");
+        msgInput.current.disabled = false;
         typing("");
         const ind = chats.findIndex(chat => chat._id == thisChat._id);
         if (messageType == "text") chats[ind].lastMessage = message;
@@ -232,22 +239,22 @@ const Chats = () => {
             })
         } else setUnreadNotifications(prev => {
             let temp = prev.map((unread, ind) => chats[ind]._id == room ? ++unread : unread);
-            const ind = chats.findIndex(chat => chat._id == room);
-            moveToTop(chats,ind);
-            moveToTop(temp, ind);
-            setVideoCallRequested(prev => {
-                moveToTop(prev, ind);
-                return prev;
-            })
             return temp;
         });
         const ind = chats.findIndex(chat => chat._id == room);
+        moveToTop(chats,ind);
+        moveToTop(temp, ind);
+        setVideoCallRequested(prev => {
+            moveToTop(prev, ind);
+            return prev;
+        });
         if (message.messageType == "text") chats[ind].lastMessage = message.message;
         else if (message.messageType == "idea") chats[ind].lastMessage = "Shared an Idea";
         else if (message.messageType == "image") chats[ind].lastMessage = "Sent an Image";
         else if (message.messageType == "video") chats[ind].lastMessage = "Sent a Video";
         else if (message.messageType == "audio") chats[ind].lastMessage = "Sent an Audio";
         else if (message.messageType == "document") chats[ind].lastMessage = "Shared a Document";
+        else if (message.messageType == "voice") chats[ind].lastMessage = "Sent a Voice Message";
     },[currChat])
     const reciveTyping = useCallback(({ room, message }) => {
         if (room == currChat._id) {
@@ -457,6 +464,26 @@ const Chats = () => {
         input.style.display = "none";
         input.click();
     }
+    const listen = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+        setListening(true);
+        const thisMediaRecorder = new MediaRecorder(stream);
+        setMediaRecorder(thisMediaRecorder);
+        thisMediaRecorder.ondataavailable = (e) => {
+            const audioFile = new File([e.data], 'recording.webm', { type: 'audio/webm' });
+            setMedia(audioFile);
+            setMessage("Recorded Audio");
+            stream.getTracks().forEach(track => track.stop());
+        };
+        thisMediaRecorder.start();
+        setMessage("Listening...");
+        msgInput.current.disabled = true;
+        console.log("Listening...");
+    }
+    const stopListening = () => {
+        mediaRecorder.stop();
+        setListening(false);
+    }
     return (
         <div className="h-lvh w-lvw flex p-2 gap-2">
             <div className="h-full w-72 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm">
@@ -625,6 +652,78 @@ const Chats = () => {
                                         </div>
                                         <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
                                     </div>
+                            } else if (message.messageType == "voice") {
+                                return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}>
+                                        <audio controls src={message.message}/>
+                                        <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-green-600 h-[65%] w-80 rounded-full flex p-2 justify-between items-center`}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    let currNode = e.target;
+                                                    if (e.target.tagName == "svg") currNode = e.target.parentNode;
+                                                    else if (e.target.tagName == "path") currNode = e.target.parentNode.parentNode;
+                                                    const audioNode = currNode.parentNode.previousSibling;
+                                                    const playNode = currNode.firstChild;
+                                                    const pauseNode = currNode.lastChild;
+                                                    if (audioNode.paused) audioNode.play();
+                                                    else audioNode.pause();
+                                                    audioNode.onended = () => {
+                                                        playNode.classList.remove("hidden");
+                                                        pauseNode.classList.add("hidden");
+                                                    }
+                                                    audioNode.onplay = () => {
+                                                        playNode.classList.add("hidden");
+                                                        pauseNode.classList.remove("hidden");
+                                                    }
+                                                    audioNode.onpause = () => {
+                                                        playNode.classList.remove("hidden");
+                                                        pauseNode.classList.add("hidden");
+                                                    }
+                                                    audioNode.addEventListener("timeupdate", () => {
+                                                        let { currentTime, duration } = audioNode;
+                                                        const durSec = Math.floor(duration%60);
+                                                        const progress = isNaN(durSec) ? Math.floor(Math.random()*(11)) + 70 : (currentTime/duration)*100;
+                                                        currNode.nextSibling.value = progress;
+                                                        const currMin = Math.floor(currentTime/60);
+                                                        const currSec = Math.floor(currentTime%60);
+                                                        const durMin = Math.floor(duration/60);
+                                                        const currTimeText = `${currMin}:${currSec.toString().padStart(2,'0')}`
+                                                        const durTimeText = isNaN(durSec) ? "" : ` / ${durMin}:${durSec.toString().padStart(2,'0')}`;
+                                                        currNode.nextSibling.nextSibling.innerText = `${currTimeText}${durTimeText}`;
+                                                    })
+                                                    audioNode.addEventListener("loadedmetadata", () => {
+                                                        let { currentTime, duration } = audioNode;
+                                                        const currMin = Math.floor(currentTime/60);
+                                                        const currSec = Math.floor(currentTime%60);
+                                                        const durMin = Math.floor(duration/60);
+                                                        const durSec = Math.floor(duration%60);
+                                                        const currTimeText = `${currMin}:${currSec.toString().padStart(2,'0')}`
+                                                        const durTimeText = isNaN(durSec) == "infinity" ? "" : ` / ${durMin}:${durSec.toString().padStart(2,'0')}`;
+                                                        currNode.nextSibling.nextSibling.innerText = `${currTimeText}${durTimeText}`;
+                                                        currNode.nextSibling.readOnly = false;
+                                                    });
+                                                }}
+                                            >
+                                                <RiPlayCircleFill size={40}/>
+                                                <RiPauseCircleFill size={40} className="hidden"/>
+                                            </button>
+                                            <input
+                                                onChange={(e) => {
+                                                    const currNode = e.target;
+                                                    const audioNode = currNode.parentNode.previousSibling;
+                                                    audioNode.currentTime = (parseInt(e.target.value)/100)*audioNode.duration;
+                                                    audioNode.play();
+                                                }}
+                                                readOnly
+                                                type="range"
+                                                defaultValue={0}
+                                                max={100}
+                                                className="w-4/5"
+                                            />
+                                            <p className="absolute bottom-0 right-7 text-sm">0:00</p>
+                                        </div>
+                                        <p className={`${(ind < messages.length-1 && messages[ind+1].sender == message.sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{message.senderUsername == activeUsername ? "You" : message.senderUsername}</p>
+                                    </div>
                             } else if (message.messageType == "idea") {
                                 return <div key={message._id} className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}>
                                         <Idea thisIdea={ideaMessages.get(message.message)}/>
@@ -700,17 +799,27 @@ const Chats = () => {
                             setMessage(e.target.value);
                             typing(e.target.value);
                         }} id="input" className="rounded-full py-2 px-4 flex-grow" type="text" placeholder="Type Something..." ref={msgInput}/>
+                        {!listening ? 
+                            <RiMicLine onClick={listen} size={30} className="cursor-pointer"/>
+                            :
+                            <div onClick={stopListening} className="relative p-1">
+                                <div className="h-full w-full rounded-full border-2 border-black absolute top-0 left-0 animate-ping"></div>
+                                <RiMicFill size={30} className="cursor-pointer"/>
+                            </div>
+                        }
                         <RiAttachment2 size={30} onClick={selectMedia} className="cursor-pointer"/>
                         <button onClick={async () => {
                             if (sending) return;
                             setSending(true);
                             if (!media) send(currChat, message, "text");
                             else {
-                                const { url, type } = await upload();
+                                let { url, type } = await upload();
+                                if (mediaRecorder) type = "voice";
                                 console.log("type", type);
                                 send(currChat, url, type);
                                 msgInput.current.disabled = false;
                                 setMedia(null);
+                                setMediaRecorder(null);
                             }
                             setSending(false);
                         }} className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center" ref={sendRef}><RiLoaderLine className={`${sending ? "" : "hidden"} animate-spin`}/><p>{sending ? "Sending" : "Send"}</p></button>

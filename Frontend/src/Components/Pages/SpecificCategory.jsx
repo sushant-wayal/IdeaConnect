@@ -1,8 +1,7 @@
 import Feed from "../Components/Feed";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useIdeas } from "../../context/ideas";
-import { headers } from "../dataLoaders";
+import { getData } from "../dataLoaders";
 import {
   useEffect,
   useState
@@ -15,7 +14,7 @@ const SpecificCategoryIdeas = () => {
   const { setIdeas, setOriginalIdeas } = useIdeas();
   useEffect(() => {
     const getIdeas = async () => {
-      const { data : { data : { ideas, authenticated } } } = await axios.get(`http://localhost:3000/api/v1/ideas/category/${category}`,{ headers });
+      const { ideas, authenticated } = await getData(`/ideas/category/${category}`, "get", true);
       setCategoryIdeas(ideas);
       setAuthenticated(authenticated);
     }

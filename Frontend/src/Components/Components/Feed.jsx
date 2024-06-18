@@ -21,13 +21,7 @@ const Feed = ({ authenticated }) => {
           {ideas.map(val => (
             <Idea
               key={val.ideaId}
-              thisIdea={{
-                idea: val.idea,
-                profileImage: val.profileImage,
-                intrested: val.intrested,
-                included: val.included,
-                ideaOf: val.ideaOf,
-              }}/>
+              thisIdea={val}/>
           ))}
           <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 relative bottom-0 sm:backdrop-blur-sm"}/>
           <div className="h-7"></div>
