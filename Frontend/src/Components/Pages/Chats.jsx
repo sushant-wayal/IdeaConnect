@@ -21,14 +21,16 @@ import {
     useState,
 } from "react";
 import { Link, useLoaderData, useLocation } from "react-router-dom"
-import io from "socket.io-client";
 import peer from "../../services/peer.js";
 import Idea from "../Components/Idea.jsx";
-
-const socket = io.connect("http://localhost:3001");
+import { useSocket } from "../../context/socket.js";
 
 const Chats = () => {
-    const chats = useLoaderData();
+    let chats;
+    const { authenticated, chatsAndGroups } = useLoaderData();
+    if (authenticated) chats = chatsAndGroups;
+    const socket = useSocket();
+    for (let chat of chats) socket.emit("joinRoom",chat._id);
     const [displayChats, setDisplayChats] = useState(chats);
     const [unreadNotifications, setUnreadNotifications] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -831,19 +833,3 @@ const Chats = () => {
 }
 
 export default Chats
-
-export const getChats = async () => {
-    const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/chats`,{
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
-    let chats = [];
-    if (data.authenticated) {
-        chats = data.chatsAndGroups;
-    }
-    for (let chat of chats) {
-        socket.emit("joinRoom",chat._id);
-    }
-    return chats;
-}

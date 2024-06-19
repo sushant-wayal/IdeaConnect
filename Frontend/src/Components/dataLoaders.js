@@ -62,18 +62,13 @@ export const getData = async (url, request, authorized) => {
 export const fecthData = async () => {
   const { data } = await axios.get("https://restcountries.com/v3/all");
   let countries = [];
-  data.forEach(country => {
-    countries.push(country.name.common);
-  })
+  data.forEach(({name : { common }}) => countries.push(common))
   countries = countries.sort();
   return countries;
 }
 
 export const getFeed = async () => await getData("/users/feed", "get", true);
-
-import { getChats } from "./Pages/Chats";
-export { getChats };
-
+export const getChats = async () => await getData("/chats", "get", true);
 export const getMyIdeas = async () => await getData("/ideas/myIdeas", "get", true);
 export const getExploreIdeas = async () => await getData("/ideas/exploreIdeas", "get", true);
 export const getCollaboratedIdeas = async () => await getData("/ideas/collaboratedIdeas", "get", true);

@@ -25,6 +25,7 @@ import {
 	getIntrestedIdeas,
 	getMyIdeas
 } from './components/dataLoaders.js'
+import StructuredChats from './components/Pages/StructuredChat.jsx'
 
 const router = createBrowserRouter(
 	createRoutesFromChildren(
@@ -40,6 +41,7 @@ const router = createBrowserRouter(
 			<Route path="/profile/:username" element={<Profile/>}/>
 			<Route path="/newIdea" element={<NewIdea/>}/>
 			<Route loader={getChats} path="/chats" element={<Chats/>}/>
+			<Route loader={getChats} path='/structuredChats' element={<StructuredChats/>}/>
 		</Route>
 	)
 )

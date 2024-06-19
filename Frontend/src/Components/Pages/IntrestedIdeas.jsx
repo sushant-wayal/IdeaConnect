@@ -16,7 +16,10 @@ const IntrestedIdeas = () => {
     }
   }, [authenticated, ideas, setIdeas, setOriginalIdeas]);
   return (
-    <Feed authenticated={authenticated}/>
+    <Feed
+      authenticated={authenticated}
+      noIdea={"You have not shown interest in any ideas yet."}
+    />
   )
 }
 

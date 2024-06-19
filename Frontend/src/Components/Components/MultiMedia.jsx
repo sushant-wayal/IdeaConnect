@@ -36,17 +36,33 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
   },[start]);
   return (
     <div className={`relative ${wrapperClassName}`}>
-      <div className={`h-full w-full flex bg-green-600 overflow-x-scroll overflow-y-hidden ${containerClassName}`} ref={container}>
+      <div
+        className={`h-full w-full flex bg-green-600 overflow-x-scroll overflow-y-hidden ${containerClassName}`}
+        ref={container}
+      >
         {medias.map((media, ind) => {
           const { src, type, alt } = media;
           return (
-            <div key={src} className="flex justify-center items-center h-full w-full bg-red-600 flex-shrink-0">
+            <div
+              key={src}
+              className="flex justify-center items-center h-full w-full bg-red-600 flex-shrink-0"
+            >
               {type == "image" || type == "default" ?
-                <img src={src} alt={alt} className="h-full w-full object-cover" />
+                <img
+                  src={src}
+                  alt={alt}
+                  className="h-full w-full object-cover"
+                />
                 : 
                 type == "video" ?
                   <div className="h-full w-full relative">
-                    <video id={`${id}Video${ind}`} loop src={src} alt={alt} className="h-full w-full object-cover" />
+                    <video
+                      id={`${id}Video${ind}`}
+                      loop
+                      src={src}
+                      alt={alt}
+                      className="h-full w-full object-cover"
+                    />
                     {muted[ind] ? 
                       <RiVolumeMuteLine
                         onClick={(e) => muteUnmute(e.target.parentNode.firstChild, ind)}
@@ -70,11 +86,23 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
         })}
       </div>
       <div className={`absolute bottom-3 ${medias.length > 1 ? "flex" : "hidden"} justify-center items-center gap-5 left-1/2 -translate-x-1/2`}>
-        <p onClick={() => moveTo(index, index-1)} className={`${index == 0 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}>
-          <RiArrowLeftWideLine size={navigationSize} color="white"/>
+        <p
+          onClick={() => moveTo(index, index-1)}
+          className={`${index == 0 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}
+        >
+          <RiArrowLeftWideLine
+            size={navigationSize}
+            color="white"
+          />
         </p>
-        <p onClick={() => moveTo(index, index+1)} className={`${index == medias.length-1 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}>
-          <RiArrowRightWideLine size={navigationSize} color="white"/>
+        <p
+          onClick={() => moveTo(index, index+1)}
+          className={`${index == medias.length-1 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}
+        >
+          <RiArrowRightWideLine
+            size={navigationSize}
+            color="white"
+          />
         </p>
       </div>
     </div>

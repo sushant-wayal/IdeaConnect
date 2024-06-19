@@ -34,7 +34,11 @@ const Idea = ({ thisIdea }) => {
     return (
 			<div className="relative w-full sm:w-[302px] h-[500px] sm:h-[450px] border-2 border-black border-solid backdrop-blur-sm rounded-2xl p-2 flex flex-col gap-2">
 				<div className="flex justify-center items-center relative border-b-2 border-b-black border-b-solid">
-					<img className="absolute left-1 -top-[6px] w-7 h-7 rounded-full border-2" src={profileImage} alt="profile"/>
+					<img
+						className="absolute left-1 -top-[6px] w-7 h-7 rounded-full border-2"
+						src={profileImage}
+						alt="profile"
+					/>
 					<p>
 						{idea.title}
 					</p>
@@ -91,11 +95,19 @@ const Idea = ({ thisIdea }) => {
 								className=""
 							/>
 							<div className="flex gap-1 justify-center items-center">
-								<img className="h-4 w-4" src="../../../../images/comment.svg"/>
+								<img
+									className="h-4 w-4"
+									src="../../../../images/comment.svg"
+								/>
 								<p>{idea.noOfComments}</p>
 							</div>
 							<div className="flex gap-1 justify-center items-center">
-								<Link to={`/chats?shareIdea=${idea._id}`}><img className="h-4 w-4" src="../../../../images/share.svg"/></Link>
+								<Link to={`/chats?shareIdea=${idea._id}`}>
+									<img
+										className="h-4 w-4"
+										src="../../../../images/share.svg"
+									/>
+								</Link>
 								<p>{idea.noOfShare}</p>
 							</div>
 					</div>

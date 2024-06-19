@@ -16,7 +16,10 @@ const CollaboratedIdeas = () => {
     }
   }, [authenticated, ideas, setIdeas, setOriginalIdeas]);
   return (
-    <Feed authenticated={authenticated}/>
+    <Feed
+      authenticated={authenticated}
+      noIdea={"You have not collaborated with any ideas yet."}
+    />
   )
 }
 

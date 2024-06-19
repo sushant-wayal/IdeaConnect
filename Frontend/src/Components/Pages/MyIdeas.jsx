@@ -16,7 +16,10 @@ const MyIdeas = () => {
     }
   }, [authenticated, ideas, setIdeas, setOriginalIdeas]);
   return (
-    <Feed authenticated={authenticated}/>
+    <Feed
+      authenticated={authenticated}
+      noIdea={"You have not published any ideas yet."}
+    />
   )
 }
 

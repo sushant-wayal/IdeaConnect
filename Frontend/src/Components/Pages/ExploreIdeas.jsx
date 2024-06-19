@@ -16,7 +16,10 @@ const ExploreIdeas = () => {
     }
   }, [authenticated, ideas, setIdeas, setOriginalIdeas]);
   return (
-    <Feed authenticated={authenticated}/>
+    <Feed
+      authenticated={authenticated}
+      noIdea={"No ideas for you to explore."}
+    />
   )
 }
 

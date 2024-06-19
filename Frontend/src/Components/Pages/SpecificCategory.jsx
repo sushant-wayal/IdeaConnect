@@ -30,7 +30,10 @@ const SpecificCategoryIdeas = () => {
     }
   }, [authenticated, categoryIdeas, setIdeas, setOriginalIdeas]);
   return (
-    <Feed authenticated={authenticated}/>
+    <Feed
+      authenticated={authenticated}
+      noIdea={`No ideas in the ${category} category.`}
+    />
   )
 }
 
