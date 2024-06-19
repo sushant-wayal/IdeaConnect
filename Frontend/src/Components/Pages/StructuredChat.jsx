@@ -2,6 +2,7 @@ import axios from "axios"
 import peer from "../../services/peer.js";
 import ChatList from "../Components/Chats/ChatList.jsx";
 import Messages from "../Components/Chats/Messages.jsx";
+import VideoCalling from "../Components/Chats/VideoCalling.jsx";
 import { getData } from "../dataLoaders.js";
 import { useSocket } from "../../context/socket.js";
 import {
