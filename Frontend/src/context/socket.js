@@ -9,7 +9,4 @@ const SocketContext = createContext({
 
 export const SocketProvider = SocketContext.Provider;
 
-export const useSocket = () => {
-  const { socket } = useContext(SocketContext);
-  return socket;
-}
+export const useSocket = () => useContext(SocketContext).socket;

@@ -7,29 +7,76 @@ import VoiceMessage from "./Messages/VoiceMessage";
 import DocumentMessage from "./Messages/DocumentMessage";
 import { Link } from "react-router-dom";
 import { RiVideoChatLine } from "@remixicon/react";
+import { useSocket } from "../../../context/socket";
+import { useCallback, useEffect } from "react";
+import { useChat } from "../../../context/chats";
+import { useVideoCall } from "../../../context/videoCall";
 
 const Messages = ({
-	currChatName,
-	username,
-	profileImage,
 	firstName,
 	lastName,
 	gotVideoCall,
-	currChatId,
-	onVideoCall,
 	messages,
 	activeUsername,
 	ideaMessages,
 	userId,
 	sendStreams,
-	requestVideoCall
+	originalUsername
 }) => {
+	const socket = useSocket();
+
+	const {
+		currChat : {
+			_id,
+			name
+		},
+		username,
+		profileImage,
+		setUsername
+	} = useChat();
+
+	const {
+		onVideoCall,
+		setOnVideoCall,
+		setVideoCallStatus
+	} = useVideoCall();
+	
+	const requestVideoCall = useCallback(() => {
+		setOnVideoCall(true);
+		setVideoCallStatus("Calling");
+		socket.emit("requestCall",{reciver: _id});
+  },[_id]);
+
+	useEffect(() => {
+		let messageEle = document.querySelector("#message");
+		messageEle.scrollTo({
+			top: messageEle.scrollHeight,
+			behavior: "smooth",
+		});
+  },[messages])
+
+	const reciveTyping = useCallback(({ room, message }) => {
+		if (room == _id) {
+			if (message.length > 0) setUsername(message);
+			else setUsername(originalUsername);
+		}
+  },[_id])
+
+	useEffect(() => {
+		socket.on("reciveTyping", reciveTyping)
+		return () => socket.off("reciveTyping", reciveTyping)
+  },[
+		socket,
+		_id,
+		reciveTyping
+	])
+
   return (
     <>
       <div className="py-2 px-5 flex justify-between items-center border-b-[1px] border-black border-solid">
 				<div className="flex justify-center gap-3">
 					<Link
-						to={currChatName ? "" : `/profile/${username}`}
+						to={name ? "" : `/profile/${username}`}
 						className="h-10 rounded-full"
 					>
 						<img
@@ -42,13 +89,13 @@ const Messages = ({
 						<p className="text-sm">{username}</p>
 					</div>
 				</div>
-				<div className={`${currChatName ? "hidden" : "flex"} justify-center gap-5 items-center hover:scale-110`}>
+				<div className={`${name ? "hidden" : "flex"} justify-center gap-5 items-center hover:scale-110`}>
 					<RiVideoChatLine
 						id="videoCallIcon"
 						size={30}
 						onClick={() => {
 							if (gotVideoCall) {
-								if (currChatId == gotVideoCall) sendStreams();
+								if (_id == gotVideoCall) sendStreams();
 							}
 							else requestVideoCall();
 						}}
@@ -80,7 +127,7 @@ const Messages = ({
 							<ImageMessage
 								align={align}
 								message={message}
-								chatTitle={currChatName ? currChatName : username}
+								chatTitle={name ? name : username}
 								messagesLength={messages.length}
 								nextSender={messages[ind+1]?.sender}
 								activeUsername={activeUsername}
@@ -92,7 +139,7 @@ const Messages = ({
 							<VideoMessage
 								align={align}
 								message={message}
-								chatTitle={currChatName ? currChatName : username}
+								chatTitle={name ? name : username}
 								ind={ind}
 								messagesLength={messages.length}
 								nextSender={messages[ind+1]?.sender}
@@ -104,7 +151,7 @@ const Messages = ({
 							<AudioMessage
 								align={align}
 								message={message}
-								chatTitle={currChatName ? currChatName : username}
+								chatTitle={name ? name : username}
 								ind={ind}
 								messagesLength={messages.length}
 								nextSender={messages[ind+1]?.sender}
@@ -140,7 +187,7 @@ const Messages = ({
 								align={align}
 								message={message}
 								activeUsername={activeUsername}
-								chatTitle={currChatName ? currChatName : username}
+								chatTitle={name ? name : username}
 								ind={ind}
 								messagesLength={messages.length}
 								nextSender={messages[ind+1]?.sender}

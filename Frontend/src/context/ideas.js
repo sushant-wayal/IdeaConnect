@@ -12,6 +12,4 @@ const IdeasContext = createContext({
 
 export const IdeasProvider = IdeasContext.Provider;
 
-export const useIdeas = () => {
-  return useContext(IdeasContext);
-}
+export const useIdeas = () => useContext(IdeasContext);

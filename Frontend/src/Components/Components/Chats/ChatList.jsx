@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { getData } from "../../dataLoaders";
 import { useSocket } from "../../../context/socket";
 import {
+  useCallback,
   useEffect,
   useState
 } from "react";
@@ -9,32 +10,59 @@ import {
   RiHome5Line,
   RiVideoOnLine
 } from "@remixicon/react";
+import { useChat } from "../../../context/chats";
+import { useVideoCall } from "../../../context/videoCall";
 
 const ChatList = ({
   chats,
   setShow,
-  setProfileImage,
   setFirstName,
   setLastName,
-  setUsername,
   setOriginalUsername,
-  setCurrChat,
   setIdeaMessages,
-  setUnreadNotifications,
   setMessages,
   send,
   sendIdea,
-  sent,
-  setSent,
-  unreadNotifications,
-  acceptVideoCall,
-  videoCallRequested,
   userId,
   className 
 }) => {
   const socket = useSocket();
+
+  const {
+    setProfileImage,
+    setUsername,
+    setCurrChat,
+    unreadNotifications,
+    setUnreadNotifications
+  } = useChat();
+
+  const {
+    videoCallRequested,
+    setOnVideoCall,
+    setVideoCallStatus,
+    setVideoCallRequested
+  } = useVideoCall();
+
   const [chatSearch, setChatSearch] = useState("");
   const [displayChats, setDisplayChats] = useState(chats);
+  const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+		setUnreadNotifications([]);
+		setVideoCallRequested([]);
+		for (let chat of chats) {
+			setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == userId.toString())]?.unread])
+			setVideoCallRequested(prev => [...prev,false]);
+		}
+  },[chats, userId])
+
+  const acceptVideoCall = useCallback((id) => {
+		setOnVideoCall(true);
+		setVideoCallStatus("Ringing")
+		setVideoCallRequested(prev => prev.map(_val => false));
+		socket.emit("acceptVideoCall",{reciver: id });
+  },[]);
+
   const openChat = async (chat) => {
     document.querySelector("#messages").style.backgroundImage = "none";
     setShow(true);
