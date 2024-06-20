@@ -8,9 +8,12 @@ import DocumentMessage from "./Messages/DocumentMessage";
 import { Link } from "react-router-dom";
 import { RiVideoChatLine } from "@remixicon/react";
 import { useSocket } from "../../../context/socket";
-import { useCallback, useEffect } from "react";
 import { useChat } from "../../../context/chats";
 import { useVideoCall } from "../../../context/videoCall";
+import {
+	useCallback,
+	useEffect
+} from "react";
 
 const Messages = ({
 	firstName,

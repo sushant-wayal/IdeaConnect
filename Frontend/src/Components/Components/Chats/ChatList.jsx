@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import { getData } from "../../dataLoaders";
+import { useChat } from "../../../context/chats";
 import { useSocket } from "../../../context/socket";
+import { useVideoCall } from "../../../context/videoCall";
+import {
+  RiHome5Line,
+  RiVideoOnLine
+} from "@remixicon/react";
 import {
   useCallback,
   useEffect,
   useState
 } from "react";
-import {
-  RiHome5Line,
-  RiVideoOnLine
-} from "@remixicon/react";
-import { useChat } from "../../../context/chats";
-import { useVideoCall } from "../../../context/videoCall";
 
 const ChatList = ({
   chats,

@@ -1,5 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useChat } from "../../../context/chats";
 import { useSocket } from "../../../context/socket";
+import { useVideoCall } from "../../../context/videoCall";
+import {
+  useCallback,
+  useEffect,
+  useState
+} from "react";
 import {
   RiMicFill,
   RiMicOffFill,
@@ -7,8 +13,6 @@ import {
   RiVideoOffFill,
   RiVideoOnLine
 } from "@remixicon/react";
-import { useChat } from "../../../context/chats";
-import { useVideoCall } from "../../../context/videoCall";
 
 const VideoCalling = ({
   peer,
