@@ -1,5 +1,5 @@
 import { RiMenu3Line } from "@remixicon/react"
-import { getData } from "../dataLoaders";
+import { getData } from "../../dataLoaders";
 import {
 	useEffect,
 	useState

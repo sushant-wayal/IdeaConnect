@@ -28,7 +28,12 @@ const SpecificCategoryIdeas = () => {
       setIdeas([]);
       setOriginalIdeas([])
     }
-  }, [authenticated, categoryIdeas, setIdeas, setOriginalIdeas]);
+  }, [
+    authenticated,
+    categoryIdeas,
+    setIdeas,
+    setOriginalIdeas
+  ]);
   return (
     <Feed
       authenticated={authenticated}

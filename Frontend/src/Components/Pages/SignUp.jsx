@@ -34,29 +34,23 @@ const SignUp = () => {
         const { root, suffixes } = data[0].idd;
         if (suffixes.length > 1) {
             setCountryCodes(prev => [...prev, ["Select Country Code",true]]);
-            suffixes.forEach(suffix => {
-                setCountryCodes(prev => [...prev, [root+suffix,false]]);
-            })
+            suffixes.forEach(suffix => setCountryCodes(prev => [...prev, [root+suffix,false]]))
         }
-        else {
-            setCountryCodes([[root+suffixes[0],false]]);
-        }
+        else setCountryCodes([[root+suffixes[0],false]]);
     }
 
     const upload = async (formData) => {
-        const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
+        const { data : { success, data : { url } } } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         })
 
-        if (data.success) {
+        if (success) {
             setProfileImageSet(true);
-            setProfileImage(data.data.url);
+            setProfileImage(url);
         }
-        else {
-            console.log("Check BackEnd");
-        }
+        else console.log("Check BackEnd");
     }
     const fileChange = async (e) => {
         let formData = new FormData();
@@ -86,13 +80,15 @@ const SignUp = () => {
             setGender("other");
             profileImage = "../../../../images/ProfileImageUpload/defaultOther.jpg";
         }
-        if (!profileImageSet) {
-            setProfileImage(profileImage);
-        }
+        if (!profileImageSet) setProfileImage(profileImage);
     }
     const register = async (e) => {
         e.preventDefault();
-        const { data : { data } } = await axios.post("http://localhost:3000/api/v1/users/register",{
+        const { data : { data : {
+            authenticated,
+            accessToken,
+            refreshToken
+        } } } = await axios.post("http://localhost:3000/api/v1/users/register",{
             username,
             password,
             firstName,
@@ -105,47 +101,121 @@ const SignUp = () => {
             bio,
             profileImage,
         });
-        if (data.authenticated) {
-            localStorage.setItem("accessToken",data.accessToken);
-            localStorage.setItem("refreshToken",data.refreshToken);
+        if (authenticated) {
+            localStorage.setItem("accessToken",accessToken);
+            localStorage.setItem("refreshToken",refreshToken);
             navigate("/ideas");
         }
-        else {
-            alert("Something went wrong. Please try Again");
-        }
+        else alert("Something went wrong. Please try Again");
     }
     return (
         <div className="flex flex-col justify-between items-center">
             <SignInUpNav/>
             <div className="flex flex-col justify-between gap-5 items-center w-full relative top-20">
-                <form onSubmit={register} className="flex flex-col gap-7 p-4 w-[max(36%,350px)] backdrop-blur-sm border-2 border-black border-solid rounded-3xl">
-                    <img onClick={imageUpload} className="h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2 cursor-pointer" src={profileImage} alt="Profile Photo"/>
+                <form
+                    onSubmit={register}
+                    className="flex flex-col gap-7 p-4 w-[max(36%,350px)] backdrop-blur-sm border-2 border-black border-solid rounded-3xl"
+                >
+                    <img
+                        onClick={imageUpload}
+                        className="h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2 cursor-pointer"
+                        src={profileImage}
+                        alt="Profile Photo"
+                    />
                     <div className="flex justify-between gap-3">
-                        <input onChange={(e) => setFirstName(e.target.value)} value={firstName} className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="text" placeholder="First"/>
-                        <input onChange={(e) => setLastName(e.target.value)} value={lastName} className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="text" placeholder="Last (optional)"/>
+                        <input
+                            onChange={(e) => setFirstName(e.target.value)}
+                            value={firstName}
+                            className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            type="text"
+                            placeholder="First"
+                        />
+                        <input
+                            onChange={(e) => setLastName(e.target.value)}
+                            value={lastName}
+                            className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            type="text"
+                            placeholder="Last (optional)"
+                        />
                     </div>
-                    <input onChange={(e) => setUsername(e.target.value)} value={username} className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="text" placeholder="Username"/>
+                    <input
+                        onChange={(e) => setUsername(e.target.value)}
+                        value={username}
+                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        type="text"
+                        placeholder="Username"
+                    />
                     <div className="relative">
-                        <input onChange={(e) => setPassword(e.target.value)} value={password} className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type={see ? "text" : "password"} placeholder="Password"/>
-                        <img onClick={() => setSee(!see)} className="absolute h-7 left-[200px] bottom-1 cursor-pointer" src={`../../../../images/${see ? "hide" : "see"}.png`} alt="see"/>
+                        <input
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            type={see ? "text" : "password"}
+                            placeholder="Password"
+                        />
+                        <img
+                            onClick={() => setSee(!see)}
+                            className="absolute h-7 left-[200px] bottom-1 cursor-pointer"
+                            src={`../../../../images/${see ? "hide" : "see"}.png`}
+                            alt="see"
+                        />
                     </div>
                     <div className="flex justify-start items-center gap-5 text-lg">
                         <p> Gender : </p>
-                        <label className="cursor-pointer" htmlFor="male">
-                            <input onChange={genderChange} checked={gender == "male"} id="male" type="radio" value="male" name="gender"/> Male
+                        <label
+                            className="cursor-pointer"
+                            htmlFor="male"
+                        >
+                            <input
+                                onChange={genderChange}
+                                checked={gender == "male"}
+                                id="male"
+                                type="radio"
+                                value="male"
+                                name="gender"
+                            /> Male
                         </label>
-                        <label className="cursor-pointer" htmlFor="female">
-                            <input onChange={genderChange} checked={gender == "female"} id="female" type="radio" value="female" name="gender"/> Female
+                        <label
+                            className="cursor-pointer"
+                            htmlFor="female"
+                        >
+                            <input
+                                onChange={genderChange}
+                                checked={gender == "female"}
+                                id="female"
+                                type="radio"
+                                value="female"
+                                name="gender"
+                            /> Female
                         </label>
-                        <label className="cursor-pointer" htmlFor="other">
-                            <input onChange={genderChange} checked={gender == "other"} id="other" type="radio" value="other" name="gender"/> other
+                        <label
+                            className="cursor-pointer"
+                            htmlFor="other"
+                        >
+                            <input
+                                onChange={genderChange}
+                                checked={gender == "other"}
+                                id="other"
+                                type="radio"
+                                value="other"
+                                name="gender"
+                            /> other
                         </label>
                     </div>
                     <div className="flex justify-start gap-5 items-center">
                         <p> DOB : </p>
-                        <input onChange={(e) => setDOB(e.target.value)} value={DOB} className="py-1 px-3 w-40 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full" type="date"/>
+                        <input
+                            onChange={(e) => setDOB(e.target.value)}
+                            value={DOB}
+                            className="py-1 px-3 w-40 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                            type="date"
+                        />
                     </div>
-                    <select value={country} onChange={countryChange} className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full">
+                    <select
+                        value={country}
+                        onChange={countryChange}
+                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                    >
                         <option disabled> Select the Country </option>
                         {countries.map(country => (
                             <option key={country}>{country}</option>
@@ -153,17 +223,44 @@ const SignUp = () => {
                     </select>
                     <div className="flex flex-col justify-center gap-8">
                         <div className="flex flex-col xl:flex-row justify-start gap-1 md:gap-3">
-                            <select value={countryCode} onChange={(e) => setCountryCode(e.target.value)} className="py-1 px-3 w-52 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full">
+                            <select
+                                value={countryCode}
+                                onChange={(e) => setCountryCode(e.target.value)}
+                                className="py-1 px-3 w-52 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                            >
                                 {countryCodes.map(thisCode => (
                                     <option disabled={thisCode[1]} key={thisCode[0]}>{thisCode[0]}</option>
                                 ))}
                             </select>
-                            <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="py-1 px-3 w-60 xl:w-1/2 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="number" placeholder="Phone Number"/>
+                            <input
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                                className="py-1 px-3 w-60 xl:w-1/2 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                                type="number"
+                                placeholder="Phone Number"
+                            />
                         </div>
-                        <input value={email} onChange={(e) => setEmail(e.target.value)} className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="email" placeholder="Email"/>
+                        <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            type="email"
+                            placeholder="Email"
+                        />
                     </div>
-                    <input value={bio} onChange={(e) => setBio(e.target.value)} className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80" type="text" placeholder="bio"/>
-                    <button type="submit" className="p-1 border-2 border-black border-solid rounded-2xl relative left-1/2 -translate-x-1/2 w-24"> Register </button>
+                    <input
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        type="text"
+                        placeholder="bio"
+                    />
+                    <button
+                        type="submit"
+                        className="p-1 border-2 border-black border-solid rounded-2xl relative left-1/2 -translate-x-1/2 w-24"
+                    >
+                        Register
+                    </button>
                 </form>
                 <Footer styling={""}/>
             </div>

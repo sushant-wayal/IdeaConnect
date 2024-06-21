@@ -4,6 +4,7 @@ import Footer from "../Components/General/Footer";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Idea from "../Components/Main/Idea";
+import { getData } from "../dataLoaders";
 
 const Profile = () => {
     const { username } = useParams();
@@ -14,30 +15,24 @@ const Profile = () => {
     const [userFollowers, setUserFollowers] = useState(user.followers);
     useEffect(() => {
         const getUsername = async () => {
-            const { data : { data } } = await axios.get("http://localhost:3000/api/v1/users/activeUser",{
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                },
-            });
-            if (data.authenticated) {
-                setActiveUsername(data.user.username);
-            }
+            const { authenticated, user } = await getData("/users/activeUser", "get", true);
+            if (authenticated) setActiveUsername(user.username);
         };
         getUsername();
         const getUser = async () => {
-            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/users/profile/${username}`);
+            const data = await getData(`/users/profile/${username}`, "get", false);
             setUser(data);
             setUserFollowers(data.followers);
         }
         getUser();
         const checkFollow = async () => {
-            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/users/checkFollow/${activeUsername}/${username}`);
-            setFollowing(data.follow);
+            const { follow } = await getData(`/users/checkFollow/${activeUsername}/${username}`, "get", false);
+            setFollowing(follow);
         }
         checkFollow();
         const getIdeas = async () => {
-            const { data : { data } } = await axios.get(`http://localhost:3000/api/v1/users/idea/${username}/${activeUsername}`);
-            setIdeas(data.ideas);
+            const { ideas } = await getData(`/users/idea/${username}/${activeUsername}`, "get", false);
+            setIdeas(ideas);
             console.log("Ideas",ideas);
         }
         getIdeas();
@@ -65,7 +60,11 @@ const Profile = () => {
             <div className="relative w-[98vw] left-1 lg:left-0 lg:w-[calc(100vw*5.4/6.5)] flex flex-col justify-center gap-2">
                 <div className="border-2 border-black border-solid rounded-2xl p-2">
                     <div className="backdrop-blur-sm flex flex-col gap-1 items-center justify-center p-5 rounded-t-2xl relative">
-                        <img className="object-cover h-32 w-32 rounded-full border-2 border-black border-solid" src={user.profileImage} alt="Profile Image"/>
+                        <img
+                            className="object-cover h-32 w-32 rounded-full border-2 border-black border-solid"
+                            src={user.profileImage}
+                            alt="Profile Image"
+                        />
                         <p>{user.username}</p>
                         <div className="flex justify-center gap-5">
                             <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl border-2 border-black border-solid">
@@ -87,12 +86,26 @@ const Profile = () => {
                         </div>
                         {activeUsername == username ?
                         <>
-                            <Link className="absolute top-36 right-1 lg:top-48 lg:right-1/4 bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl" to="/newIdea">New Idea</Link>
+                            <Link
+                                className="absolute top-36 right-1 lg:top-48 lg:right-1/4 bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                                to="/newIdea"
+                            >
+                                New Idea
+                            </Link>
                         </>
                         :
                         <>
-                            <button onClick={follow} className="absolute top-36 lg:top-48 right-1 lg:right-[375px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl">{following ? "Following" : "Follow"}</button>
-                            <Link className="absolute top-36 lg:top-48 right-[90vw] translate-x-[100%] lg:translate-x-0 lg:right-[275px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl">Message</Link>
+                            <button
+                                onClick={follow}
+                                className="absolute top-36 lg:top-48 right-1 lg:right-[375px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                            >
+                                {following ? "Following" : "Follow"}
+                            </button>
+                            <Link
+                                className="absolute top-36 lg:top-48 right-[90vw] translate-x-[100%] lg:translate-x-0 lg:right-[275px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                            >
+                                Message
+                            </Link>
                         </>
                         }
                     </div>
@@ -101,14 +114,10 @@ const Profile = () => {
                     <p className="border-t-2 border-b-2 border-black border-solid text-center backdrop-blur-sm text-lg mb-2">My Ideas</p>
                     <div className="flex flex-start flex-wrap gap-4">
                         {ideas.map(val => (
-                            <>
-                                <Idea key={val.ideaId} thisIdea={{
-                                    idea: val.idea,
-                                    profileImage: val.profileImage,
-                                    intrested: val.intrested,
-                                    ideaOf: val.ideaOf,
-                                }}/>
-                            </>
+                            <Idea
+                                key={val.ideaId}
+                                thisIdea={val}
+                            />
                         ))}
                     </div>
                     </>:<></>}
