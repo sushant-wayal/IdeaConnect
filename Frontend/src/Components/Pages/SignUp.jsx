@@ -1,6 +1,6 @@
 import axios from "axios";
-import Footer from "../Components/Footer"
-import SignInUpNav from "../Components/SignInUpNav"
+import Footer from "../Components/General/Footer"
+import SignInUpNav from "../Components/General/SignInUpNav"
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 
@@ -172,13 +172,3 @@ const SignUp = () => {
 }
 
 export default SignUp
-
-// export const fecthData = async () => {
-//     const { data } = await axios.get("https://restcountries.com/v3/all");
-//     let countries = [];
-// 	data.forEach(country => {
-// 		countries.push(country.name.common);
-// 	})
-// 	countries = countries.sort();
-//     return countries;
-// }

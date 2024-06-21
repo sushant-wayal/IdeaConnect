@@ -1,4 +1,7 @@
-import { RiPauseCircleFill, RiPlayCircleFill } from "@remixicon/react";
+import {
+  RiPauseCircleFill,
+  RiPlayCircleFill
+} from "@remixicon/react";
 
 const VoiceMessage = ({
   align,

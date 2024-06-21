@@ -1,11 +1,11 @@
 import MultiMedia from "./MultiMedia";
-import Category from "./Idea/Category";
-import Intrested from "./Idea/Intrested";
-import Description from "./Idea/Description";
-import Progress from "./Idea/Progress";
-import Likes from "./Idea/Likes";
+import Category from "../Idea/Category";
+import Intrested from "../Idea/Intrested";
+import Description from "../Idea/Description";
+import Progress from "../Idea/Progress";
+import Likes from "../Idea/Likes";
 import { Link } from "react-router-dom";
-import { getData } from "../dataLoaders";
+import { getData } from "../../dataLoaders";
 import {
 	useEffect,
 	useState

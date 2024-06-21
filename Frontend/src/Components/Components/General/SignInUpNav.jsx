@@ -1,7 +1,6 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom"
 import { RiMenu3Line } from "@remixicon/react"
-import { useState } from "react";
-
 
 const SignInUpNav = () => {
 	const active = (isActive) => {

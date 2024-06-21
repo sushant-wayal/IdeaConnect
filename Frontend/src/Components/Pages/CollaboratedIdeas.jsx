@@ -1,11 +1,17 @@
-import { useLoaderData } from "react-router-dom";
-import { useIdeas } from "../../context/ideas";
-import Feed from "../Components/Feed";
+import Feed from "../Components/Feed/Feed";
 import { useEffect } from "react";
+import { useIdeas } from "../../context/ideas";
+import { useLoaderData } from "react-router-dom";
 
 const CollaboratedIdeas = () => {
-  const { ideas, authenticated } = useLoaderData();
-  const { setIdeas, setOriginalIdeas } = useIdeas();
+  const {
+    ideas,
+    authenticated
+  } = useLoaderData();
+  const {
+    setIdeas,
+    setOriginalIdeas
+  } = useIdeas();
   useEffect(() => {
     if (authenticated) {
       setIdeas(ideas);
@@ -14,7 +20,12 @@ const CollaboratedIdeas = () => {
       setIdeas([]);
       setOriginalIdeas([])
     }
-  }, [authenticated, ideas, setIdeas, setOriginalIdeas]);
+  }, [
+    authenticated,
+    ideas,
+    setIdeas,
+    setOriginalIdeas
+  ]);
   return (
     <Feed
       authenticated={authenticated}

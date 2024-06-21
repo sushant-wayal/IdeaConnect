@@ -22,7 +22,7 @@ import {
 } from "react";
 import { Link, useLoaderData, useLocation } from "react-router-dom"
 import peer from "../../services/peer.js";
-import Idea from "../Components/Idea.jsx";
+import Idea from "../Components/Main/";
 import { useSocket } from "../../context/socket.js";
 
 const Chats = () => {

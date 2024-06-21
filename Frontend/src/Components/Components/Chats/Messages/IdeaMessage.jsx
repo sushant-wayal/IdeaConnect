@@ -1,4 +1,4 @@
-import Idea from "../../Idea";
+import Idea from "../../Main/Idea";
 
 const IdeaMessage = ({
   align,

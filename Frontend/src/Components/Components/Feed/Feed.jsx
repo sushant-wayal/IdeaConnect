@@ -1,10 +1,10 @@
-import Idea from "./Idea";
-import SideNav from "./SideNav";
-import TopNav from "./TopNav";
-import Footer from "./Footer";
+import Idea from "../Main/Idea";
+import SideNav from "../General/SideNav";
+import TopNav from "../General/TopNav";
+import Footer from "../General/Footer";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useIdeas } from "../../context/ideas";
+import { useIdeas } from "../../../context/ideas";
 
 const Feed = ({ authenticated, noIdea }) => {
   const { ideas } = useIdeas();

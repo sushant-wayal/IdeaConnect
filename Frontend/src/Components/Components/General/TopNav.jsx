@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react"
-import { useIdeas } from "../../context/ideas";
 import { getData } from "../dataLoaders";
+import { useIdeas } from "../../context/ideas";
+import {
+	useEffect,
+	useState
+} from "react"
 
 const TopNav = () => {
 	const [prompt, setPrompt] = useState("");
