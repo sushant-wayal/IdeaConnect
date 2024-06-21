@@ -4,8 +4,9 @@ import {
   useRef,
   useState
 } from "react";
+import Comment from "./Comment";
 
-const Description = ({ description, seeingLikedBy, likedBy, className }) => {
+const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, className }) => {
   const [seeing, setSeeing] = useState(false);
   const descriptionEleRef = useRef();
   const handleClick = () => {
@@ -31,7 +32,8 @@ const Description = ({ description, seeingLikedBy, likedBy, className }) => {
     }
   }
   useEffect(() => {
-    if (seeingLikedBy) {
+    if (seeingLikedBy || seeingComments) {
+      setSeeing(false);
       const descriptionEle = descriptionEleRef.current;
       gsap.to(descriptionEle,{
         height: 280,
@@ -48,7 +50,7 @@ const Description = ({ description, seeingLikedBy, likedBy, className }) => {
         duration: 0.3,
       })
     }
-  }, [seeingLikedBy])
+  }, [seeingLikedBy, seeingComments])
   return (
     <div
       onClick={handleClick}
@@ -64,7 +66,14 @@ const Description = ({ description, seeingLikedBy, likedBy, className }) => {
           )
         )
         :
-        description
+        seeingComments ?
+          <Comment
+            comments={comments}
+            setComments={setComments}
+            ideaId={ideaId}
+          />
+          :
+          description
       }
     </div>
   )

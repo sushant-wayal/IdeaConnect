@@ -10,6 +10,7 @@ import {
 	useEffect,
 	useState
 } from "react";
+import { SeeComments } from "../Idea/Comment";
 
 const Idea = ({ thisIdea }) => {
 	const { idea, profileImage, ideaOf, included, intrested } = thisIdea;
@@ -17,6 +18,8 @@ const Idea = ({ thisIdea }) => {
 	const [isLiked,setIsLiked] = useState(false);
 	const [likedBy, setLikedBy] = useState([]);
 	const [seeingLikedBy, setSeeingLikedBy] = useState(false);
+	const [comments, setComments] = useState([]);
+	const [seeingComments, setSeeingComments] = useState(false);
 	useEffect(() =>{
 		const checkLike = async () => {
 			const { liked } = await getData(`/ideas/checkLike/${idea._id}/${username}`, "get", false);
@@ -70,9 +73,13 @@ const Idea = ({ thisIdea }) => {
 			</div>
 			<div className="flex flex-col gap-0 absolute w-[95%] sm:w-[285px] bottom-7">
 					<Description
+						ideaId={idea._id}
 						description={idea.description}
 						seeingLikedBy={seeingLikedBy}
 						likedBy={likedBy}
+						comments={comments}
+						seeingComments={seeingComments}
+						setComments={setComments}
 						className="absolute bottom-[40px]"
 					/>
 					<Progress
@@ -94,13 +101,21 @@ const Idea = ({ thisIdea }) => {
 								username={username}
 								className=""
 							/>
-							<div className="flex gap-1 justify-center items-center">
+							{/* <div className="flex gap-1 justify-center items-center">
 								<img
 									className="h-4 w-4"
 									src="../../../../images/comment.svg"
 								/>
 								<p>{idea.noOfComments}</p>
-							</div>
+							</div> */}
+							<SeeComments
+								ideaId={idea._id}
+								setComments={setComments}
+								noOfComments={comments.length == 0 ? idea.noOfComments : comments.length}
+								seeingComments={seeingComments}
+								setSeeingComments={setSeeingComments}
+								className=""
+							/>
 							<div className="flex gap-1 justify-center items-center">
 								<Link to={`/chats?shareIdea=${idea._id}`}>
 									<img

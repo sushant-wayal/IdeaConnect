@@ -21,6 +21,7 @@ import imageUpload from './routes/image.route.js';
 import ideaRoutes from './routes/idea.route.js';
 import chatRoutes from './routes/chatAndGroup.route.js';
 import messageRoutes from './routes/message.route.js';
+import commentRoutes from './routes/comment.route.js';
 
 // use routes
 
@@ -29,6 +30,7 @@ app.use('/api/v1/images', imageUpload);
 app.use('/api/v1/ideas', ideaRoutes);
 app.use('/api/v1/chats', chatRoutes);
 app.use('/api/v1/messages', messageRoutes);
+app.use('/api/v1/comments', commentRoutes);
 
 // websocket stepup
 
