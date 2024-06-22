@@ -43,7 +43,7 @@ const Comment = ({ comments, setComments, ideaId }) => {
         </div>
       )
       )}
-      <div className="w-full absolute flex px-2 py-1 gap-1 bg-white" ref={addCommentEleRef}>
+      <div className="w-full absolute flex px-2 py-1 gap-1 bg-black" ref={addCommentEleRef}>
         <input
           type="text"
           placeholder="Add Comment..."
@@ -53,7 +53,7 @@ const Comment = ({ comments, setComments, ideaId }) => {
           className="flex-grow rounded-full h-1/6 bg-gray-600 text-white px-2 py-1 w-full"
         />
         <button onClick={addComment}>
-          <RiSendPlaneFill color="black" size={24}/>
+          <RiSendPlaneFill size={24}/>
         </button>
       </div>
     </div>

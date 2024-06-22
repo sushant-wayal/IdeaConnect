@@ -19,7 +19,7 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
         color: "white",
         duration: 0.3,
       })
-      setSeeing(true);
+      if (!seeingComments && !seeingLikedBy) setSeeing(true);
     }
     else {
       gsap.to(descriptionEle,{

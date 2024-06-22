@@ -73,11 +73,11 @@ export const likeIdea = asyncHandler(async (req, res) => {
 		idea.likes--;
 		idea.likedBy.splice(user._id,1);
 	}
-	idea.save({ validateBeforeSave: false});
-    res.status(201).json(new ApiResponse(201, {
-      liked,
-      success: true,
-    } ,'Idea liked successfully'));
+	await idea.save({ validateBeforeSave: false});
+	res.status(201).json(new ApiResponse(201, {
+		liked,
+		success: true,
+	} ,'Idea liked successfully'));
 });
 
 export const likedBy = asyncHandler(async (req, res) => {
