@@ -5,13 +5,8 @@ import {
 
 const VoiceMessage = ({
   align,
-  message,
-  ind,
-  messagesLength,
-  nextSender,
-  activeUsername
+  voiceSrc,
 }) => {
-  const { _id, sender, senderUsername } = message;
   const handleClick = (e) => {
     e.stopPropagation();
     let currNode = e.target;
@@ -59,13 +54,10 @@ const VoiceMessage = ({
     });
   }
   return (
-    <div
-      key={_id}
-      className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
-    >
+    <>
       <audio
         controls
-        src={message.message}
+        src={voiceSrc}
       />
       <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-green-600 h-[65%] w-80 rounded-full flex p-2 justify-between items-center`}>
         <button onClick={handleClick}>
@@ -87,8 +79,7 @@ const VoiceMessage = ({
         />
         <p className="absolute bottom-0 right-7 text-sm">0:00</p>
       </div>
-      <p className={`${(ind < messagesLength-1 && nextSender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
-    </div>
+    </>
   )
 }
 

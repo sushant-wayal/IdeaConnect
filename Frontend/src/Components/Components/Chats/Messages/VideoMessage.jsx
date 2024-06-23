@@ -2,15 +2,10 @@ import { RiDownloadLine } from "@remixicon/react";
 
 const VideoMessage = ({
 	align,
-	message,
 	chatTitle,
-	ind,
-	messagesLength,
-	nextSender,
-	activeUsername
+	videoSrc,
+	messageId
 }) => {
-	const { _id, sender, senderUsername } = message;
-	const videoSrc = message.message;
 	const downloadVideo = async () => {
 		try {
 			const response = await fetch(videoSrc);
@@ -18,7 +13,7 @@ const VideoMessage = ({
 			const url = URL.createObjectURL(blob);
 			let a = document.createElement("a");
 			a.href = url;
-			a.download = `${chatTitle}-${message._id}`;
+			a.download = `${chatTitle}-${messageId}`;
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
@@ -28,25 +23,19 @@ const VideoMessage = ({
 		}
 	}
   return (
-    <div
-			key={_id}
-			className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1`}
-		>
-			<div className="max-w-96 relative">
-				<RiDownloadLine
-					size={30}
-					color="white"
-					className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
-					onClick={downloadVideo}
-				/>
-				<video
-					controls
-					className="w-full rounded-2xl"
-					src={videoSrc}
-				/>
-			</div>
-			<p className={`${(ind < messagesLength && nextSender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
-    </div>
+		<div className="max-w-96 relative">
+			<RiDownloadLine
+				size={30}
+				color="white"
+				className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
+				onClick={downloadVideo}
+			/>
+			<video
+				controls
+				className="w-full rounded-2xl"
+				src={videoSrc}
+			/>
+		</div>
   )
 }
 

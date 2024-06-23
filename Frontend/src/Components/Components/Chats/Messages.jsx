@@ -12,7 +12,8 @@ import { useChat } from "../../../context/chats";
 import { useVideoCall } from "../../../context/videoCall";
 import {
 	useCallback,
-	useEffect
+	useEffect,
+	useState
 } from "react";
 
 const Messages = ({
@@ -43,6 +44,8 @@ const Messages = ({
 		setOnVideoCall,
 		setVideoCallStatus
 	} = useVideoCall();
+
+	const [messageDeleted, setMessageDeleted] = useState(false);
 	
 	const requestVideoCall = useCallback(() => {
 		setOnVideoCall(true);
@@ -51,6 +54,10 @@ const Messages = ({
   },[_id]);
 
 	useEffect(() => {
+		if (messageDeleted) {
+			setMessageDeleted(false);
+			return;
+		}
 		let messageEle = document.querySelector("#message");
 		messageEle.scrollTo({
 			top: messageEle.scrollHeight,
@@ -111,92 +118,64 @@ const Messages = ({
 				id="message"
 				className={`${onVideoCall ? "hidden" : ""} flex-grow w-full overflow-scroll p-2`}
 			>
-				{messages.map((message, ind) => {
+				{messages.map(({ _id, sender, senderUsername, messageType, message }, ind) => {
 					let align = "start";
-					if (userId.toString() == message.sender.toString()) align = "end";
-					if (message.messageType == "text") {
-						return (
-							<TextMessage
-								align={align}
-								message={message}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-								ind={ind}
-							/>
-						)
-					} else if (message.messageType == "image") {
-						return (
-							<ImageMessage
-								align={align}
-								message={message}
-								chatTitle={name ? name : username}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-								ind={ind}
-							/>
-						)
-					} else if (message.messageType == "video") {
-						return (
-							<VideoMessage
-								align={align}
-								message={message}
-								chatTitle={name ? name : username}
-								ind={ind}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-							/>
-						)
-					} else if (message.messageType == "audio") {
-						return (
-							<AudioMessage
-								align={align}
-								message={message}
-								chatTitle={name ? name : username}
-								ind={ind}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-							/>
-						)
-					} else if (message.messageType == "voice") {
-						return (
-							<VoiceMessage
-								align={align}
-								message={message}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-								ind={ind}
-							/>
-						)
-					} else if (message.messageType == "idea") {
-						return (
-							<IdeaMessage
-								align={align}
-								message={message}
-								thisIdea={ideaMessages.get(message.message)}
-								ind={ind}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-								activeUsername={activeUsername}
-							/>
-						)
-					} else {
-						return (
-							<DocumentMessage
-								align={align}
-								message={message}
-								activeUsername={activeUsername}
-								chatTitle={name ? name : username}
-								ind={ind}
-								messagesLength={messages.length}
-								nextSender={messages[ind+1]?.sender}
-							/>
-						)
-					}
+					if (userId.toString() == sender.toString()) align = "end";
+					return (
+						<div
+							key={_id}
+							className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
+						>
+							{messageType == "text" && (
+								<TextMessage
+									displayMessage={message}
+								/>
+							)}
+							{messageType == "image" && (
+								<ImageMessage
+									align={align}
+									chatTitle={name ? name : username}
+									messageId={_id}
+									imageSrc={message}
+								/>
+							)}
+							{messageType == "video" && (
+								<VideoMessage
+									align={align}
+									chatTitle={name ? name : username}
+									messageId={_id}
+									videoSrc={message}
+								/>
+							)}
+							{messageType == "audio" && (
+								<AudioMessage
+									align={align}
+									chatTitle={name ? name : username}
+									messageId={_id}
+									audioSrc={message}
+								/>
+							)}
+							{messageType == "voice" && (
+								<VoiceMessage
+									align={align}
+									voiceSrc={message}
+								/>
+							)}
+							{messageType == "idea" && (
+								<IdeaMessage thisIdea={ideaMessages.get(message)} />
+							)}
+							{messageType == "document" && (
+								<DocumentMessage
+									activeUsername={activeUsername}
+									chatTitle={name ? name : username}
+									senderUsername={senderUsername}
+									fileSrc={message}
+									messageId={_id}
+								/>
+							)}
+							<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
+						</div>
+					)
 				})}
 			</div>
     </>
