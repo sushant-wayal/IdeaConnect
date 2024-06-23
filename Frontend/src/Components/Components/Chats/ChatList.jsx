@@ -25,6 +25,7 @@ const ChatList = ({
   send,
   sendIdea,
   userId,
+  defaultChat,
   className 
 }) => {
   const socket = useSocket();
@@ -128,6 +129,14 @@ const ChatList = ({
       setSent(true);
     }
   }
+
+  useEffect(() => {
+    if (defaultChat && chats.length > 0 && userId) {
+      const ind = chats.findIndex(chat => !chat.name ? chat.members[0].userId.toString() == defaultChat.toString() || chat.members[1].userId.toString() == defaultChat.toString() : false);
+      if (ind != -1) openChat(chats[ind]);
+    }
+  },[chats, defaultChat, userId])
+
   useEffect(() => {
     const toSearch = chatSearch.trim().replace(/ +/g," ").toLowerCase();
     if (toSearch.length == 0) setDisplayChats(chats);

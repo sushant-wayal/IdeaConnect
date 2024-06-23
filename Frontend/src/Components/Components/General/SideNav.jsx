@@ -59,7 +59,7 @@ const SideNav = () => {
 	]
 	const BottomContent = [
 		{to: `/profile/${username}`, primaryText: "Profile"},
-		{to: "/settings", primaryText: "Settings"}
+		// {to: "/settings", primaryText: "Settings"}
 	]
 	return (
 		<>

@@ -102,6 +102,7 @@ const Profile = () => {
                                 {following ? "Following" : "Follow"}
                             </button>
                             <Link
+                                to={user._id ? `/chats?chat=${user._id}` : ""}
                                 className="absolute top-36 lg:top-48 right-[90vw] translate-x-[100%] lg:translate-x-0 lg:right-[275px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
                             >
                                 Message

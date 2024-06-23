@@ -71,6 +71,7 @@ const Chats = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const sendIdea = query.get("shareIdea");
+	const defaultChat = query.get("chat");
 
   useEffect(() => {
 		const getUserId = async () => {
@@ -290,6 +291,7 @@ const Chats = () => {
 						send={send}
 						sendIdea={sendIdea}
 						userId={userId}
+						defaultChat={defaultChat}
 						className=""
 					/>
 					<div

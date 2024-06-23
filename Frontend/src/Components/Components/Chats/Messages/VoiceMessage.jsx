@@ -1,6 +1,6 @@
 import {
-  RiPauseCircleFill,
-  RiPlayCircleFill
+  RiMicFill,
+  RiMicOffFill
 } from "@remixicon/react";
 
 const VoiceMessage = ({
@@ -54,15 +54,15 @@ const VoiceMessage = ({
     });
   }
   return (
-    <>
+    <div className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}>
       <audio
         controls
         src={voiceSrc}
       />
-      <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-green-600 h-[65%] w-80 rounded-full flex p-2 justify-between items-center`}>
+      <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-blue-600 h-full w-80 rounded-full flex p-2 justify-between items-center`}>
         <button onClick={handleClick}>
-          <RiPlayCircleFill size={40}/>
-          <RiPauseCircleFill size={40} className="hidden"/>
+          <RiMicFill size={30}/>
+          <RiMicOffFill size={30} className="hidden"/>
         </button>
         <input
           onChange={(e) => {
@@ -75,11 +75,11 @@ const VoiceMessage = ({
           type="range"
           defaultValue={0}
           max={100}
-          className="w-4/5"
+          className="w-[88%]"
         />
         <p className="absolute bottom-0 right-7 text-sm">0:00</p>
       </div>
-    </>
+    </div>
   )
 }
 

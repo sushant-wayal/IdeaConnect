@@ -29,7 +29,7 @@ const ImageMessage = ({
         color="white"
         className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}
         onClick={downloadImage}
-      />
+      /> 
       <img
         className="w-full rounded-2xl"
         src={imageSrc}

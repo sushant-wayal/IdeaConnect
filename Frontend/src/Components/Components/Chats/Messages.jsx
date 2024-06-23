@@ -6,7 +6,7 @@ import AudioMessage from "./Messages/AudioMessage";
 import VoiceMessage from "./Messages/VoiceMessage";
 import DocumentMessage from "./Messages/DocumentMessage";
 import { Link } from "react-router-dom";
-import { RiVideoChatLine } from "@remixicon/react";
+import { RiDeleteBin5Fill, RiVideoChatLine } from "@remixicon/react";
 import { useSocket } from "../../../context/socket";
 import { useChat } from "../../../context/chats";
 import { useVideoCall } from "../../../context/videoCall";
@@ -45,7 +45,12 @@ const Messages = ({
 		setVideoCallStatus
 	} = useVideoCall();
 
+	const [seeDelete, setSeeDelete] = useState([]);
 	const [messageDeleted, setMessageDeleted] = useState(false);
+
+	useEffect(() => {
+		setSeeDelete(messages.map(() => false));
+	},[messages])
 	
 	const requestVideoCall = useCallback(() => {
 		setOnVideoCall(true);
@@ -126,53 +131,59 @@ const Messages = ({
 							key={_id}
 							className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
 						>
-							{messageType == "text" && (
-								<TextMessage
-									displayMessage={message}
-								/>
-							)}
-							{messageType == "image" && (
-								<ImageMessage
-									align={align}
-									chatTitle={name ? name : username}
-									messageId={_id}
-									imageSrc={message}
-								/>
-							)}
-							{messageType == "video" && (
-								<VideoMessage
-									align={align}
-									chatTitle={name ? name : username}
-									messageId={_id}
-									videoSrc={message}
-								/>
-							)}
-							{messageType == "audio" && (
-								<AudioMessage
-									align={align}
-									chatTitle={name ? name : username}
-									messageId={_id}
-									audioSrc={message}
-								/>
-							)}
-							{messageType == "voice" && (
-								<VoiceMessage
-									align={align}
-									voiceSrc={message}
-								/>
-							)}
-							{messageType == "idea" && (
-								<IdeaMessage thisIdea={ideaMessages.get(message)} />
-							)}
-							{messageType == "document" && (
-								<DocumentMessage
-									activeUsername={activeUsername}
-									chatTitle={name ? name : username}
-									senderUsername={senderUsername}
-									fileSrc={message}
-									messageId={_id}
-								/>
-							)}
+							<div
+								onClick={() => setSeeDelete(seeDelete.map((val, index) => index == ind ? !val : val))}
+								className="flex items-start gap-2"
+							>
+								{messageType == "text" && (
+									<TextMessage
+										displayMessage={message}
+									/>
+								)}
+								{messageType == "image" && (
+									<ImageMessage
+										align={align}
+										chatTitle={name ? name : username}
+										messageId={_id}
+										imageSrc={message}
+									/>
+								)}
+								{messageType == "video" && (
+									<VideoMessage
+										align={align}
+										chatTitle={name ? name : username}
+										messageId={_id}
+										videoSrc={message}
+									/>
+								)}
+								{messageType == "audio" && (
+									<AudioMessage
+										align={align}
+										chatTitle={name ? name : username}
+										messageId={_id}
+										audioSrc={message}
+									/>
+								)}
+								{messageType == "voice" && (
+									<VoiceMessage
+										align={align}
+										voiceSrc={message}
+									/>
+								)}
+								{messageType == "idea" && (
+									<IdeaMessage thisIdea={ideaMessages.get(message)} />
+								)}
+								{messageType == "document" && (
+									<DocumentMessage
+										activeUsername={activeUsername}
+										chatTitle={name ? name : username}
+										senderUsername={senderUsername}
+										fileSrc={message}
+										messageId={_id}
+									/>
+								)}
+								<RiDeleteBin5Fill color="red" size={24} className={senderUsername == activeUsername && seeDelete[ind] ? "" : "hidden"}/>
+							</div>
 							<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
 						</div>
 					)
