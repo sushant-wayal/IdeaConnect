@@ -8,12 +8,31 @@ import {
 	NavLink,
 	useNavigate
 } from "react-router-dom";
+import { useNotification } from "../../../context/notifications";
+import { useSocket } from "../../../context/socket";
 
 const SideNav = () => {
+	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders } = useNotification();
+
+	const socket = useSocket();
+
+	useEffect(() => {
+		const fetchUnreadMessages = async () => {
+			const { unreadMessages, senders } = await getData("/chats/unread", "get", true);
+			setNoOfMessages(unreadMessages);
+			setNoOfSenders(senders);
+		}
+		fetchUnreadMessages();
+	},[
+		setNoOfMessages,
+		setNoOfSenders,
+		socket
+	])
+
 	const [username,setUsername] = useState("");
 	const navigate = useNavigate();
 	const active = (isActive) => {
-		let style = "p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105";
+		let style = "relative p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105 flex items-center justify-center gap-1";
 		if (isActive) style += " bg-black text-white";
 		return style;
 	}
@@ -62,7 +81,23 @@ const SideNav = () => {
 							className={({isActive}) => active(isActive)}
 							to={to}
 						>
-							{primaryText}	{responsiveText ? <p className="hidden xl:inline-block"> {responsiveText} </p> : null}
+							<p>{primaryText}</p>
+							{responsiveText ?
+								<p className="hidden xl:inline-block">
+									{responsiveText}
+								</p>
+								:
+								null
+							}
+							{(to == "/chats" && noOfMessages > 0) ?
+								<div className="rounded-full bg-black text-white text-sm px-2 py-1 flex justify-center items-center">
+									<p>
+									{noOfMessages >= 100 ? "99+" : noOfMessages}/{noOfSenders >= 10 ? "9+" : noOfSenders}
+									</p>
+								</div>
+								:
+								null
+							}
 						</NavLink>
 					))}
 				</div>

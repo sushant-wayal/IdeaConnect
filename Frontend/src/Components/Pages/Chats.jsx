@@ -23,6 +23,7 @@ import {
   RiLoaderLine,
   RiMicLine
 } from "@remixicon/react"
+import { useNotification } from "../../context/notifications.js";
 
 const Chats = () => {
   let chats = [];
@@ -32,6 +33,8 @@ const Chats = () => {
   const socket = useSocket();
 
   for (let chat of chats) socket.emit("joinRoom",chat._id);
+
+	const { setNoOfMessages, setNoOfSenders } = useNotification();
 
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -142,10 +145,15 @@ const Chats = () => {
 				userId,
 				group: currChat.name ? true : false,
 			})
-		} else setUnreadNotifications(prev => {
-			let temp = prev.map((unread, ind) => chats[ind]._id == room ? ++unread : unread);
-			return temp;
-		});
+		} else {
+			const preUnread = unreadNotifications.find((_, ind) => chats[ind]._id == room);
+			if (preUnread == 0) setNoOfSenders(prev => prev+1);
+			setNoOfMessages(prev => prev+1);
+			setUnreadNotifications(prev => {
+				let temp = prev.map((unread, ind) => chats[ind]._id == room ? ++unread : unread);
+				return temp;
+			})
+	};
 		const ind = chats.findIndex(chat => chat._id == room);
 		moveToTop(chats,ind);
 		moveToTop(temp, ind);

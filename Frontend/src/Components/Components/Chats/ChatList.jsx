@@ -12,6 +12,7 @@ import {
   useEffect,
   useState
 } from "react";
+import { useNotification } from "../../../context/notifications";
 
 const ChatList = ({
   chats,
@@ -42,6 +43,11 @@ const ChatList = ({
     setVideoCallStatus,
     setVideoCallRequested
   } = useVideoCall();
+
+  const {
+    setNoOfMessages,
+    setNoOfSenders
+  } = useNotification();
 
   const [chatSearch, setChatSearch] = useState("");
   const [displayChats, setDisplayChats] = useState(chats);
@@ -103,6 +109,11 @@ const ChatList = ({
       userId,
       group: chat.name ? true : false,
     })
+    const preUnread = unreadNotifications.find((_,ind) => chats[ind]._id == chat._id);
+    if (preUnread > 0) {
+      setNoOfMessages(prev => prev - preUnread);
+      setNoOfSenders(prev => prev - 1);
+    }
     setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     setMessages(messages);
     if (sendIdea && !sent) {

@@ -5,6 +5,30 @@ import { Group } from '../models/group.model.js';
 import { Message } from '../models/message.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
+export const totalUnreadMessages = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const user = await User.findById(id);
+  let unreadMessages = 0;
+  let senders = 0;
+  for (let chatId of user.chats) {
+    const chat = await Chat.findById(chatId);
+    const { unread } = chat.members.find(member => member.userId.toString() == id.toString());
+    unreadMessages += unread;
+    if (unread > 0) senders++;
+  }
+  for (let groupId of user.groups) {
+    const group = await Group.findById(groupId);
+    const { unread } = group.members.find(member => member.userId.toString() == id.toString());
+    unreadMessages += unread;
+    if (unread > 0) senders++;
+  }
+  res.status(200).json(new ApiResponse(200, {
+    authenticated: true,
+    unreadMessages,
+    senders
+  }));
+});
+
 export const sortGroupsAndChats = asyncHandler(async (req, res) => {
   const { id } = req.user;
 	const user = await User.findById(id);
