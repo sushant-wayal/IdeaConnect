@@ -1,6 +1,7 @@
 import { RiMenu3Line } from "@remixicon/react"
 import { getData } from "../../dataLoaders";
 import {
+	useCallback,
 	useEffect,
 	useState
 } from "react";
@@ -17,6 +18,14 @@ const SideNav = () => {
 	const socket = useSocket();
 
 	useEffect(() => {
+		const getUser = async () => {
+			const { user : { _id } } = await getData("/users/activeUser", "get", true);
+			socket.emit("joinNotificationRoom", _id);
+		}
+		getUser();
+	})
+
+	useEffect(() => {
 		const fetchUnreadMessages = async () => {
 			const { unreadMessages, senders } = await getData("/chats/unread", "get", true);
 			setNoOfMessages(unreadMessages);
@@ -28,6 +37,16 @@ const SideNav = () => {
 		setNoOfSenders,
 		socket
 	])
+
+	const reciveUnreadMessages = useCallback(({ preUnread }) => {
+		setNoOfMessages(prev => prev + 1);
+		if (preUnread > 0) setNoOfSenders(prev => prev + 1);
+	},[setNoOfMessages, setNoOfSenders])
+
+	useEffect(() => {
+		socket.on("unreadMessages", reciveUnreadMessages);
+		return () => socket.off("unreadMessages", reciveUnreadMessages);
+	},[reciveUnreadMessages, socket]);
 
 	const [username,setUsername] = useState("");
 	const navigate = useNavigate();

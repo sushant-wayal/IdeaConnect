@@ -13,7 +13,6 @@ const messanging = () => {
       socket.join(room);
     })
     socket.on('sendMessage', async ({ sender, reciver, messageType, message, senderUsername, group }) => {
-      console.log("send message", messageType);
       let chatId = !group ? reciver : null;
       let groupId = group ? reciver : null;
       const newMessage = await Message.create({
@@ -35,6 +34,7 @@ const messanging = () => {
       else if (messageType == "voice") chatOrGroup.lastMessage = senderUsername+": Sent a Voice Message";
       for (let member of chatOrGroup.members) {
         if (member.userId.toString() !== sender.toString()) {
+          io.to(member.userId.toString()).emit("unreadMessages",{ preUnread : member.unread });
           member.unread += 1;
         }
       }
@@ -43,7 +43,6 @@ const messanging = () => {
       socket.to(room).emit("reciveMessage",{room, message: newMessage});
     });
     socket.on('typing', ({ reciver, message }) => {
-      console.log("typing typing");
       const room = reciver;
       socket.to(room).emit("reciveTyping",{
         room,
