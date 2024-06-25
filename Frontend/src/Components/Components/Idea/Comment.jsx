@@ -2,15 +2,26 @@ import { RiSendPlaneFill } from "@remixicon/react";
 import { getData, headers } from "../../dataLoaders";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import { useSocket } from "../../../context/socket";
 
-const Comment = ({ comments, setComments, ideaId }) => {
+const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, username, userProfileImage }) => {
+  const socket = useSocket();
+
   const descriptionDivHeight = 272;
   const [comment, setComment] = useState("");
   const [scrollable, setScrollable] = useState(false);
   const addComment = async (e) => {
     e.stopPropagation();
     const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, headers);
-    if (success) setComments(prev => [newComment, ...prev]);
+    if (success) {
+      setComments(prev => [newComment, ...prev]);
+      console.log("sending comment notification", userId, ideaId, title, ideaOf, userProfileImage, username);
+      socket.emit("commentedNotification", { userId, idea: {
+        _id: ideaId,
+        title,
+        ideaOf
+      }, username, profileImage: userProfileImage});
+    }
     setComment("");
   }
   const commentsEleRef = useRef();

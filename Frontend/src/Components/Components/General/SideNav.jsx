@@ -13,17 +13,25 @@ import { useNotification } from "../../../context/notifications";
 import { useSocket } from "../../../context/socket";
 
 const SideNav = () => {
-	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders } = useNotification();
+	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders, unreadNotifications, setUnreadNotifications } = useNotification();
 
 	const socket = useSocket();
+
+	const [userId, setUserId] = useState("");
 
 	useEffect(() => {
 		const getUser = async () => {
 			const { user : { _id } } = await getData("/users/activeUser", "get", true);
 			socket.emit("joinNotificationRoom", _id);
+			setUserId(_id);
 		}
 		getUser();
-	})
+		const getNoOfUnreadNotifications = async () => {
+			const { noOfNotifications } = await getData("/notifications/unread", "get", true);
+			setUnreadNotifications(noOfNotifications);
+		}
+		getNoOfUnreadNotifications();
+	},[])
 
 	useEffect(() => {
 		const fetchUnreadMessages = async () => {
@@ -41,12 +49,17 @@ const SideNav = () => {
 	const reciveUnreadMessages = useCallback(({ preUnread }) => {
 		setNoOfMessages(prev => prev + 1);
 		if (preUnread > 0) setNoOfSenders(prev => prev + 1);
-	},[setNoOfMessages, setNoOfSenders])
+	},[setNoOfMessages, setNoOfSenders]);
 
 	useEffect(() => {
 		socket.on("unreadMessages", reciveUnreadMessages);
-		return () => socket.off("unreadMessages", reciveUnreadMessages);
+		return () => socket.off("unreadMessages", reciveUnreadMessages)
 	},[reciveUnreadMessages, socket]);
+
+	const openNotifications = () => {
+		socket.emit("seenAllNotification", { userId });
+		setUnreadNotifications(0);
+	}
 
 	const [username,setUsername] = useState("");
 	const navigate = useNavigate();
@@ -74,7 +87,8 @@ const SideNav = () => {
 		{to: "/exploreIdeas", primaryText: "Explore", responsiveText: "Ideas"},
 		{to: "/collaboratedIdeas", primaryText: "Collaborated", responsiveText: "Ideas"},
 		{to: "/intrestedIdeas", primaryText: "Intrested", responsiveText: "Ideas"},
-		{to: "/chats", primaryText: "Chats"}
+		{to: "/chats", primaryText: "Chats"},
+		{to: "/notifications", primaryText: "Notifications"}
 	]
 	const BottomContent = [
 		{to: `/profile/${username}`, primaryText: "Profile"},
@@ -99,6 +113,7 @@ const SideNav = () => {
 							key={index}
 							className={({isActive}) => active(isActive)}
 							to={to}
+							onClick={to == "/notifications" ? openNotifications : null}
 						>
 							<p>{primaryText}</p>
 							{responsiveText ?
@@ -117,16 +132,19 @@ const SideNav = () => {
 								:
 								null
 							}
+							{(to == "/notifications" && unreadNotifications > 0) ?
+								<div className="rounded-full bg-black text-white text-sm px-2 py-1 flex justify-center items-center">
+									<p>
+									{unreadNotifications >= 100 ? "99+" : unreadNotifications}
+									</p>
+								</div>
+								:
+								null
+							}
 						</NavLink>
 					))}
 				</div>
 				<div className="flex flex-col justify-center gap-5 w-full">
-					<button
-						onClick={logout}
-						className="p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105"
-					>
-						Logout
-					</button>
 					{BottomContent.map(({ to, primaryText, responsiveText }, index) => (
 						<NavLink
 							key={index}
@@ -136,6 +154,12 @@ const SideNav = () => {
 							{primaryText}	{responsiveText ? <p className="hidden xl:inline-block"> {responsiveText} </p> : null}
 						</NavLink>
 					))}
+					<button
+						onClick={logout}
+						className="p-1 border-2 border-black border-solid rounded-full text-center w-full hover:scale-105"
+					>
+						Logout
+					</button>
 				</div>
 			</div>
 		</>

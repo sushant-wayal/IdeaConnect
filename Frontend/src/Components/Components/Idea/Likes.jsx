@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { getData } from "../../dataLoaders";
+import { useSocket } from "../../../context/socket";
 
-const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, username, className }) => {
+const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, username, userId, title, ideaOf, userProfileImage, className }) => {
+  const socket = useSocket();
+
   const [noOfLikes, setNoOfLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const getLikes = async () => {
@@ -17,6 +20,13 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
     console.log("like Idea", liked);
     setNoOfLikes(liked ? noOfLikes-1 : noOfLikes+1);
     setIsLiked(!liked);
+    if (!liked) {
+      socket.emit("likedNotification", { userId, idea: {
+        _id: ideaId,
+        title,
+        ideaOf
+      },  username, profileImage: userProfileImage});
+    }
   }
   useEffect(() => {
     setNoOfLikes(noOfLikesInitial);

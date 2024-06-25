@@ -1,14 +1,18 @@
 import gsap from "gsap";
 import { getData } from "../../dataLoaders";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState
 } from "react";
+import { useSocket } from "../../../context/socket";
 
 // Yet to fix : "Version Error" in backend when there is new intrested user
 
-const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isIncluded, ideaOf, username, className }) => {
+const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isIncluded, ideaOf, username, userId, idea, userProfileImage, className }) => {
+  const socket = useSocket();
+
   const [seeing, setSeeing] = useState(false);
   const intrestedEleRef = useRef(null);
   const [intrestedUserInfo, setIntrestedUserInfo] = useState([]);
@@ -17,6 +21,16 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
   const include = async (e, id, ind) => {
     e.stopPropagation();
     await getData(`/ideas/include/${ideaId}/${id}`, "get", true);
+    socket.emit("includedNotification", {
+      userId,
+      idea: {
+        _id: ideaId,
+        title: idea.title
+      },
+      profileImage: userProfileImage,
+      username,
+      includedUser: id,
+    });
     setIntrestedUserInfo(intrestedUserInfo.filter((_, index) => index != ind));
     setNoOfIntrested(prev => prev - 1);
   }
@@ -50,14 +64,28 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
       setSeeing(false);
     }
   }
-  const setIntrestedStatus = async () => {
+  const setIntrestedStatus = useCallback(async () => {
     const { alreadyIntrested } = await getData(`/ideas/intrested/${ideaId}`, "get", true);
+    if (!alreadyIntrested) {
+      console.log("Intrested", ideaId, userId, idea.title, idea.ideaOf, userProfileImage, username);
+      socket.emit("intrestedNotification", {
+        userId,
+        idea: {
+          _id: ideaId,
+          title: idea.title,
+          ideaOf: idea.ideaOf,
+        },
+        profileImage: userProfileImage,
+        username,
+      });
+    };
     setIsIntrested(!alreadyIntrested);
-  }
+  },[username, ideaId, userId, idea, userProfileImage]);
   useEffect(() => {
     if (ideaOf == username && !isIncluded) return;
     intrestedEleRef.current.addEventListener("click", setIntrestedStatus);
-  }, [])
+    return () => intrestedEleRef?.current?.removeEventListener("click", setIntrestedStatus);
+  }, [username, userId, userProfileImage, ideaId, ideaOf, setIntrestedStatus, isIncluded]);
   return (
     <div
       onClick={handleClick}

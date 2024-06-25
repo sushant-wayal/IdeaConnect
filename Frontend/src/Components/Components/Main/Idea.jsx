@@ -20,6 +20,8 @@ const Idea = ({ thisIdea }) => {
 	const [seeingLikedBy, setSeeingLikedBy] = useState(false);
 	const [comments, setComments] = useState([]);
 	const [seeingComments, setSeeingComments] = useState(false);
+	const [userId, setUserId] = useState("");
+	const [userProfileImage, setUserProfileImage] = useState("");
 	useEffect(() =>{
 		const checkLike = async () => {
 			const { liked } = await getData(`/ideas/checkLike/${idea._id}/${username}`, "get", false);
@@ -30,7 +32,11 @@ const Idea = ({ thisIdea }) => {
 	useEffect(() => {
 		const getUsername = async () => {
 			const { authenticated, user } = await getData("/users/activeUser", "get", true);
-			if (authenticated) setUsername(user.username);
+			if (authenticated) {
+				setUsername(user.username);
+				setUserId(user._id);
+				setUserProfileImage(user.profileImage);
+			}
 		};
 		getUsername();
 	},[]);
@@ -68,6 +74,9 @@ const Idea = ({ thisIdea }) => {
 						isIncluded={included}
 						ideaOf={ideaOf}
 						username={username}
+						idea={idea}
+						userId={userId}
+						userProfileImage={userProfileImage}
 						className="absolute top-2 right-2"
 					/>
 			</div>
@@ -80,6 +89,11 @@ const Idea = ({ thisIdea }) => {
 						comments={comments}
 						seeingComments={seeingComments}
 						setComments={setComments}
+						ideaOf={idea.ideaOf}
+						username={username}
+						userProfileImage={userProfileImage}
+						title={idea.title}
+						userId={userId}
 						className="absolute bottom-[40px]"
 					/>
 					<Progress
@@ -99,6 +113,10 @@ const Idea = ({ thisIdea }) => {
 								seeingLikedBy={seeingLikedBy}
 								setSeeingLikedBy={setSeeingLikedBy}
 								username={username}
+								userId={userId}
+								title={idea.title}
+								ideaOf={idea.ideaOf}
+								userProfileImage={userProfileImage}
 								className=""
 							/>
 							{/* <div className="flex gap-1 justify-center items-center">

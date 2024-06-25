@@ -11,6 +11,7 @@ import {
 	IntrestedIdeas,
 	MyIdeas,
 	NewIdea,
+	Notification,
 	Profile,
 	SignIn, 
 	SignUp,
@@ -40,6 +41,7 @@ const router = createBrowserRouter(
 			<Route path="/profile/:username" element={<Profile/>}/>
 			<Route path="/newIdea" element={<NewIdea/>}/>
 			<Route loader={getChats} path="/chats" element={<Chats/>}/>
+			<Route path="/notifications" element={<Notification/>}/>
 			{/* <Route loader={getChats} path='/structuredChats' element={<StructuredChats/>}/> */}
 		</Route>
 	)

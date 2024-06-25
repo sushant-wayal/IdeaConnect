@@ -5,18 +5,24 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Idea from "../Components/Main/Idea";
 import { getData } from "../dataLoaders";
+import { useSocket } from "../../context/socket";
 
 const Profile = () => {
+    const socket = useSocket();
     const { username } = useParams();
     const [activeUsername, setActiveUsername] = useState("");
     const [user, setUser] = useState({});
     const [following, setFollowing] = useState(false);
     const [ideas, setIdeas] = useState([]);
     const [userFollowers, setUserFollowers] = useState(user.followers);
+    const [activeUserId, setActiveUserId] = useState("");
     useEffect(() => {
         const getUsername = async () => {
             const { authenticated, user } = await getData("/users/activeUser", "get", true);
-            if (authenticated) setActiveUsername(user.username);
+            if (authenticated) {
+                setActiveUsername(user.username);
+                setActiveUserId(user._id);
+            }
         };
         getUsername();
         const getUser = async () => {
@@ -53,6 +59,7 @@ const Profile = () => {
                 setFollowing(true);
             }
         }
+        socket.emit("followNotification", { follower: activeUserId, followed: user._id});
     };
     return (
         <div className="flex justify-end p-2">

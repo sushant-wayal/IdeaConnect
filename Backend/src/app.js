@@ -22,6 +22,7 @@ import ideaRoutes from './routes/idea.route.js';
 import chatRoutes from './routes/chatAndGroup.route.js';
 import messageRoutes from './routes/message.route.js';
 import commentRoutes from './routes/comment.route.js';
+import notificationRoutes from './routes/notification.route.js';
 
 // use routes
 
@@ -31,6 +32,7 @@ app.use('/api/v1/ideas', ideaRoutes);
 app.use('/api/v1/chats', chatRoutes);
 app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/comments', commentRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // websocket stepup
 

@@ -15,6 +15,7 @@ import CollaboratedIdeas from "./Pages/CollaboratedIdeas";
 import IntrestedIdeas from "./Pages/IntrestedIdeas";
 import SpecificCategoryIdeas from "./Pages/SpecificCategory";
 import MultiMedia from "./Components/Main/MultiMedia";
+import Notification from "./Pages/Notifications";
 
 export {
     SignInUpNav,
@@ -33,5 +34,6 @@ export {
     CollaboratedIdeas,
     IntrestedIdeas,
     SpecificCategoryIdeas,
-    MultiMedia
+    MultiMedia,
+    Notification
 }

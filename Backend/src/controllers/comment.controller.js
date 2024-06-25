@@ -8,8 +8,6 @@ export const addComment = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { ideaId, comment } = req.body;
   const { profileImage, username } = await User.findById(id);
-  console.log("ideaId, comment",ideaId, comment);
-  console.log("profileImage, username",profileImage, username);
   const { _id } = await Comment.create({
     commentOf: id,
     commentOn: ideaId,

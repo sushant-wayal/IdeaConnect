@@ -85,6 +85,10 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Idea",
   }],
+  notifications: [{
+    type: Schema.Types.ObjectId,
+    ref: "Notification",
+  }],
   refreshToken: String,
 }, { timestamps: true });
 

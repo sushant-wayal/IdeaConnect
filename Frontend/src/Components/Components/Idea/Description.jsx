@@ -6,7 +6,7 @@ import {
 } from "react";
 import Comment from "./Comment";
 
-const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, className }) => {
+const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, userId, title, ideaOf, username, userProfileImage, className }) => {
   const [seeing, setSeeing] = useState(false);
   const descriptionEleRef = useRef();
   const handleClick = () => {
@@ -71,6 +71,11 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
             comments={comments}
             setComments={setComments}
             ideaId={ideaId}
+            userId={userId}
+            title={title}
+            ideaOf={ideaOf}
+            userProfileImage={userProfileImage}
+            username={username}
           />
           :
           description
