@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNotification } from "../../context/notifications"
 import { getData } from "../dataLoaders";
 import SideNav from "../Components/General/SideNav";
@@ -6,12 +6,16 @@ import TopNav from "../Components/General/TopNav";
 import Footer from "../Components/General/Footer";
 import { useSocket } from "../../context/socket";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Notification = ({}) => {
   const socket = useSocket();
 
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const unread = query.get("unread") || 0;
 
   const { notifications, setNotifications, setUnreadNotifications } = useNotification();
   useEffect(() => {
@@ -23,27 +27,13 @@ const Notification = ({}) => {
   },[]);
   useEffect(() => {
     setUnreadNotifications(0);
-    const checkFollowAndIncludedAll = async () => {
-      const newNotifications = [...notifications];
-      for (let i = 0; i < newNotifications.length; i++) {
-        if (newNotifications[i].type == "follow") {
-          const { follow } = await getData(`/users/checkFollow/${activeUsername}/${username}`, "get", false);
-          newNotifications[i].isFollowing = follow;
-        }
-        else if (newNotifications[i].type == "intrested") {
-          const { include } = await getData(`/ideas/checkInclude/${newNotifications[i].ideaId}/${activeUserId}`, "get", true);
-          newNotifications[i].isIncluded = include;
-        }
-      }
-      setNotifications(newNotifications);
-    }
-    checkFollowAndIncludedAll();
     socket.emit("seenNotification", { notificationId: notifications[0]?._id });
-  },[notifications, setNotifications, socket])
+  },[notifications, socket])
 
   const [activeUsername, setActiveUsername] = useState("");
   const [activeUserId, setActiveUserId] = useState("");
   const [userProfileImage, setUserProfileImage] = useState("");
+
   useEffect(() => {
     const getUsername = async () => {
       const { authenticated, user } = await getData("/users/activeUser", "get", true);
@@ -54,7 +44,34 @@ const Notification = ({}) => {
       }
     };
     getUsername();
-  })
+  },[])
+
+  const [notificationLength, setNotificationLength] = useState(0);
+
+  useEffect(() => {
+    setNotificationLength(notifications.length);
+  },[notifications])
+
+  useEffect(() => {
+    const checkFollowAndIncludedAll = async () => {
+      const newNotifications = [...notifications];
+      for (let i = 0; i < newNotifications.length; i++) {
+        console.log("notification",i,newNotifications[i]);
+        if (newNotifications[i].type == "follow") {
+          const { follow } = await getData(`/users/checkFollow/${activeUsername}/${username}`, "get", false);
+          newNotifications[i].isFollowing = follow;
+        }
+        else if (newNotifications[i].type == "intrested") {
+          if (!newNotifications[i].ideaId) continue;
+          const { include } = await getData(`/ideas/checkInclude/${newNotifications[i].ideaId}/${activeUserId}`, "get", true);
+          newNotifications[i].isIncluded = include;
+        }
+      }
+      setNotifications(newNotifications);
+    }
+    checkFollowAndIncludedAll();
+  },[notificationLength])
+
   const follow = async (ind) => {
     const { username, isFollowing, notifiedBy } = notifications[ind];
     const { data : { data } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${username}`,{},{
@@ -97,35 +114,40 @@ const Notification = ({}) => {
       {notifications.length > 0 ? 
         <div key={"1"} className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-full flex flex-col justify-start gap-4 p-2 pb-0 overflow-y-scroll">
           {notifications.map(({_id, type, profileImage, username, title, isFollowing, isIncluded}, ind) => (
-            <div key={_id} className="w-full flex justify-start items-center gap-4 border-2 border-black backdrop-blur-sm rounded-xl px-2 py-1 text-md">
-              <img src={profileImage} alt="profile" className="w-10 h-10 rounded-full"/>
-              <div>
-                {type == "follow" &&
-                  <div className="flex-grow flex justify-between items-center gap-4">
-                    <p><b>{username}</b> followed you</p>
-                    <button onClick={() => follow(ind)} className={`${isFollowing ? "bg-white text-black border-2 border-black" : "bg-black text-white border-2 border-white"} rounded-lg p-1`}>{
-                      isFollowing ? "Following" : "Follow"
-                    }</button>
-                  </div>}
-                {type == "intrested" && 
-                  <div className="flex-grow flex justify-between items-center gap-4">
-                    <p><b>{username}</b> is intrested in your idea <b>{title}</b></p>
-                    <button
-                      onClick={() => isIncluded ? null : include(ind)}
-                      className="bg-black text-white rounded-lg p-1"
-                    >
-                      {isIncluded ? "Included" : "Include"}
-                    </button>
-                  </div>}
-                {type == "included" &&
-                  <div className="flex-grow flex justify-between items-center gap-4">
-                    <p><b>{username}</b> included you in their idea <b>{title}</b></p>
-                    <button onClick={() => openGroup(ind)} className="bg-black text-white rounded-lg p-1">See Group</button>
-                  </div>}
-                {type == "liked" && <p><b>{username}</b> liked your idea <b>{title}</b></p>}
-                {type == "commented" && <p><b>{username}</b> commented on your idea <b>{title}</b></p>}
+            <>
+              {ind == unread && <p className="w-full text-center backdrop-blur-sm rounded-2xl text-5xl p-4 border-2 border-black border-solid">
+                All Bellow Notifications are Read.
+              </p>}
+              <div key={_id} className="w-full flex justify-start items-center gap-4 border-2 border-black backdrop-blur-sm rounded-xl px-2 py-1 text-md">
+                <img src={profileImage} alt="profile" className="w-10 h-10 rounded-full"/>
+                <div>
+                  {type == "follow" &&
+                    <div className="flex-grow flex justify-between items-center gap-4">
+                      <p><b>{username}</b> followed you</p>
+                      <button onClick={() => follow(ind)} className={`${isFollowing ? "bg-white text-black border-2 border-black" : "bg-black text-white border-2 border-white"} rounded-lg p-1`}>{
+                        isFollowing ? "Following" : "Follow"
+                      }</button>
+                    </div>}
+                  {type == "intrested" && 
+                    <div className="flex-grow flex justify-between items-center gap-4">
+                      <p><b>{username}</b> is intrested in your idea <b>{title}</b></p>
+                      <button
+                        onClick={() => isIncluded ? null : include(ind)}
+                        className="bg-black text-white rounded-lg p-1"
+                      >
+                        {isIncluded ? "Included" : "Include"}
+                      </button>
+                    </div>}
+                  {type == "included" &&
+                    <div className="flex-grow flex justify-between items-center gap-4">
+                      <p><b>{username}</b> included you in their idea <b>{title}</b></p>
+                      <button onClick={() => openGroup(ind)} className="bg-black text-white rounded-lg p-1">See Group</button>
+                    </div>}
+                  {type == "liked" && <p><b>{username}</b> liked your idea <b>{title}</b></p>}
+                  {type == "commented" && <p><b>{username}</b> commented on your idea <b>{title}</b></p>}
+                </div>
               </div>
-            </div>
+            </>
           ))}
           <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 relative bottom-0 sm:backdrop-blur-sm"}/>
           <div className="h-7"></div>

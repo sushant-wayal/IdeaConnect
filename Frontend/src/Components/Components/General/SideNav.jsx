@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import { useNotification } from "../../../context/notifications";
 import { useSocket } from "../../../context/socket";
+import { set } from "mongoose";
 
 const SideNav = () => {
 	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders, unreadNotifications, setUnreadNotifications } = useNotification();
@@ -81,7 +82,7 @@ const SideNav = () => {
 		navigate("/");
 	}
 	const [seeing, setSeeing] = useState(false);
-	const TopContent = [
+	const [TopContent, setTopContent] = useState([
 		{to: "/ideas", primaryText: "Feed"},
 		{to: "/myIdeas", primaryText: "My", responsiveText: "Ideas"},
 		{to: "/exploreIdeas", primaryText: "Explore", responsiveText: "Ideas"},
@@ -89,7 +90,12 @@ const SideNav = () => {
 		{to: "/intrestedIdeas", primaryText: "Intrested", responsiveText: "Ideas"},
 		{to: "/chats", primaryText: "Chats"},
 		{to: "/notifications", primaryText: "Notifications"}
-	]
+	])
+
+	useEffect(() => {
+		setTopContent(prev => prev.map(content => content.to == "/notifications" ? {...content, to: `/notifications?unread=${unreadNotifications}`} : content));
+	},[unreadNotifications, setTopContent]);
+
 	const BottomContent = [
 		{to: `/profile/${username}`, primaryText: "Profile"},
 		// {to: "/settings", primaryText: "Settings"}
