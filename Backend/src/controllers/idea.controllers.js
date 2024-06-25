@@ -122,6 +122,17 @@ export const intrested = asyncHandler(async (req, res) => {
 	} ,'Idea intrested successfully'));
 });
 
+export const checkInclude = asyncHandler(async (req, res) => {
+	const { ideaId, userId } = req.params;
+	const idea = await Idea.findById(ideaId);
+	let included = false;
+	for (let includedUserId of idea.includedUsers) if (includedUserId.toString() == userId.toString()) included = true;
+	res.status(201).json(new ApiResponse(201, {
+		included,
+	} ,'Checked if user is included in idea'));
+});
+
+
 export const include = asyncHandler(async (req, res) => {
 	const { ideaId, userId } = req.params;
 	const idea = await Idea.findById(ideaId);

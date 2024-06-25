@@ -7,6 +7,7 @@ import {
   likedBy,
   intrested,
   include,
+  checkInclude,
   share,
   myIdeas,
   exploreIdeas,
@@ -27,6 +28,7 @@ router.route("/likeIdea/:ideaId/:username").get(likeIdea);
 router.route("/likedBy/:ideaId").get(likedBy);
 router.route("/intrested/:ideaId").get(isLoggedIn,intrested);
 router.route("/include/:ideaId/:userId").get(isLoggedIn,include);
+router.route("/checkInclude/:ideaId/:userId").get(isLoggedIn,checkInclude);
 router.route("/share/:ideaId").get(isLoggedIn,share);
 router.route("/myIdeas").get(isLoggedIn,myIdeas);
 router.route("/exploreIdeas").get(isLoggedIn, exploreIdeas);

@@ -66,3 +66,12 @@ export const sortGroupsAndChats = asyncHandler(async (req, res) => {
     chatsAndGroups
   }));
 });
+
+export const getGroupId = asyncHandler(async (req, res) => {
+  const { ideaId } = req.params;
+  const group = await Group.findOne({ ideaId });
+  res.status(200).json(new ApiResponse(200, {
+    authenticated: true,
+    groupId: group._id
+  }));
+});

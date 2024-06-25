@@ -19,6 +19,7 @@ const notification = () => {
         _id,
         username,
         profileImage,
+        notifiedBy: follower,
         type
       });
     });
@@ -38,6 +39,8 @@ const notification = () => {
         username: newNotification.username,
         profileImage: newNotification.profileImage,
         title: newNotification.title,
+        ideaId: newNotification.IdeaId,
+        notifiedBy: newNotification.notifiedBy,
         type: newNotification.type
       });
     });
@@ -56,6 +59,7 @@ const notification = () => {
         username: newNotification.username,
         profileImage: newNotification.profileImage,
         title: newNotification.title,
+        ideaId: newNotification.IdeaId,
         type: newNotification.type
       });
     });

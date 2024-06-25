@@ -132,7 +132,7 @@ const ChatList = ({
 
   useEffect(() => {
     if (defaultChat && chats.length > 0 && userId) {
-      const ind = chats.findIndex(chat => !chat.name ? chat.members[0].userId.toString() == defaultChat.toString() || chat.members[1].userId.toString() == defaultChat.toString() : false);
+      const ind = chats.findIndex(chat => !chat.name ? chat.members[0].userId.toString() == defaultChat.toString() || chat.members[1].userId.toString() == defaultChat.toString() : chat._id == defaultChat);
       if (ind != -1) openChat(chats[ind]);
     }
   },[chats, defaultChat, userId])
