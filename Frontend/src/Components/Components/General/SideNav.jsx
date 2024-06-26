@@ -11,7 +11,6 @@ import {
 } from "react-router-dom";
 import { useNotification } from "../../../context/notifications";
 import { useSocket } from "../../../context/socket";
-import { set } from "mongoose";
 
 const SideNav = () => {
 	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders, unreadNotifications, setUnreadNotifications } = useNotification();
@@ -75,7 +74,7 @@ const SideNav = () => {
 			if (authenticated) setUsername(user.username);
 		};
 		getUsername();
-	})
+	},[])
 	const logout = async () => {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
@@ -91,10 +90,6 @@ const SideNav = () => {
 		{to: "/chats", primaryText: "Chats"},
 		{to: "/notifications", primaryText: "Notifications"}
 	])
-
-	useEffect(() => {
-		setTopContent(prev => prev.map(content => content.to == "/notifications" ? {...content, to: `/notifications?unread=${unreadNotifications}`} : content));
-	},[unreadNotifications, setTopContent]);
 
 	const BottomContent = [
 		{to: `/profile/${username}`, primaryText: "Profile"},
@@ -116,9 +111,9 @@ const SideNav = () => {
 					</button>
 					{TopContent.map(({ to, primaryText, responsiveText }, index) => (
 						<NavLink
-							key={index}
+							key={to == "/notifications" ? `${unreadNotifications}notify` : index}
 							className={({isActive}) => active(isActive)}
-							to={to}
+							to={to == "/notifications" ? `/notifications?unread=${unreadNotifications}` : to}
 							onClick={to == "/notifications" ? openNotifications : null}
 						>
 							<p>{primaryText}</p>

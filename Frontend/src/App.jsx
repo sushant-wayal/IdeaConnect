@@ -31,7 +31,10 @@ const App = () => {
 
 	const reciveNotification = useCallback(newNotification => {
 		setNotifications(prev => [newNotification, ...prev]);
-		setUnreadNotifications(prev => prev + 1);
+		setUnreadNotifications(prev => {
+			console.log("unreadNotifications",prev);
+			return prev + 1;
+		});
 	},[setNotifications, socket]);
 
 	useEffect(() => {

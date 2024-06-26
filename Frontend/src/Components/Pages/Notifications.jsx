@@ -115,9 +115,15 @@ const Notification = ({}) => {
         <div key={"1"} className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-full flex flex-col justify-start gap-4 p-2 pb-0 overflow-y-scroll">
           {notifications.map(({_id, type, profileImage, username, title, isFollowing, isIncluded}, ind) => (
             <>
-              {ind == unread && <p className="w-full text-center backdrop-blur-sm rounded-2xl text-5xl p-4 border-2 border-black border-solid">
-                All Bellow Notifications are Read.
-              </p>}
+              {ind == unread && unread > 0 &&
+                <div className="flex justify-center items-center gap-2">
+                  <div className="h-0 flex-grow border-2 border-black"></div>
+                  <p className="text-lg backdrop-blur-sm p-1 rounded-xl border-2 border-black">
+                    All caught up!
+                  </p>
+                  <div className="h-0 flex-grow border-2 border-black"></div>
+                </div>
+              }
               <div key={_id} className="w-full flex justify-start items-center gap-4 border-2 border-black backdrop-blur-sm rounded-xl px-2 py-1 text-md">
                 <img src={profileImage} alt="profile" className="w-10 h-10 rounded-full"/>
                 <div>

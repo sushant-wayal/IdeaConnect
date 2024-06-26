@@ -21,6 +21,7 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
     setNoOfLikes(liked ? noOfLikes-1 : noOfLikes+1);
     setIsLiked(!liked);
     if (!liked) {
+      console.log("emitting likedNotification");
       socket.emit("likedNotification", { userId, idea: {
         _id: ideaId,
         title,
