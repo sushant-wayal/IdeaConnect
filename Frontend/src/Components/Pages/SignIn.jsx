@@ -3,29 +3,44 @@ import Footer from "../Components/General/Footer";
 import SignInUpNav from "../Components/General/SignInUpNav"
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "sonner";
+import { RiLoader2Line } from "@remixicon/react";
 
 const SignIn = () => {
     const [see, setSee] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
     const login = async (e) => {
         e.preventDefault();
-        const { data : { data : {
-            authenticated,
-            accessToken,
-            refreshToken 
-        } } } = await axios.post("http://localhost:3000/api/v1/users/login", {
-            username,
-            password,
-        })
-        if (authenticated) {
-            setErrorMsg("");
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
-            navigate("/ideas");
+        const toastId = toast.loading("Logging In...")
+        setLoading(true);
+        try {
+            const { data : { data : {
+                authenticated,
+                accessToken,
+                refreshToken 
+            } } } = await axios.post("http://localhost:3000/api/v1/users/login", {
+                username,
+                password,
+            })
+            if (authenticated) {
+                setErrorMsg("");
+                localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
+                navigate("/ideas");
+                toast.success("Logged In Successfully", { id: toastId });
+            } else {
+                toast.error("Invalid Credentials", { id: toastId });
+                setErrorMsg("Invalid Credentials");
+            }
+        } catch {
+            toast.error("An Error Occurred. Try Again", { id: toastId });
+            setErrorMsg("An Error Occurred. Try Again");
         }
+        setLoading(false);
     }
     return (
         <div className="h-lvh w-lvw flex flex-col justify-between items-center">
@@ -69,8 +84,13 @@ const SignIn = () => {
                 <button
                     className="p-2 border-2 border-black border-solid rounded-2xl sm:text-sm text-2xl sm:w-20 w-32"
                     type="submit"
+                    disabled={loading}
                 >
-                    Log    in
+                    {loading ?
+                        <>
+                            <RiLoader2Line className="animate-spin h-7 w-7" />
+                            <p>Logging in...</p>
+                        </> : "Log    in"}
                 </button>
                 <Link
                     className="underline sm:text-sm text-lg"

@@ -3,6 +3,8 @@ import Footer from "../Components/General/Footer"
 import SignInUpNav from "../Components/General/SignInUpNav"
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { RiLoader2Line } from "@remixicon/react";
 
 const SignUp = () => {
     const [profileImage, setProfileImage] = useState("../../../../images/ProfileImageUpload/defaultOther.jpg");
@@ -23,6 +25,8 @@ const SignUp = () => {
     const countries = useLoaderData();
 
     const [countryCodes, setCountryCodes] = useState([["Select Country Code",true]]);
+
+    const [uploading, setUploading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -55,7 +59,9 @@ const SignUp = () => {
     const fileChange = async (e) => {
         let formData = new FormData();
         formData.append("file",e.target.files[0]);
+        setUploading(true);
         await upload(formData);
+        setUploading(false);
         document.querySelector("#profileImage").remove();
     }
     const imageUpload = () => {
@@ -84,6 +90,7 @@ const SignUp = () => {
     }
     const register = async (e) => {
         e.preventDefault();
+        const toastId = toast.loading("Registering & Logging In...")
         const { data : { data : {
             authenticated,
             accessToken,
@@ -105,6 +112,7 @@ const SignUp = () => {
             localStorage.setItem("accessToken",accessToken);
             localStorage.setItem("refreshToken",refreshToken);
             navigate("/ideas");
+            toast.success("Registered & Logged In Successfully", { id: toastId });
         }
         else alert("Something went wrong. Please try Again");
     }
@@ -116,12 +124,17 @@ const SignUp = () => {
                     onSubmit={register}
                     className="flex flex-col gap-7 p-4 w-[max(36%,350px)] backdrop-blur-sm border-2 border-black border-solid rounded-3xl"
                 >
-                    <img
-                        onClick={imageUpload}
-                        className="h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2 cursor-pointer"
-                        src={profileImage}
-                        alt="Profile Photo"
-                    />
+                    {uploading ?
+                        <div className="flex justify-center items-center h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2">
+                            <RiLoader2Line size={24} className="animate-spin"/>
+                        </div>
+                        :
+                        <img
+                            onClick={imageUpload}
+                            className="h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2 cursor-pointer"
+                            src={profileImage}
+                            alt="Profile Photo"
+                        />}
                     <div className="flex justify-between gap-3">
                         <input
                             onChange={(e) => setFirstName(e.target.value)}

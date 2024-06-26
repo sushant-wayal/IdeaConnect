@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { SocketProvider } from "./context/socket";
 import { NotificationProvider } from "./context/notifications";
 import { getData } from "./components/dataLoaders";
+import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner";
 
 const App = () => {
 	const socket = io.connect("http://localhost:3001");
@@ -15,6 +17,7 @@ const App = () => {
 
 	useEffect(() => {
 		const getUser = async () => {
+			if (!localStorage.getItem("accessToken")) return;
 			const { user } = await getData("/users/activeUser", "get", true);
 			socket.emit("joinNotificationRoom", user._id);
 			setUserId(user._id);
@@ -30,6 +33,39 @@ const App = () => {
 	const [unreadNotifications, setUnreadNotifications] = useState(0);
 
 	const reciveNotification = useCallback(newNotification => {
+		const { type, username, profileImage, title } = newNotification;
+		if (type == " follow") {
+			toast.success(`${username} started following you`, {
+				duration: 5000,
+				icon: profileImage,
+			});
+			toast(
+				<div
+					className="flex items-center gap-3 justify-start bg-white rounded-lg text-md"
+				>
+					<img src={profileImage} alt="profile" className="h-10 aspect-square object-cover rounded-full" />
+					<p><b>{username}</b> started <b>following</b> you</p>
+				</div>
+			)
+		} else if (type == "intrested") {
+			toast(
+				<div
+					className="flex items-center gap-3 justify-start bg-white rounded-lg text-md"
+				>
+					<img src={profileImage} alt="profile" className="h-10 aspect-square object-cover rounded-full" />
+					<p><b>{username}</b> is <b>intrested</b> in your idea: <b>{title}</b></p>
+				</div>
+			)
+		} else if (type == " included") {
+			toast(
+				<div
+					className="flex items-center gap-3 justify-start bg-white rounded-lg text-md"
+				>
+					<img src={profileImage} alt="profile" className="h-10 aspect-square object-cover rounded-full" />
+					<p><b>{username}</b> <b>included</b> you in their idea: <b>{title}</b></p>
+				</div>
+			)
+		}
 		setNotifications(prev => [newNotification, ...prev]);
 		setUnreadNotifications(prev => {
 			console.log("unreadNotifications",prev);
@@ -50,6 +86,11 @@ const App = () => {
 			<NotificationProvider value={{ noOfMessages, setNoOfMessages, noOfSenders, setNoOfSenders, notifications, setNotifications, unreadNotifications, setUnreadNotifications, userId, setUserId, username, setUsername, userProfileImage, setUserProfileImage }}>
 				<IdeasProvider value={{ ideas, setIdeas, originalIdeas, setOriginalIdeas }}>
 					<Outlet/>
+					<Toaster
+						richColors={true}
+						theme="light"
+						position="top-center"
+					/>
 				</IdeasProvider>
 			</NotificationProvider>
 		</SocketProvider>

@@ -3,20 +3,48 @@ import SideNav from "../General/SideNav";
 import TopNav from "../General/TopNav";
 import Footer from "../General/Footer";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useIdeas } from "../../../context/ideas";
+import { RiLoader2Line } from "@remixicon/react";
 
 const Feed = ({ authenticated, noIdea }) => {
   const { ideas } = useIdeas();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     if (!authenticated) navigate("/");
-  })
+  },[])
+  useEffect(() => {
+    if (authenticated === true || authenticated === false) setLoading(false);
+    else setLoading(true);
+  },[authenticated])
   return (
     <div>
       <SideNav/>
       <TopNav/>
-      {ideas.length > 0 ? 
+      {loading ? 
+        <div key={"2"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-100vw flex justify-center items-center gap-4 p-2 pb-0 flex-wrap overflow-scroll">
+          <RiLoader2Line className="w-20 h-20 animate-spin"/>
+          <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 absolute bottom-0 right-0 sm:backdrop-blur-sm"}/>
+        </div>
+        :
+        ideas.length > 0 ? 
+          <div key={"1"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-full flex justify-start gap-4 p-2 pb-0 flex-wrap overflow-scroll">
+            {ideas.map(val => (
+              <Idea
+                key={val.ideaId}
+                thisIdea={val}/>
+            ))}
+            <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 relative bottom-0 sm:backdrop-blur-sm"}/>
+            <div className="h-7"></div>
+          </div>
+          :
+          <div key={"2"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-100vw flex justify-center items-center gap-4 p-2 pb-0 flex-wrap overflow-scroll">
+            <p className="w-72 text-center backdrop-blur-sm rounded-2xl text-5xl p-4 border-2 border-black border-solid">{noIdea}</p>
+            <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 absolute bottom-0 right-0 sm:backdrop-blur-sm"}/>
+          </div>
+      }
+      {/* {ideas.length > 0 ? 
         <div key={"1"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-full flex justify-start gap-4 p-2 pb-0 flex-wrap overflow-scroll">
           {ideas.map(val => (
             <Idea
@@ -31,7 +59,7 @@ const Feed = ({ authenticated, noIdea }) => {
           <p className="w-72 text-center backdrop-blur-sm rounded-2xl text-5xl p-4 border-2 border-black border-solid">{noIdea}</p>
           <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 absolute bottom-0 right-0 sm:backdrop-blur-sm"}/>
         </div>
-      }
+      } */}
     </div>
   )
 }

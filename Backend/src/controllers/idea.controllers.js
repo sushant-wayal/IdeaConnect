@@ -223,7 +223,7 @@ export const exploreIdeas = asyncHandler(async (req, res) => {
 		const idea = await Idea.findById(ideaId);
 		const ideaOf = await User.findById(idea.ideaOf);
 		const intrested = idea.intrestedUser.includes(id);
-		const included = false;
+		let included = false;
 		for (let groupId of user.groups) {
 			const group = await Group.findById(groupId);
 			if (group.ideaId.toString() == ideaId.toString()) {

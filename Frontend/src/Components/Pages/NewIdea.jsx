@@ -8,12 +8,16 @@ import MultiMedia from "../Components/Main/MultiMedia";
 import { getData } from "../dataLoaders";
 import Step from "../Components/NewIdea/Step";
 import Category from "../Components/NewIdea/Category";
+import { toast } from "sonner";
+import { RiLoader2Line } from "@remixicon/react";
 
 const NewIdea = () => {
     const [username,setUsername] = useState("");
     const [categories,setCategories] = useState([]);
     const [title,setTitle] = useState("");
     const [description,setDescription] = useState("");
+    const [publishing,setPublishing] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [steps, setSteps] = useState([{
         value: "Start",
@@ -70,7 +74,9 @@ const NewIdea = () => {
     const fileChange = async (e) => {
         let formData = new FormData();
         formData.append("file",e.target.files[0]);
+        setUploading(true);
         await upload(formData);
+        setUploading(false);
         document.querySelector("#media").remove();
     }
 
@@ -87,6 +93,8 @@ const NewIdea = () => {
 
     const publish = async (e) => {
         e.preventDefault();
+        setPublishing(true);
+        const toastId = toast.loading("Publishing Idea...");
         const { data : { data : { success } } } = await axios.post("http://localhost:3000/api/v1/ideas/publishIdea",{
             username,
             title,
@@ -96,7 +104,11 @@ const NewIdea = () => {
             steps : steps.map(step => step.value),
             progress : steps.reduce((acc,step) => step.checked ? acc+1 : acc,0)
         })
-        if (success) navigate(`/profile/${username}`)
+        if (success) {
+            navigate(`/profile/${username}`);
+            toast.success("Idea Published Successfully", { id: toastId });
+        }
+        setPublishing(false);
     }
 
     return (
@@ -126,6 +138,7 @@ const NewIdea = () => {
                                 soundSize={30}
                                 wrapperClassName="w-full h-full rounded-2xl"
                                 containerClassName="rounded-2xl"
+                                uploading={uploading}
                             />
                             <div
                                 onClick={imageUpload}
@@ -176,10 +189,18 @@ const NewIdea = () => {
                         </div>
                     </div>
                     <button
-                        className="border-2 border-black border-solid rounded-full p-2 w-24 bg-gray-600 bg-opacity-80"
+                        className="border-2 border-black border-solid rounded-full p-2 px-3 bg-gray-600 bg-opacity-80"
                         type="submit"
+                        disabled={publishing}
                     >
-                        Publish
+                        {publishing ?
+                            <div className="flex justify-center items-center gap-1">
+                                <RiLoader2Line color="white" className="animate-spin h-5 w-5"/>
+                                <p>Publishing...</p>
+                            </div>
+                            :
+                            "Publish"
+                        }
                     </button>
                 </form>
                 <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 backdrop-blur-sm"}/>

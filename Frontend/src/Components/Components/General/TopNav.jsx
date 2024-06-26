@@ -5,7 +5,7 @@ import {
 	useState
 } from "react"
 
-const TopNav = () => {
+const TopNav = ({ noSearchText }) => {
 	const [prompt, setPrompt] = useState("");
 	const { originalIdeas, setIdeas } = useIdeas();
 	const handleOnChange = (e) => {
@@ -28,14 +28,20 @@ const TopNav = () => {
 						alt="Logo"
 					/>
 					<div className="relative w-full lg:w-60">
-						<input
-							className="bg-transparent border-2 border-black border-solid rounded-full pl-8 py-1 w-full"
-							type="text"
-							value={prompt}
-							onChange={handleOnChange}
-							placeholder="Search Ideas"
-						/>
-						<p className="absolute top-1/2 -translate-y-1/2 left-[min(10px,3%)]">🔎</p>
+						{!noSearchText ?
+							<>
+								<input
+									className="bg-transparent border-2 border-black border-solid rounded-full pl-8 py-1 w-full"
+									type="text"
+									value={prompt}
+									onChange={handleOnChange}
+									placeholder="Search Ideas"
+								/>
+								<p className="absolute top-1/2 -translate-y-1/2 left-[min(10px,3%)]">🔎</p>
+							</>
+							:
+							<p className="text-2xl">{noSearchText}</p>
+						}
 					</div>
 			</div>
 	)

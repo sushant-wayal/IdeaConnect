@@ -1,8 +1,10 @@
 import axios from "axios";
 
-export const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+export const getHeaders = () => {
+  return {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    }
   }
 }
 
@@ -10,6 +12,11 @@ const backendUrl = "http://localhost:3000/api/v1";
 
 export const getData = async (url, request, authorized) => {
   url = `${backendUrl}${url}`
+  const headers = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    }
+  }
   if (authorized) {
     if (request == "get") {
       const { data : { data } } = await axios.get(url, headers);

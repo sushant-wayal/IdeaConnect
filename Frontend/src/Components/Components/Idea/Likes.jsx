@@ -2,18 +2,23 @@ import { useEffect, useState } from "react";
 import { getData } from "../../dataLoaders";
 import { useSocket } from "../../../context/socket";
 
-const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, username, userId, title, ideaOf, userProfileImage, className }) => {
+const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, username, userId, title, ideaOf, userProfileImage, setLoading, className }) => {
   const socket = useSocket();
 
   const [noOfLikes, setNoOfLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const getLikes = async () => {
     if (!seeingLikedBy) {
+      setLoading(true);
       const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", false);
       setLikedBy(likedBy);
       setSeeingLikedBy(true);
+      setLoading(false);
     }
-    else setSeeingLikedBy(false);
+    else {
+      setSeeingLikedBy(false);
+      setLoading(false);
+    }
   }
   const likeIdea = async () => {
     const { liked } = await getData(`/ideas/likeIdea/${ideaId}/${username}`, "get", false);

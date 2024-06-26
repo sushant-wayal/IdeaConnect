@@ -22,6 +22,8 @@ const Idea = ({ thisIdea }) => {
 	const [seeingComments, setSeeingComments] = useState(false);
 	const [userId, setUserId] = useState("");
 	const [userProfileImage, setUserProfileImage] = useState("");
+	const [loadingLikes, setLoadingLikes] = useState(false);
+	const [loadingComments, setLoadingComments] = useState(false);
 	useEffect(() =>{
 		const checkLike = async () => {
 			const { liked } = await getData(`/ideas/checkLike/${idea._id}/${username}`, "get", false);
@@ -94,6 +96,7 @@ const Idea = ({ thisIdea }) => {
 						userProfileImage={userProfileImage}
 						title={idea.title}
 						userId={userId}
+						loading={loadingLikes || loadingComments}
 						className="absolute bottom-[40px]"
 					/>
 					<Progress
@@ -117,21 +120,16 @@ const Idea = ({ thisIdea }) => {
 								title={idea.title}
 								ideaOf={idea.ideaOf}
 								userProfileImage={userProfileImage}
+								setLoading={setLoadingLikes}
 								className=""
 							/>
-							{/* <div className="flex gap-1 justify-center items-center">
-								<img
-									className="h-4 w-4"
-									src="../../../../images/comment.svg"
-								/>
-								<p>{idea.noOfComments}</p>
-							</div> */}
 							<SeeComments
 								ideaId={idea._id}
 								setComments={setComments}
 								noOfComments={comments.length == 0 ? idea.noOfComments : comments.length}
 								seeingComments={seeingComments}
 								setSeeingComments={setSeeingComments}
+								setLoading={setLoadingComments}
 								className=""
 							/>
 							<div className="flex gap-1 justify-center items-center">

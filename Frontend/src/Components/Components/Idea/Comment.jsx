@@ -1,10 +1,10 @@
 import { RiSendPlaneFill } from "@remixicon/react";
-import { getData, headers } from "../../dataLoaders";
+import { getData, getHeaders } from "../../dataLoaders";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../context/socket";
 
-const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, username, userProfileImage }) => {
+const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, username, userProfileImage, loading }) => {
   const socket = useSocket();
 
   const descriptionDivHeight = 272;
@@ -12,7 +12,7 @@ const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, usernam
   const [scrollable, setScrollable] = useState(false);
   const addComment = async (e) => {
     e.stopPropagation();
-    const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, headers);
+    const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
     if (success) {
       setComments(prev => [newComment, ...prev]);
       console.log("sending comment notification", userId, ideaId, title, ideaOf, userProfileImage, username);
@@ -40,19 +40,24 @@ const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, usernam
   return (
     <>
     <div className={`${scrollable ? "relative overflow-y-scroll" : ""}`} ref={commentsEleRef} onScroll={handleScroll}>
-      {comments.map(({ profileImage, username, comment }) => (
-        <div className="flex flex-col justify-center px-2 py-1 gap-1 items-start text-white border-b-2 border-b-white">
-          <div className="flex justify-start items-start gap-2">
-            <img
-              src={profileImage}
-              className="h-7 w-7 rounded-full object-cover border-2 border-white"
-              alt="Profile Image"
-            />
-            <p>{comment}</p>
-          </div>
-          <p className="w-full text-right">{username}</p>
+      {loading ?
+        <div className="flex justify-center items-center h-full w-full">
+          <RiLoader2Line size={24}/>
         </div>
-      )
+        :
+        comments.map(({ profileImage, username, comment }) => (
+          <div className="flex flex-col justify-center px-2 py-1 gap-1 items-start text-white border-b-2 border-b-white">
+            <div className="flex justify-start items-start gap-2">
+              <img
+                src={profileImage}
+                className="h-7 w-7 rounded-full object-cover border-2 border-white"
+                alt="Profile Image"
+              />
+              <p>{comment}</p>
+            </div>
+            <p className="w-full text-right">{username}</p>
+          </div>
+        )
       )}
       <div className="w-full absolute flex px-2 py-1 gap-1 bg-black" ref={addCommentEleRef}>
         <input
@@ -74,14 +79,19 @@ const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, usernam
 
 export default Comment;
 
-export const SeeComments = ({ ideaId, setComments, noOfComments, seeingComments, setSeeingComments, className }) => {
+export const SeeComments = ({ ideaId, setComments, noOfComments, seeingComments, setSeeingComments, setLoading, className }) => {
   const getComments = async () => {
-    if (seeingComments) setSeeingComments(false);
+    if (seeingComments) {
+      setSeeingComments(false);
+      setLoading(false);
+    }
     else {
+      setLoading(true);
       const data = await getData(`/comments/${ideaId}`, "get", false);
       console.log("comments comments",data);
       setComments(data.comments);
       setSeeingComments(true);
+      setLoading(false);
     }
   }
   return (

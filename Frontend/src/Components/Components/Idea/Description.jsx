@@ -5,8 +5,9 @@ import {
   useState
 } from "react";
 import Comment from "./Comment";
+import { RiLoader2Line } from "@remixicon/react";
 
-const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, userId, title, ideaOf, username, userProfileImage, className }) => {
+const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, userId, title, ideaOf, username, userProfileImage, loading, className }) => {
   const [seeing, setSeeing] = useState(false);
   const descriptionEleRef = useRef();
   const handleClick = () => {
@@ -57,28 +58,33 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
       ref={descriptionEleRef}
       className={`overflow-y-hidden border-2 border-black border-solid border-b-0 rounded-t-2xl p-[3px] leading-5 h-[50px] cursor-pointer w-full flex flex-col gap-2 ${className}`}
     >
-      {seeingLikedBy ?
-        likedBy.map(({ profileImage, username }) => (
-            <div className="flex px-2 py-1 gap-3 items-center text-white">
-              <img src={profileImage} className="h-7 w-7 rounded-full"/>
-              <p>{username}</p>
-            </div>
-          )
-        )
+      {loading ?
+        <div className="h-full w-full flex justify-center items-center">
+          <RiLoader2Line className="h-[10%] aspect-square animate-spin"/>
+        </div>
         :
-        seeingComments ?
-          <Comment
-            comments={comments}
-            setComments={setComments}
-            ideaId={ideaId}
-            userId={userId}
-            title={title}
-            ideaOf={ideaOf}
-            userProfileImage={userProfileImage}
-            username={username}
-          />
+        seeingLikedBy ?
+          likedBy.map(({ profileImage, username }) => (
+              <div className="flex px-2 py-1 gap-3 items-center text-white">
+                <img src={profileImage} className="h-7 w-7 rounded-full"/>
+                <p>{username}</p>
+              </div>
+            )
+          )
           :
-          description
+          seeingComments ?
+            <Comment
+              comments={comments}
+              setComments={setComments}
+              ideaId={ideaId}
+              userId={userId}
+              title={title}
+              ideaOf={ideaOf}
+              userProfileImage={userProfileImage}
+              username={username}
+            />
+            :
+            description
       }
     </div>
   )

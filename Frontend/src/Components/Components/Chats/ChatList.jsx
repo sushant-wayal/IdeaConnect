@@ -5,6 +5,7 @@ import { useSocket } from "../../../context/socket";
 import { useVideoCall } from "../../../context/videoCall";
 import {
   RiHome5Line,
+  RiLoader2Line,
   RiVideoOnLine
 } from "@remixicon/react";
 import {
@@ -27,6 +28,8 @@ const ChatList = ({
   userId,
   defaultChat,
   setUnreadMessages,
+  loading,
+  setLoadingMessages,
   className 
 }) => {
   const socket = useSocket();
@@ -72,6 +75,7 @@ const ChatList = ({
   },[]);
 
   const openChat = async (chat) => {
+    setLoadingMessages(true);
     document.querySelector("#messages").style.backgroundImage = "none";
     setShow(true);
     const { members } = chat;
@@ -130,6 +134,7 @@ const ChatList = ({
       send(chat, sendIdea, "idea");
       setSent(true);
     }
+    setLoadingMessages(false);
   }
 
   useEffect(() => {
@@ -178,6 +183,11 @@ const ChatList = ({
           <p className="absolute top-1/2 -translate-y-1/2 left-2">🔎</p>
         </div>
       </div>
+      {loading ?
+        <div className="flex justify-center items-center h-full w-full">
+          <RiLoader2Line className="animate-spin h-10 w-10"/>
+        </div>
+        :
         <div className="flex flex-col">
           {displayChats.map((chat,ind) => {
             const { members } = chat;
@@ -225,6 +235,7 @@ const ChatList = ({
             )
           })}
         </div>
+      }
     </div>
   )
 }

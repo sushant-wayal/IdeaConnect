@@ -6,11 +6,12 @@ import {
 import {
   RiArrowLeftWideLine,
   RiArrowRightWideLine,
+  RiLoader2Line,
   RiVolumeMuteLine,
   RiVolumeUpLine
 } from "@remixicon/react";
 
-const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClassName, containerClassName }) => {
+const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClassName, uploading, containerClassName }) => {
   const [index, setIndex] = useState(start);
   const container = useRef(null);
   const [muted, setMuted] = useState(new Array(medias.length).fill(true));
@@ -34,10 +35,19 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
   useEffect(() => {
     moveTo(0, start);
   },[start]);
+  useEffect(() => {
+    if (uploading) {
+      container.current.scrollTo({
+        left: container.current.clientWidth*medias.length,
+        right: 0,
+        behavior: "smooth"
+      });
+    }
+  },[uploading]);
   return (
     <div className={`relative ${wrapperClassName}`}>
       <div
-        className={`h-full w-full flex bg-green-600 overflow-x-scroll overflow-y-hidden ${containerClassName}`}
+        className={`h-full w-full flex backdrop-blur-sm overflow-x-scroll overflow-y-hidden ${containerClassName}`}
         ref={container}
       >
         {medias.map((media, ind) => {
@@ -45,7 +55,7 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
           return (
             <div
               key={src}
-              className="flex justify-center items-center h-full w-full bg-red-600 flex-shrink-0"
+              className="flex justify-center items-center h-full w-full flex-shrink-0"
             >
               {type == "image" || type == "default" ?
                 <img
@@ -84,6 +94,11 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
             </div>
           )
         })}
+        {uploading &&
+          <div className="flex justify-center items-center h-full w-full flex-shrink-0">
+            <RiLoader2Line className="h-[10%] aspect-square animate-spin"/>
+          </div>
+        }
       </div>
       <div className={`absolute bottom-3 ${medias.length > 1 ? "flex" : "hidden"} justify-center items-center gap-5 left-1/2 -translate-x-1/2`}>
         <p

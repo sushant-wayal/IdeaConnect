@@ -30,6 +30,13 @@ const Chats = () => {
   const { authenticated, chatsAndGroups } = useLoaderData();
   if (authenticated) chats = chatsAndGroups;
 
+	const [loading, setLoading] = useState(true);
+	const [loadingMessages, setLoadingMessages] = useState(false);
+	useEffect(() => {
+		if (authenticated === true || authenticated === false) setLoading(false);
+		else setLoading(true);
+	},[])
+
   const socket = useSocket();
 
   for (let chat of chats) socket.emit("joinRoom",chat._id);
@@ -301,6 +308,8 @@ const Chats = () => {
 						userId={userId}
 						defaultChat={defaultChat}
 						setUnreadMessages={setUnreadMessages}
+						loading={loading}
+						setLoadingMessages={setLoadingMessages}
 						className=""
 					/>
 					<div
@@ -320,6 +329,7 @@ const Chats = () => {
 								sendStreams={sendStreams}
 								originalUsername={originalUsername}
 								unreadMessages={unreadMessages}
+								loading={loadingMessages}
 							/>
 							<VideoCalling
 								peer={peer}
