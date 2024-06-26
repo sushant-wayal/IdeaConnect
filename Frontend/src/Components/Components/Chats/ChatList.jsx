@@ -26,6 +26,7 @@ const ChatList = ({
   sendIdea,
   userId,
   defaultChat,
+  setUnreadMessages,
   className 
 }) => {
   const socket = useSocket();
@@ -115,6 +116,7 @@ const ChatList = ({
       setNoOfMessages(prev => prev - preUnread);
       setNoOfSenders(prev => prev - 1);
     }
+    setUnreadMessages(unreadNotifications.find((_,ind) => chats[ind]._id == chat._id));
     setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
     setMessages(messages);
     if (sendIdea && !sent) {

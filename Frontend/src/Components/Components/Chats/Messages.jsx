@@ -25,7 +25,8 @@ const Messages = ({
 	ideaMessages,
 	userId,
 	sendStreams,
-	originalUsername
+	originalUsername,
+	unreadMessages
 }) => {
 	const socket = useSocket();
 
@@ -127,65 +128,76 @@ const Messages = ({
 					let align = "start";
 					if (userId.toString() == sender.toString()) align = "end";
 					return (
-						<div
-							key={_id}
-							className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
-						>
-							<div
-								onClick={() => setSeeDelete(seeDelete.map((val, index) => index == ind ? !val : val))}
-								className="flex items-start gap-2"
-							>
-								{messageType == "text" && (
-									<TextMessage
-										displayMessage={message}
-									/>
-								)}
-								{messageType == "image" && (
-									<ImageMessage
-										align={align}
-										chatTitle={name ? name : username}
-										messageId={_id}
-										imageSrc={message}
-									/>
-								)}
-								{messageType == "video" && (
-									<VideoMessage
-										align={align}
-										chatTitle={name ? name : username}
-										messageId={_id}
-										videoSrc={message}
-									/>
-								)}
-								{messageType == "audio" && (
-									<AudioMessage
-										align={align}
-										chatTitle={name ? name : username}
-										messageId={_id}
-										audioSrc={message}
-									/>
-								)}
-								{messageType == "voice" && (
-									<VoiceMessage
-										align={align}
-										voiceSrc={message}
-									/>
-								)}
-								{messageType == "idea" && (
-									<IdeaMessage thisIdea={ideaMessages.get(message)} />
-								)}
-								{messageType == "document" && (
-									<DocumentMessage
-										activeUsername={activeUsername}
-										chatTitle={name ? name : username}
-										senderUsername={senderUsername}
-										fileSrc={message}
-										messageId={_id}
-									/>
-								)}
-								<RiDeleteBin5Fill color="red" size={24} className={senderUsername == activeUsername && seeDelete[ind] ? "" : "hidden"}/>
+						<>
+							{ind == messages.length-unreadMessages && (
+								<div className="w-full flex justify-center items-center gap-2">
+									<div className="h-[2px] flex-grow border-1 border-black bg-black"></div>
+									<p className="text-lg">
+										New Messages
+									</p>
+									<div className="h-[2px] flex-grow border-1 border-black bg-black"></div>
 							</div>
-							<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
-						</div>
+							)}
+							<div
+								key={_id}
+								className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
+							>
+								<div
+									onClick={() => setSeeDelete(seeDelete.map((val, index) => index == ind ? !val : val))}
+									className="flex items-start gap-2"
+								>
+									{messageType == "text" && (
+										<TextMessage
+											displayMessage={message}
+										/>
+									)}
+									{messageType == "image" && (
+										<ImageMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											imageSrc={message}
+										/>
+									)}
+									{messageType == "video" && (
+										<VideoMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											videoSrc={message}
+										/>
+									)}
+									{messageType == "audio" && (
+										<AudioMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											audioSrc={message}
+										/>
+									)}
+									{messageType == "voice" && (
+										<VoiceMessage
+											align={align}
+											voiceSrc={message}
+										/>
+									)}
+									{messageType == "idea" && (
+										<IdeaMessage thisIdea={ideaMessages.get(message)} />
+									)}
+									{messageType == "document" && (
+										<DocumentMessage
+											activeUsername={activeUsername}
+											chatTitle={name ? name : username}
+											senderUsername={senderUsername}
+											fileSrc={message}
+											messageId={_id}
+										/>
+									)}
+									<RiDeleteBin5Fill color="red" size={24} className={senderUsername == activeUsername && seeDelete[ind] ? "" : "hidden"}/>
+								</div>
+								<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
+							</div>
+						</>
 					)
 				})}
 			</div>

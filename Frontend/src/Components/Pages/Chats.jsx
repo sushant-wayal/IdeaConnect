@@ -37,6 +37,7 @@ const Chats = () => {
 	const { setNoOfMessages, setNoOfSenders } = useNotification();
 
   const [unreadNotifications, setUnreadNotifications] = useState([]);
+	const [unreadMessages, setUnreadMessages] = useState(0);
   const [messages, setMessages] = useState([]);
   const [show, setShow] = useState(false);
   const [profileImage, setProfileImage] = useState("");
@@ -267,7 +268,9 @@ const Chats = () => {
 					username,
 					setUsername,
 					currChat,
-					setCurrChat
+					setCurrChat,
+					unreadMessages,
+					setUnreadMessages,
 				}}
 			>
 				<VideoCallProvider
@@ -292,6 +295,7 @@ const Chats = () => {
 						sendIdea={sendIdea}
 						userId={userId}
 						defaultChat={defaultChat}
+						setUnreadMessages={setUnreadMessages}
 						className=""
 					/>
 					<div
@@ -310,6 +314,7 @@ const Chats = () => {
 								userId={userId}
 								sendStreams={sendStreams}
 								originalUsername={originalUsername}
+								unreadMessages={unreadMessages}
 							/>
 							<VideoCalling
 								peer={peer}
