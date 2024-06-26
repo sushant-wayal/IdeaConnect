@@ -120,6 +120,11 @@ const Chats = () => {
 		const ind = chats.findIndex(chat => chat._id == thisChat._id);
 		if (messageType == "text") chats[ind].lastMessage = message;
 		else if (messageType == "idea") chats[ind].lastMessage = "Shared an Idea";
+		else if (messageType == "image") chats[ind].lastMessage = "Sent an Image";
+		else if (messageType == "video") chats[ind].lastMessage = "Sent a Video";
+		else if (messageType == "audio") chats[ind].lastMessage = "Sent an Audio";
+		else if (messageType == "document") chats[ind].lastMessage = "Shared a Document";
+		else if (messageType == "voice") chats[ind].lastMessage = "Sent a Voice Message";
 		moveToTop(chats,ind);
 		setUnreadNotifications(prev => {
 			moveToTop(prev, ind);
@@ -155,14 +160,8 @@ const Chats = () => {
 				let temp = prev.map((unread, ind) => chats[ind]._id == room ? ++unread : unread);
 				return temp;
 			})
-	};
+		};
 		const ind = chats.findIndex(chat => chat._id == room);
-		moveToTop(chats,ind);
-		moveToTop(temp, ind);
-		setVideoCallRequested(prev => {
-			moveToTop(prev, ind);
-			return prev;
-		});
 		if (message.messageType == "text") chats[ind].lastMessage = message.message;
 		else if (message.messageType == "idea") chats[ind].lastMessage = "Shared an Idea";
 		else if (message.messageType == "image") chats[ind].lastMessage = "Sent an Image";
@@ -170,6 +169,12 @@ const Chats = () => {
 		else if (message.messageType == "audio") chats[ind].lastMessage = "Sent an Audio";
 		else if (message.messageType == "document") chats[ind].lastMessage = "Shared a Document";
 		else if (message.messageType == "voice") chats[ind].lastMessage = "Sent a Voice Message";
+		moveToTop(chats,ind);
+		moveToTop(temp, ind);
+		setVideoCallRequested(prev => {
+			moveToTop(prev, ind);
+			return prev;
+		});
   },[currChat])
 
   useEffect(() => {
