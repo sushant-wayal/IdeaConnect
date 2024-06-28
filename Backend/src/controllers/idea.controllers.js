@@ -81,11 +81,12 @@ export const likeIdea = asyncHandler(async (req, res) => {
 });
 
 export const likedBy = asyncHandler(async (req, res) => {
+	const { id } = req.user;
   const { ideaId } = req.params;
-	const idea = await Idea.findById(ideaId);
-	let likedBy= [];
-	for (let user of idea.likedBy) {
-		likedBy.push(await User.findById(user));
+	const { likedBy } = await Idea.findById(ideaId).populate('likedBy');
+	for (let i = 0; i < likedBy.length; i++) {
+		if (likedBy[i].followersList.includes(id)) likedBy[i].following = true;
+		else likedBy[i].following = false;
 	}
 	res.status(201).json(new ApiResponse(201, {
     likedBy,

@@ -43,10 +43,10 @@ const Idea = ({ thisIdea }) => {
 		getUsername();
 	},[]);
     return (
-			<div className="relative w-full sm:w-[302px] h-[500px] sm:h-[450px] border-2 border-black border-solid backdrop-blur-sm rounded-2xl p-2 flex flex-col gap-2">
+			<div className="relative w-full sm:w-[302px] h-[500px] sm:h-[450px] backdrop-blur-sm rounded-2xl p-2 flex flex-col gap-2 bg-[#797270]">
 				<div className="flex justify-center items-center relative border-b-2 border-b-black border-b-solid">
 					<img
-						className="absolute left-1 -top-[6px] w-7 h-7 rounded-full border-2"
+						className="absolute left-1 -top-[6px] w-7 h-7 rounded-full"
 						src={profileImage}
 						alt="profile"
 					/>
@@ -97,7 +97,7 @@ const Idea = ({ thisIdea }) => {
 						title={idea.title}
 						userId={userId}
 						loading={loadingLikes || loadingComments}
-						className="absolute bottom-[40px]"
+						className="absolute bottom-[40px] bg-[#6C757D]"
 					/>
 					<Progress
 						ideaId={idea._id}
@@ -107,7 +107,7 @@ const Idea = ({ thisIdea }) => {
 						ideaOf={ideaOf}
 						className=""
 					/>
-					<div className="flex justify-around border-2 border-black border-solid border-t-0 rounded-b-2xl p-1">
+					<div className="flex justify-around rounded-b-2xl p-1 bg-[#C1EDCC]">
 							<Likes
 								ideaId={idea._id}
 								noOfLikesInitial={idea.likes}

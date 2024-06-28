@@ -4,13 +4,14 @@ import { RiMenu3Line } from "@remixicon/react"
 
 const SignInUpNav = () => {
 	const active = (isActive) => {
-		let style = "sm:p-3 p-1 text-center";
-		if (isActive) style += " border-2 border-black border-solid rounded-3xl";
+		let style = "sm:p-3 p-1 text-center rounded-full";
+		if (!isActive) style += " bg-[#A7A7A9]";
+		else style += " bg-[#C1EDCC]"
 		return style;
 	}
 	const [seeing, setSeeing] = useState(false);
 	return (
-		<div className="fixed top-0 sm:top-2 w-full flex h-12 py-1 px-2 pr-5 justify-between items-center z-50 bg-[#f8f8f8] sm:bg-transparent sm:z-0">
+		<div className="bg-[#797270] fixed w-[99%] flex h-12 py-8 px-2 pr-5 justify-between items-center z-50 sm:z-10 rounded-2xl">
 			<img className="w-[15vmax]" src="../../../../images/logo.png" alt="IdeaConnect"/>
 			<div className="hidden sm:flex justify-center gap-10">
 					<NavLink

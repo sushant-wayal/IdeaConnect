@@ -25,7 +25,7 @@ router.route("/publishIdea").post(publishIdea);
 router.route("/updateProgress/:ideaId/:newProgress").get(updateProgress);
 router.route("/checkLike/:ideaId/:username").get(checkLike);
 router.route("/likeIdea/:ideaId/:username").get(likeIdea);
-router.route("/likedBy/:ideaId").get(likedBy);
+router.route("/likedBy/:ideaId").get(isLoggedIn, likedBy);
 router.route("/intrested/:ideaId").get(isLoggedIn,intrested);
 router.route("/include/:ideaId/:userId").get(isLoggedIn,include);
 router.route("/checkInclude/:ideaId/:userId").get(isLoggedIn,checkInclude);

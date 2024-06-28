@@ -14,6 +14,7 @@ import {
   useState
 } from "react";
 import { useNotification } from "../../../context/notifications";
+import { House } from "lucide-react";
 
 const ChatList = ({
   chats,
@@ -161,13 +162,13 @@ const ChatList = ({
   };
   },[chatSearch, chats])
   return (
-    <div className={`h-full w-72 rounded-2xl border-2 border-black border-solid flex flex-col p-2 backdrop-blur-sm ${className}`}>
+    <div className={`bg-[#797270] h-full w-72 rounded-2xl flex flex-col p-2 ${className}`}>
       <div className="border-b-2 border-black border-solid pb-1 flex justify-between items-center">
         <Link
           to="/ideas"
-          className="hover:scale-105"
+          className="hover:bg-[#B0C0BC] p-1 rounded-full bg-[#C1EDCC]"
         >
-          <RiHome5Line/>
+          <House/>
         </Link>
         <p className="text-xl font-semibold">
           Chats
@@ -177,7 +178,7 @@ const ChatList = ({
             value={chatSearch}
             onChange={(e) => setChatSearch(e.target.value)}
             placeholder="Search Chats"
-            className="rounded-full w-40 bg-transparent border-2 border-black border-solid pl-8"
+            className="rounded-full w-40 bg-[#C1EDCC] pl-8 placeholder:text-black/90 text-black"
             type="search"
           />
           <p className="absolute top-1/2 -translate-y-1/2 left-2">🔎</p>
@@ -188,7 +189,7 @@ const ChatList = ({
           <RiLoader2Line className="animate-spin h-10 w-10"/>
         </div>
         :
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-2 py-2">
           {displayChats.map((chat,ind) => {
             const { members } = chat;
             let profileImage;
@@ -209,7 +210,7 @@ const ChatList = ({
               <div
                 onClick={() => openChat(chat)}
                 key={chat._id}
-                className="border-b-[1px] border-black border-solid cursor-pointer flex justify-between items-center relative hover:scale-105"
+                className="bg-[#908D8D] rounded-2xl cursor-pointer flex justify-between items-center relative hover:bg-[#A7A7A9]"
               >
                 <div className="py-2 px-1 flex justify-start gap-5 relative">
                   <div className="h-10 aspect-square object-cover rounded-full relative">
@@ -217,7 +218,7 @@ const ChatList = ({
                       className="h-full w-full rounded-full"
                       src={profileImage}
                     />
-                    <div className={`absolute -right-1 -top-1 ${unreadNotifications[ind] == 0 ? "hidden" : "flex"} justify-center items-center h-5 aspect-square rounded-full bg-black text-white p-2`}>
+                    <div className={`absolute -right-1 -top-1 ${unreadNotifications[ind] == 0 ? "hidden" : "flex"} justify-center items-center h-5 aspect-square rounded-full bg-[#C1EDCC] text-black p-2`}>
                       <p>{unreadNotifications[ind] >= 10 ? "9+" : unreadNotifications[ind]}</p>
                     </div>
                   </div>
@@ -228,8 +229,7 @@ const ChatList = ({
                 </div>
                 <RiVideoOnLine
                   onClick={() => acceptVideoCall(chat._id)}
-                  color="green"
-                  className={`${videoCallRequested[ind] ? "" : "hidden"} absolute left-[90%] -translate-x-1/2 animate-connecting-md bg-[rgba(0,255,0,0.7)] rounded-full`}
+                  className={`${videoCallRequested[ind] ? "" : "hidden"} absolute left-[90%] -translate-x-1/2 animate-connecting-md bg-[#C1EDCC] rounded-full`}
                 />
               </div>
             )

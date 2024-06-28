@@ -5,6 +5,7 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { RiLoader2Line } from "@remixicon/react";
+import { Eye, EyeOff } from "lucide-react";
 
 const SignIn = () => {
     const [see, setSee] = useState(false);
@@ -47,28 +48,27 @@ const SignIn = () => {
             <SignInUpNav/>
             <form
                 onSubmit={login}
-                className="relative top-1/2 -translate-y-1/2 sm:h-96 h-[400px] w-80 flex flex-col justify-between items-center sm:gap-7 gap-0 border-2 border-black border-solid rounded-3xl p-3 py-5 backdrop-blur-sm"
+                className="bg-[#797270] relative top-1/2 -translate-y-1/2 sm:h-96 h-[400px] w-80 flex flex-col justify-between items-center sm:gap-7 gap-0 rounded-3xl p-3 py-5"
             >
                 <h3 className="sm:text-4xl text-5xl font-semibold sm:mb-5"> Log In </h3>
                 <div className="relative w-full flex flex-col justify-center gap-2">
                     <input
                         onChange={(e) => setUsername(e.target.value)}
-                        className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        className="py-1 px-3 w-full bg-[#C1EDCC] placeholder:text-black/90 text-black bg-opacity-80 rounded-full"
                         type="text"
                         placeholder="Username"
                     />
                     <input
                         onChange={(e) => setPassword(e.target.value)}
-                        className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        className="py-1 px-3 w-full bg-[#C1EDCC] placeholder:text-black/90 text-black bg-opacity-80 rounded-full"
                         type={`${see ? "text" : "password"}`}
                         placeholder="Password"
                     />
-                    <img
-                        onClick={() => setSee(!see)}
-                        className="absolute h-7 right-3 top-12 cursor-pointer"
-                        src={`../../../../images/${!see ? "see" : "hide"}.png`}
-                        alt="see"
-                    />
+                    {see ?
+                        <EyeOff onClick={() => setSee(!see)} className="absolute h-7 right-3 top-[44px] cursor-pointer"/>
+                        :
+                        <Eye onClick={() => setSee(!see)} className="absolute h-7 right-3 top-[44px] cursor-pointer"/>
+                    }
                 </div>
                 <p className="absolute left-5 top-48 text-red-600 font-semibold text-sm"> {errorMsg} </p>
                 <label
@@ -82,7 +82,7 @@ const SignIn = () => {
                     /> Remember Me
                 </label>
                 <button
-                    className="p-2 border-2 border-black border-solid rounded-2xl sm:text-sm text-2xl sm:w-20 w-32"
+                    className="bg-[#C1EDCC] p-2 rounded-2xl sm:text-sm text-2xl sm:w-20 w-32"
                     type="submit"
                     disabled={loading}
                 >
@@ -99,7 +99,7 @@ const SignIn = () => {
                     <i> Create New Account </i>
                 </Link>
             </form>
-            <Footer styling={""}/>
+            <Footer styling={"w-[98%] relative bottom-2 rounded-2xl"}/>
         </div>
     )
 }

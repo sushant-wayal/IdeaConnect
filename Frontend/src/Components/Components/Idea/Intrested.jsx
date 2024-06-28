@@ -49,12 +49,12 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
       setLoading(true);
       for (let thisUser of intrestedUser) {
         const data = await getData(`/users/userInfo/${thisUser}`, "get", false);
-        const { profileImage } = data;
+        const { profileImage, firstName, lastName } = data;
         if (data.username == username) {
           setNoOfIntrested(prev => prev - 1);
           continue;
         }
-        setIntrestedUserInfo(prev => [...prev, { id: thisUser, profileImage, username: data.username }]);
+        setIntrestedUserInfo(prev => [...prev, { id: thisUser, profileImage, username: data.username, firstName, lastName}]);
       }
       setLoading(false);
       setSeeing(true);
@@ -62,7 +62,7 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
     else {
       gsap.to(intrestEle,{
         height: 35,
-        width: 110,
+        width: 95,
         duration: 0.3,
       })
       setSeeing(false);
@@ -95,7 +95,7 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
     <div
       onClick={handleClick}
       ref={intrestedEleRef}
-      className={`px-2 py-1 bg-gray-600 rounded-xl ${isIncluded ? "text-white" : "cursor-pointer"} flex flex-col gap-2 hover:scale-105 overflow-y-scroll ${className}`}
+      className={`px-2 py-1 bg-[#C1EDCC] rounded-xl ${isIncluded ? "text-white" : "cursor-pointer"} flex flex-col gap-2 hover:bg-[#B0C0BC] overflow-y-scroll ${className}`}
     >
       {seeing ?
         loading ?
@@ -103,11 +103,14 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
             <RiLoader2Line className="h-[10%] aspect-square animate-spin"/>
           </div>
         :
-          intrestedUserInfo.map(({ id, profileImage, username }, ind) => (
+          intrestedUserInfo.map(({ id, profileImage, username, firstName, lastName }, ind) => (
             <div onClick={(e) => include(e, id, ind)} className="flex px-2 py-1 gap-3 items-center justify-between border-b-2 border-b-black border-b-solid">
               <div className="flex px-2 py-1 gap-3 items-center">
                 <img className="h-7 w-7 rounded-full" src={profileImage} alt="profile"/>
-                <p className="text-lg font-medium">{username}</p>
+                <div>
+                  <p className="font-medium">{username}</p>
+                  <p className="text-sm">{firstName} {lastName}</p>
+                </div>
               </div>
               {username ?
                 <button className="bg-black text-white rounded-xl px-2 py-1">
@@ -127,7 +130,7 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
               "Intrested"
             :
             isIncluded ?
-              "Included"
+              <b>Included</b>
             :
             "Intrested ?"
           }

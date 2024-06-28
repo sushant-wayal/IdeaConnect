@@ -122,7 +122,7 @@ const SignUp = () => {
             <div className="flex flex-col justify-between gap-5 items-center w-full relative top-20">
                 <form
                     onSubmit={register}
-                    className="flex flex-col gap-7 p-4 w-[max(36%,350px)] backdrop-blur-sm border-2 border-black border-solid rounded-3xl"
+                    className="bg-[#797270] flex flex-col gap-7 p-4 w-[max(36%,350px)] rounded-3xl"
                 >
                     {uploading ?
                         <div className="flex justify-center items-center h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2">
@@ -131,7 +131,7 @@ const SignUp = () => {
                         :
                         <img
                             onClick={imageUpload}
-                            className="h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2 cursor-pointer"
+                            className="h-40 w-40 object-cover rounded-full relative left-1/2 -translate-x-1/2 cursor-pointer"
                             src={profileImage}
                             alt="Profile Photo"
                         />}
@@ -139,14 +139,14 @@ const SignUp = () => {
                         <input
                             onChange={(e) => setFirstName(e.target.value)}
                             value={firstName}
-                            className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            className="py-1 px-3 w-full bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             type="text"
                             placeholder="First"
                         />
                         <input
                             onChange={(e) => setLastName(e.target.value)}
                             value={lastName}
-                            className="py-1 px-3 w-full bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            className="py-1 px-3 w-full bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             type="text"
                             placeholder="Last (optional)"
                         />
@@ -154,7 +154,7 @@ const SignUp = () => {
                     <input
                         onChange={(e) => setUsername(e.target.value)}
                         value={username}
-                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        className="py-1 px-3 w-60 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                         type="text"
                         placeholder="Username"
                     />
@@ -162,7 +162,7 @@ const SignUp = () => {
                         <input
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
-                            className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            className="py-1 px-3 w-60 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             type={see ? "text" : "password"}
                             placeholder="Password"
                         />
@@ -220,26 +220,26 @@ const SignUp = () => {
                         <input
                             onChange={(e) => setDOB(e.target.value)}
                             value={DOB}
-                            className="py-1 px-3 w-40 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                            className="py-1 px-3 w-40 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             type="date"
                         />
                     </div>
                     <select
                         value={country}
                         onChange={countryChange}
-                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                        className="py-1 px-3 w-60 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                     >
                         <option disabled> Select the Country </option>
                         {countries.map(country => (
                             <option key={country}>{country}</option>
                         ))}
                     </select>
-                    <div className="flex flex-col justify-center gap-8">
+                    <div className="flex flex-col justify-center gap-8 ">
                         <div className="flex flex-col xl:flex-row justify-start gap-1 md:gap-3">
                             <select
                                 value={countryCode}
                                 onChange={(e) => setCountryCode(e.target.value)}
-                                className="py-1 px-3 w-52 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full"
+                                className="py-1 px-3 w-52 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             >
                                 {countryCodes.map(thisCode => (
                                     <option disabled={thisCode[1]} key={thisCode[0]}>{thisCode[0]}</option>
@@ -248,7 +248,7 @@ const SignUp = () => {
                             <input
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
-                                className="py-1 px-3 w-60 xl:w-1/2 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                                className="py-1 px-3 w-60 xl:w-1/2 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                                 type="number"
                                 placeholder="Phone Number"
                             />
@@ -256,7 +256,7 @@ const SignUp = () => {
                         <input
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                            className="py-1 px-3 w-60 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                             type="email"
                             placeholder="Email"
                         />
@@ -264,18 +264,18 @@ const SignUp = () => {
                     <input
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
-                        className="py-1 px-3 w-60 bg-gray-600 bg-opacity-80 border-2 border-black border-solid rounded-full placeholder:text-white placeholder:opacity-80"
+                        className="py-1 px-3 w-60 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
                         type="text"
                         placeholder="bio"
                     />
                     <button
                         type="submit"
-                        className="p-1 border-2 border-black border-solid rounded-2xl relative left-1/2 -translate-x-1/2 w-24"
+                        className="p-1 bg-[#5F5956] rounded-2xl relative left-1/2 -translate-x-1/2 w-24"
                     >
                         Register
                     </button>
                 </form>
-                <Footer styling={""}/>
+                <Footer styling={"w-[98%] relative bottom-2 rounded-2xl"}/>
             </div>
         </div>
     )

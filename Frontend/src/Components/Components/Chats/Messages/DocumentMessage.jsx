@@ -34,7 +34,7 @@ const DocumentMessage = ({
     }
   })
   return (
-    <div className="bg-gray-600 rounded-md flex justify-center items-center p-2 gap-4">
+    <div className="bg-[#908D8D] rounded-md flex justify-center items-center p-2 gap-4">
       <RiDownloadLine
         size={30}
         color="white"

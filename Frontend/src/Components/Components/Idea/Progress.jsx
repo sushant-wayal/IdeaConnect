@@ -34,8 +34,10 @@ const Progress = ({ ideaId, steps, progress, username, ideaOf, className }) => {
       gsap.to(progressEle,{
         height: 295,
         zIndex: 1,
-        background: "black",
+        background: "#A7A7A9",
         duration: 0.3,
+        paddingTop: 10,
+        paddingBottom: 10,
       })
       setSeeing(true);
     }
@@ -52,8 +54,10 @@ const Progress = ({ ideaId, steps, progress, username, ideaOf, className }) => {
       gsap.to(progressEle,{
         height: 8,
         zIndex: 0,
-        background: `linear-gradient(to right, black 0%, black ${(newProgress/steps.length)*100}%, transparent ${(newProgress/steps.length)*100}%, transparent 100%`,
+        background: `linear-gradient(to right, #A7A7A9 0%, #A7A7A9 ${(newProgress/steps.length)*100}%, transparent ${(newProgress/steps.length)*100}%, transparent 100%`,
         duration: 0.3,
+        paddingTop: 0,
+        paddingBottom: 0,
       })
       setSeeing(false);
     }
@@ -62,8 +66,8 @@ const Progress = ({ ideaId, steps, progress, username, ideaOf, className }) => {
     <div
       ref={progressEleRef}
       onClick={handleClick}
-      className={`w-full h-2 border-2 border-black border-solid flex flex-col px-2 gap-2 cursor-pointer overflow-y-scroll ${className}`}
-      style={{background: `linear-gradient(to right, black 0%, black ${(ideaProgress/steps.length)*100}%, transparent ${(ideaProgress/steps.length)*100}%, transparent 100%`}}
+      className={`w-full h-2 flex flex-col px-2 gap-2 cursor-pointer overflow-y-scroll ${className}`}
+      style={{background: `linear-gradient(to right, #A7A7A9 0%, #A7A7A9 ${(ideaProgress/steps.length)*100}%, transparent ${(ideaProgress/steps.length)*100}%, transparent 100%`}}
     >
       {seeing ?
         steps.map((step, index) => (
@@ -79,10 +83,11 @@ const Progress = ({ ideaId, steps, progress, username, ideaOf, className }) => {
                 onChange={() => checkboxClick(progressEleRef.current, `step${index}`)}
                 onClick={(e) => e.stopPropagation()}
                 disabled={ideaOf != username}
+                className="h-4 w-4 cursor-pointer"
               />
-              <p className="text-white">{step}</p>
+              <p className="text-black">{step}</p>
             </div>
-            <div className={`${index == steps.length-1 ? "hidden" : ""} h-10 w-1 rounded-full bg-white relative left-1`}></div>
+            <div className={`${index == steps.length-1 ? "hidden" : ""} min-h-10 w-2 rounded-full bg-[#C1EDCC] relative left-1`}></div>
           </>
         ))
         : null

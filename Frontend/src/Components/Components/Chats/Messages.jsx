@@ -106,7 +106,7 @@ const Messages = ({
 						<p className="text-sm">{username}</p>
 					</div>
 				</div>
-				<div className={`${name ? "hidden" : "flex"} justify-center gap-5 items-center hover:scale-110`}>
+				<div className={`${name ? "hidden" : "flex"} justify-center gap-5 items-center bg-[#C1EDCC] hover:bg-[#B0C0BC] p-2 rounded-full`}>
 					<RiVideoChatLine
 						id="videoCallIcon"
 						size={30}
@@ -128,6 +128,11 @@ const Messages = ({
 				{loading ?
 					<div className="flex justify-center items-center h-full w-full">
 						<RiLoader2Line className="animate-spin h-10 w-10"/>
+					</div>
+					:
+					messages.length == 0 ?
+					<div className="flex justify-center items-center h-full w-full">
+						<p className="text-2xl text-white font-semibold">No Messages in this Conversation</p>
 					</div>
 					:
 					messages.map(({ _id, sender, senderUsername, messageType, message }, ind) => {
@@ -201,7 +206,7 @@ const Messages = ({
 										)}
 										<RiDeleteBin5Fill color="red" size={24} className={senderUsername == activeUsername && seeDelete[ind] ? "" : "hidden"}/>
 									</div>
-									<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-light bg-gray-600 rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
+									<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-semibold bg-[#C1EDCC] rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
 								</div>
 							</>
 						)

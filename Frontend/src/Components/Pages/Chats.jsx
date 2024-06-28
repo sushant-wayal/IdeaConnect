@@ -24,6 +24,7 @@ import {
   RiMicLine
 } from "@remixicon/react"
 import { useNotification } from "../../context/notifications.js";
+import { Mic, MicOff, Paperclip, Send } from "lucide-react";
 
 const Chats = () => {
   let chats = [];
@@ -315,9 +316,9 @@ const Chats = () => {
 					<div
 						id="messages"
 						style={{backgroundImage: "url(../../../../images/chatbg1.jpg)"}}
-						className="h-full border-2 border-black border-solid rounded-2xl flex-grow backdrop-blur-sm bg-cover"
+						className="h-full rounded-2xl flex-grow backdrop-blur-sm bg-cover"
 					>
-						<div className={`${show ? "flex" : "hidden"} flex-col h-full`}>
+						<div className={`${show ? "flex" : "hidden"} flex-col h-full bg-[#5F5956] rounded-2xl`}>
 							<Messages
 								firstName={firstName}
 								lastName={lastName}
@@ -346,33 +347,35 @@ const Chats = () => {
 										typing(e.target.value);
 									}}
 									id="input"
-									className="rounded-full py-2 px-4 flex-grow"
+									className="bg-[#C1EDCC] rounded-full py-2 px-4 flex-grow placeholder:text-black/90 text-black"
 									type="text"
 									placeholder="Type Something..."
 									ref={msgInput}
 								/>
-								{!listening ? 
-									<RiMicLine
-										onClick={listen}
-										size={30}
-										className="cursor-pointer"
-									/>
-									:
-									<div
-										onClick={stopListening}
-										className="relative p-1"
-									>
-										<div className="h-full w-full rounded-full border-2 border-black absolute top-0 left-0 animate-ping"></div>
-										<RiMicFill
+								<div className="p-1 bg-[#C1EDCC] rounded-full hover:bg-[#B0C0BC]">
+									{!listening ? 
+										<Mic
+											onClick={listen}
 											size={30}
 											className="cursor-pointer"
 										/>
-									</div>
-								}
-								<RiAttachment2
-									size={30}
+										:
+										<div
+											onClick={stopListening}
+											className="relative p-1"
+										>
+											<div className="h-full w-full rounded-full border-2 border-black absolute top-0 left-0 animate-ping"></div>
+											<MicOff
+												size={30}
+												className="cursor-pointer"
+											/>
+										</div>
+									}
+								</div>
+								<Paperclip
+									size={36}
 									onClick={selectMedia}
-									className="cursor-pointer"
+									className="cursor-pointer p-1 rounded-full bg-[#C1EDCC] hover:bg-[#B0C0BC]"
 								/>
 								<button
 									onClick={async () => {
@@ -390,10 +393,10 @@ const Chats = () => {
 										}
 										setSending(false);
 									}}
-									className="h-full w-24 rounded-full border-2 border-black border-solid flex justify-center items-center"
+									className="h-full w-24 rounded-full bg-[#C1EDCC] text-black font-semibold flex justify-center items-center gap-2 hover:bg-[#B0C0BC]"
 									ref={sendRef}
 								>
-									<RiLoaderLine className={`${sending ? "" : "hidden"} animate-spin`}/> <p>{sending ? "Sending" : "Send"}</p>
+									<Send className={sending ? "animate-flying-infinite" : ""}/> <p>{sending ? "Sending" : "Send"}</p>
 								</button>
 							</div>
 						</div>

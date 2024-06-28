@@ -13,6 +13,7 @@ import {
   RiVideoOffFill,
   RiVideoOnLine
 } from "@remixicon/react";
+import { Mic, MicOff, Phone, Video, VideoOff } from "lucide-react";
 
 const VideoCalling = ({
   peer,
@@ -210,32 +211,32 @@ const VideoCalling = ({
         className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"
       />
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-10 pb-5">
-        <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
-          <RiVideoOnLine
+        <div className="cursor-pointer p-2 rounded-full bg-[#C1EDCC] hover:opacity-50">
+          <Video
             size={36}
             onClick={toggleVideo}
             className={`${video ? "" : "hidden"}`}
           />
-          <RiVideoOffFill
+          <VideoOff
             size={36}
             onClick={toggleVideo}
             className={`${video ? "hidden" : ""}`}
           />
         </div>
-        <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
-          <RiMicFill
+        <div className="cursor-pointer p-2 rounded-full bg-[#C1EDCC] hover:opacity-50">
+          <Mic
             size={36}
             onClick={toggleAudio}
             className={`${audio ? "" : "hidden"}`}
           />
-          <RiMicOffFill
+          <MicOff
             size={36}
             onClick={toggleAudio}
             className={`${audio ? "hidden" : ""}`}
           />
         </div>
-        <div className="cursor-pointer p-2 rounded-full border-2 border-black bg-white/50 hover:bg-white">
-          <RiPhoneFill
+        <div className="cursor-pointer p-2 rounded-full bg-[#C1EDCC] hover:opacity-50">
+          <Phone
             size={36}
             color="red"
             onClick={() => {

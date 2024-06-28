@@ -10,7 +10,8 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
   const getLikes = async () => {
     if (!seeingLikedBy) {
       setLoading(true);
-      const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", false);
+      const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", true);
+      console.log("likedBy", likedBy);
       setLikedBy(likedBy);
       setSeeingLikedBy(true);
       setLoading(false);

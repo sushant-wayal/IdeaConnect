@@ -32,7 +32,7 @@ const Category = ({ categories, className }) => {
   return (
     <div
       onClick={handleClick}
-      className={`px-2 py-1 bg-gray-600 rounded-xl w-[80px] h-[35px] cursor-pointer overflow-y-scroll hover:scale-105 ${className}`}
+      className={`px-2 py-1 bg-[#C1EDCC] rounded-xl w-[80px] h-[35px] cursor-pointer overflow-y-scroll hover:bg-[#B0C0BC] ${className}`}
       ref={categoryEleRef}
     >
       {seeing ?
@@ -41,7 +41,7 @@ const Category = ({ categories, className }) => {
             <Link
               key={category}
               to={`/ideas/category/${category}`}
-              className="bg-black text-white inline-block mr-2 mb-2 p-2 rounded-3xl"
+              className="bg-[#908D8D] text-black inline-block mr-2 mb-2 p-2 rounded-3xl"
             >
               {category}
             </Link>

@@ -135,13 +135,13 @@ const Notification = ({}) => {
                       <div className="h-0 flex-grow border-2 border-black"></div>
                     </div>
                   }
-                  <div key={_id} className="w-full flex justify-start items-center gap-4 border-2 border-black backdrop-blur-sm rounded-xl px-2 py-1 text-md">
+                  <div key={_id} className="bg-[#797270] w-full flex justify-start items-center gap-4 rounded-xl px-2 py-1 text-md">
                     <img src={profileImage} alt="profile" className="w-10 h-10 rounded-full"/>
                     <div>
                       {type == "follow" &&
                         <div className="flex-grow flex justify-between items-center gap-4">
                           <p><b>{username}</b> followed you</p>
-                          <button onClick={() => follow(ind)} className={`${isFollowing ? "bg-white text-black border-2 border-black" : "bg-black text-white border-2 border-white"} rounded-lg p-1`}>{
+                          <button onClick={() => follow(ind)} className={`${isFollowing ? "bg-[#A7A7A9]" : "bg-[#C1EDCC]"} text-black rounded-lg p-1 hover:bg-[#B0C0BC]`}>{
                             isFollowing ? "Following" : "Follow"
                           }</button>
                         </div>}
@@ -150,7 +150,7 @@ const Notification = ({}) => {
                           <p><b>{username}</b> is intrested in your idea <b>{title}</b></p>
                           <button
                             onClick={() => isIncluded ? null : include(ind)}
-                            className="bg-black text-white rounded-lg p-1"
+                            className={`${isIncluded ? "bg-[#A7A7A9]" : "bg-[#C1EDCC]"} text-black rounded-lg p-1 hover:bg-[#B0C0BC]`}
                           >
                             {isIncluded ? "Included" : "Include"}
                           </button>
@@ -158,7 +158,7 @@ const Notification = ({}) => {
                       {type == "included" &&
                         <div className="flex-grow flex justify-between items-center gap-4">
                           <p><b>{username}</b> included you in their idea <b>{title}</b></p>
-                          <button onClick={() => openGroup(ind)} className="bg-black text-white rounded-lg p-1">See Group</button>
+                          <button onClick={() => openGroup(ind)} className="bg-[#C1EDCC] text-black rounded-lg p-1">See Group</button>
                         </div>}
                       {type == "liked" && <p><b>{username}</b> liked your idea <b>{title}</b></p>}
                       {type == "commented" && <p><b>{username}</b> commented on your idea <b>{title}</b></p>}
@@ -167,13 +167,11 @@ const Notification = ({}) => {
                 </>
               ))}
             </div>
-            <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 relative bottom-0 sm:backdrop-blur-sm w-[99%]"}/>
-            <div className="h-7"></div>
+            <Footer styling={"rounded-2xl pr-5 relative bottom-0 sm:backdrop-blur-sm w-[99%] mb-6"}/>
           </div>
         :
         <div key={"2"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-100vw flex justify-center items-center gap-4 p-2 pb-0 flex-wrap overflow-scroll">
-          <p className="w-72 text-center backdrop-blur-sm rounded-2xl text-5xl p-4 border-2 border-black border-solid">No Notification Yet.</p>
-          <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 absolute bottom-0 right-0 sm:backdrop-blur-sm"}/>
+          <p className="text-center text-5xl p-4 text-white">No Notifications Yet.</p>
         </div>
       }
     </div>

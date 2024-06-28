@@ -1,3 +1,4 @@
+import { Minus, Plus } from "lucide-react";
 import {
   useEffect,
   useRef
@@ -44,14 +45,14 @@ const Step = ({ step, setSteps, ind, stepsLength }) => {
   }, [isNew])
   return (
     <div>
-      <div className={`${ind == 0 ? "hidden" : ""} w-2 h-24 rounded-full bg-gray-500 relative left-10`}></div>
+      <div className={`${ind == 0 ? "hidden" : ""} w-2 h-24 rounded-full bg-[#C1EDCC] relative left-10`}></div>
       <div className="flex gap-3">
         <button
           onClick={addStep}
           type="button"
-          className="h-7 w-7 rounded-full bg-gray-600 flex justify-center items-center text-xl"
+          className="h-7 w-7 rounded-full bg-[#C1EDCC] flex justify-center items-center"
         >
-          <p>+</p>
+          <Plus/>
         </button>
         <input
           onChange={checkboxClick}
@@ -68,9 +69,9 @@ const Step = ({ step, setSteps, ind, stepsLength }) => {
         <button
           onClick={removeStep}
           type="button"
-          className={`h-7 w-7 rounded-full bg-gray-600 ${stepsLength > 2 ? "flex" : "hidden"} justify-center items-center text-xl`}
+          className={`h-7 w-7 rounded-full bg-[#C1EDCC] ${stepsLength > 2 ? "flex" : "hidden"} justify-center items-center text-xl`}
         >
-          <p>-</p>
+          <Minus/>
         </button>
       </div>
     </div>

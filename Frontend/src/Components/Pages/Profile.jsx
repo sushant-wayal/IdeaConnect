@@ -7,6 +7,7 @@ import Idea from "../Components/Main/Idea";
 import { getData } from "../dataLoaders";
 import { useSocket } from "../../context/socket";
 import { RiLoader2Line } from "@remixicon/react";
+import { CirclePlus, UserPlus } from "lucide-react";
 
 const Profile = () => {
     const socket = useSocket();
@@ -74,58 +75,66 @@ const Profile = () => {
         <div className="flex justify-end p-2">
             <SideNav/>
             <div className="relative w-[98vw] left-1 lg:left-0 lg:w-[calc(100vw*5.4/6.5)] flex flex-col justify-center gap-2 min-h-[100vh]">
-                <div className="border-2 border-black border-solid rounded-2xl p-2 h-full">
+                <div className="rounded-2xl p-2 h-full">
                     {loadingUserInfo < 3 ?
                         <div className="w-full flex justify-center items-center h-[40%]">
                             <RiLoader2Line className="animate-spin h-10 w-10"/>
                         </div>
                         :
-                        <div className="backdrop-blur-sm flex flex-col gap-1 items-center justify-center p-5 rounded-t-2xl relative">
+                        <div className="bg-[#797270] flex flex-col gap-1 items-center justify-center p-5 rounded-t-2xl relative">
                             <img
-                                className="object-cover h-32 w-32 rounded-full border-2 border-black border-solid"
+                                className="object-cover h-32 w-32 rounded-full"
                                 src={user.profileImage}
                                 alt="Profile Image"
                             />
                             <p>{user.username}</p>
                             <div className="flex justify-center gap-5">
-                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl border-2 border-black border-solid">
+                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl bg-[#A7A7A9]">
                                     <p>Followers</p>
                                     <p>{userFollowers}</p>
                                 </div>
-                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl border-2 border-black border-solid">
+                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl bg-[#A7A7A9]">
                                     <p>Following</p>
                                     <p>{user.following}</p>
                                 </div>
-                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl border-2 border-black border-solid">
+                                <div className="w-24 flex flex-col justify-center items-center gap-px p-px rounded-2xl bg-[#A7A7A9]">
                                     <p>Ideas</p>
                                     <p>{user.noOfIdeas}</p>
                                 </div>
                             </div>
-                            <div className="border-2 border-black border-solid rounded-2xl p-1 w-80">
+                            <div className="bg-[#A7A7A9] rounded-2xl p-1 w-80">
                                 <p className="border-b-2 border-b-black border-b-solid">{user.firstName} {user.lastName}</p>
                                 <p id="bio" className="overflow-y-scroll h-14">{user.bio}</p>
                             </div>
                             {activeUsername == username ?
                             <>
                                 <Link
-                                    className="absolute top-36 right-1 lg:top-48 lg:right-1/4 bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                                    className="absolute top-36 right-1 lg:top-48 lg:right-1/4 bg-[#C1EDCC] py-1 px-2 rounded-2xl flex items-center justify-center gap-1"
                                     to="/newIdea"
                                 >
-                                    New Idea
+                                    <CirclePlus/> <p>New Idea</p>
                                 </Link>
                             </>
                             :
                             <>
                                 <button
                                     onClick={follow}
-                                    className="absolute top-36 lg:top-48 right-1 lg:right-[375px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                                    className={`absolute top-36 lg:top-48 right-1 lg:right-[375px] bg-[#C1EDCC] hover:bg-[#B0C0BC] py-1 px-2 rounded-2xl`}
                                     disabled={makingFollow}
                                 >
-                                    {following ? "Following" : "Follow"}
+                                    {following
+                                        ?
+                                            "Following"
+                                        :
+                                            <div className="flex justify-center items-center gap-1">
+                                                <UserPlus/>
+                                                <p>Follow</p>
+                                            </div>
+                                    }
                                 </button>
                                 <Link
                                     to={user._id ? `/chats?chat=${user._id}` : ""}
-                                    className="absolute top-36 lg:top-48 right-[90vw] translate-x-[100%] lg:translate-x-0 lg:right-[275px] bg-gray-500 border-2 border-black border-solid py-1 px-2 rounded-2xl"
+                                    className="absolute top-36 lg:top-48 right-[90vw] translate-x-[100%] lg:translate-x-0 lg:right-[275px] bg-[#C1EDCC] hover:bg-[#B0C0BC] py-1 px-2 rounded-2xl"
                                 >
                                     Message
                                 </Link>
@@ -135,7 +144,7 @@ const Profile = () => {
                     }
                     {user.noOfIdeas > 0 ? 
                     <>
-                    <p className="border-t-2 border-b-2 border-black border-solid text-center backdrop-blur-sm text-lg mb-2">My Ideas</p>
+                    <p className="bg-[#A7A7A9] text-center backdrop-blur-sm text-lg mb-2">My Ideas</p>
                     <div className="h-[50%] flex flex-start flex-wrap gap-4">
                         {loadingUserIdeas ?
                             <div className="w-full h-full flex justify-center items-center">
@@ -152,7 +161,7 @@ const Profile = () => {
                     </div>
                     </>:<></>}
                 </div>
-                <Footer styling={`border-2 border-black border-solid rounded-2xl pr-5 backdrop-blur-sm ${user.noOfIdeas == 0 ? "absolute -bottom-[345px]" : ""}`}/>
+                <Footer styling={`rounded-2xl pr-5 backdrop-blur-sm ${user.noOfIdeas == 0 ? "absolute -bottom-[345px]" : ""}`}/>
             </div>
         </div>
     )
