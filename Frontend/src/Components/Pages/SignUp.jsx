@@ -6,6 +6,7 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { RiLoader2Line } from "@remixicon/react";
 import { useUser } from "../../context/user";
+import { Loader } from "lucide-react";
 
 const SignUp = () => {
     const { setId, setUsername : setFinalUsername, setProfileImage: setFinalProfileImage, setFirstName: setFinalFirstName, setLastName: setFinalLastName } = useUser();
@@ -19,10 +20,12 @@ const SignUp = () => {
     const [DOB, setDOB] = useState("dd-mm-yyyy");
     const [country, setCountry] = useState("Select the Country");
     const [countryCode, setCountryCode] = useState("Select Country Code");
+    const [countryCodeLoading, setCountryCodeLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [email,setEmail] = useState("");
     const [bio, setBio] = useState("");
     const [see,setSee] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const countries = useLoaderData();
 
@@ -33,6 +36,7 @@ const SignUp = () => {
     const navigate = useNavigate();
 
     const countryChange = async (e) => {
+        setCountryCodeLoading(true);
         const thisCountry = e.target.value;
         setCountry(thisCountry);
         setCountryCodes([]);
@@ -40,9 +44,13 @@ const SignUp = () => {
         const { root, suffixes } = data[0].idd;
         if (suffixes.length > 1) {
             setCountryCodes(prev => [...prev, ["Select Country Code",true]]);
-            suffixes.forEach(suffix => setCountryCodes(prev => [...prev, [root+suffix,false]]))
+            suffixes.forEach(suffix => setCountryCodes(prev => [...prev, [root+suffix,false]]));
         }
-        else setCountryCodes([[root+suffixes[0],false]]);
+        else {
+            setCountryCodes([[root+suffixes[0],false]]);
+            setCountryCode(root+suffixes[0]);
+        }
+        setCountryCodeLoading(false);
     }
 
     const upload = async (formData) => {
@@ -92,6 +100,52 @@ const SignUp = () => {
     }
     const register = async (e) => {
         e.preventDefault();
+        console.log("Registering", countryCode);
+        if (!firstName) {
+            toast.error("First Name is Required");
+            return;
+        }
+        if (!username) {
+            toast.error("Username is Required");
+            return;
+        }
+        if (!password) {
+            toast.error("Password is Required");
+            return;
+        }
+        if (!gender) {
+            toast.error("Gender is Required");
+            return;
+        }
+        if (DOB == "dd-mm-yyyy") {
+            toast.error("DOB is Required");
+            return;
+        }
+        if (country == "Select the Country") {
+            toast.error("Country is Required");
+            return;
+        }
+        if (!phoneNumber) {
+            toast.error("Phone Number is Required");
+            return;
+        }
+        if (!email) {
+            toast.error("Email is Required");
+            return;
+        }
+        if (!bio) {
+            toast.error("Bio is Required");
+            return;
+        }
+        if (countryCodeLoading) {
+            toast.info("Waiting for Country Code to Load");
+            return;
+        }
+        if (countryCode == "Select Country Code") {
+            toast.error("Country Code is Required");
+            return;
+        }
+        setLoading(true);
         const toastId = toast.loading("Registering & Logging In...")
         const { data : { data : {
             authenticated,
@@ -129,6 +183,7 @@ const SignUp = () => {
             toast.success("Registered & Logged In Successfully", { id: toastId });
         }
         else alert("Something went wrong. Please try Again");
+        setLoading(false);
     }
     return (
         <div className="flex flex-col justify-between items-center">
@@ -250,15 +305,21 @@ const SignUp = () => {
                     </select>
                     <div className="flex flex-col justify-center gap-8 ">
                         <div className="flex flex-col xl:flex-row justify-start gap-1 md:gap-3">
-                            <select
-                                value={countryCode}
-                                onChange={(e) => setCountryCode(e.target.value)}
-                                className="py-1 px-3 w-52 bg-[#C1EDCC] placeholder:text-black/90 rounded-full text-black"
-                            >
-                                {countryCodes.map(thisCode => (
-                                    <option disabled={thisCode[1]} key={thisCode[0]}>{thisCode[0]}</option>
-                                ))}
-                            </select>
+                            <div className="py-1 px-3 w-52  rounded-full text-black bg-[#C1EDCC] flex items-center justify-center gap-1">
+                                {countryCodeLoading ? <Loader className="h-5 w-5 animate-spin"/> : null}
+                                <select
+                                    value={countryCode}
+                                    onChange={(e) => {
+                                        console.log(e.target.value);
+                                        setCountryCode(e.target.value);
+                                    }}
+                                    className="bg-[#C1EDCC] placeholder:text-black/90 flex-grow h-full"
+                                >
+                                    {countryCodes.map(thisCode => (
+                                        <option disabled={thisCode[1]} key={thisCode[0]}>{thisCode[0]}</option>
+                                    ))}
+                                </select>
+                            </div>
                             <input
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -284,9 +345,11 @@ const SignUp = () => {
                     />
                     <button
                         type="submit"
-                        className="p-1 bg-[#5F5956] rounded-2xl relative left-1/2 -translate-x-1/2 w-24"
+                        className="p-1 bg-[#5F5956] rounded-2xl relative left-1/2 -translate-x-1/2 w-24 flex items-center justify-center gap-1 text-lg text-white"
+                        disabled={loading}
                     >
-                        Register
+                        {loading && <Loader className="animate-spin h-7 w-7" />}
+                        <p>Register</p>
                     </button>
                 </form>
                 <Footer styling={"w-[98%] relative bottom-2 rounded-2xl"}/>

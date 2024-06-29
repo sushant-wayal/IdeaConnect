@@ -19,8 +19,21 @@ const SignIn = () => {
     const navigate = useNavigate()
     const login = async (e) => {
         e.preventDefault();
-        const toastId = toast.loading("Logging In...")
+        if (!username || !password) {
+            if (!username && !password) {
+                toast.error("All Fields Are Required");
+                setErrorMsg("All Fields Are Required");
+            } else if (!password) {
+                toast.error("Password is Required");
+                setErrorMsg("Password is Required");
+            } else {
+                toast.error("Username is Required");
+                setErrorMsg("Username is Required");
+            }
+            return;
+        }
         setLoading(true);
+        const toastId = toast.loading("Logging In...")
         try {
             const { data : { data : {
                 authenticated,
