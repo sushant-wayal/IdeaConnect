@@ -15,15 +15,14 @@ import {
 	useEffect,
 	useState
 } from "react";
+import { useUser } from "../../../context/user";
 
 const Messages = ({
 	firstName,
 	lastName,
 	gotVideoCall,
 	messages,
-	activeUsername,
 	ideaMessages,
-	userId,
 	sendStreams,
 	originalUsername,
 	unreadMessages,
@@ -46,6 +45,8 @@ const Messages = ({
 		setOnVideoCall,
 		setVideoCallStatus
 	} = useVideoCall();
+
+	const { id, username: activeUsername } = useUser();
 
 	const [seeDelete, setSeeDelete] = useState([]);
 	const [messageDeleted, setMessageDeleted] = useState(false);
@@ -137,7 +138,7 @@ const Messages = ({
 					:
 					messages.map(({ _id, sender, senderUsername, messageType, message }, ind) => {
 						let align = "start";
-						if (userId.toString() == sender.toString()) align = "end";
+						if (id.toString() == sender.toString()) align = "end";
 						return (
 							<>
 								{ind == messages.length-unreadMessages && (
@@ -197,7 +198,6 @@ const Messages = ({
 										)}
 										{messageType == "document" && (
 											<DocumentMessage
-												activeUsername={activeUsername}
 												chatTitle={name ? name : username}
 												senderUsername={senderUsername}
 												fileSrc={message}

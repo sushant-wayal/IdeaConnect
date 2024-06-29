@@ -8,11 +8,14 @@ import {
 } from "react";
 import { useSocket } from "../../../context/socket";
 import { RiLoader2Line } from "@remixicon/react";
+import { useUser } from "../../../context/user";
 
 // Yet to fix : "Version Error" in backend when there is new intrested user
 
-const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isIncluded, ideaOf, username, userId, idea, userProfileImage, className }) => {
+const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isIncluded, ideaOf, idea, className }) => {
   const socket = useSocket();
+
+  const { id: userId, username, profileImage: userProfileImage } = useUser();
 
   const [seeing, setSeeing] = useState(false);
   const intrestedEleRef = useRef(null);

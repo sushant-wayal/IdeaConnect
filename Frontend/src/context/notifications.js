@@ -9,12 +9,6 @@ const NotificationContext = createContext({
   setNotifications: () => {},
   unreadNotifications: [],
   setUnreadNotifications: () => {},
-  userId: "",
-  setUserId: () => {},
-  username: "",
-  setUsername: () => {},
-  userProfileImage: "",
-  setUserProfileImage: () => {},
 })
 
 export const NotificationProvider = NotificationContext.Provider;

@@ -15,6 +15,7 @@ import {
 } from "react";
 import { useNotification } from "../../../context/notifications";
 import { House } from "lucide-react";
+import { useUser } from "../../../context/user";
 
 const ChatList = ({
   chats,
@@ -26,7 +27,6 @@ const ChatList = ({
   setMessages,
   send,
   sendIdea,
-  userId,
   defaultChat,
   setUnreadMessages,
   loading,
@@ -55,6 +55,8 @@ const ChatList = ({
     setNoOfSenders
   } = useNotification();
 
+  const { id } = useUser();
+
   const [chatSearch, setChatSearch] = useState("");
   const [displayChats, setDisplayChats] = useState(chats);
   const [sent, setSent] = useState(false);
@@ -63,10 +65,10 @@ const ChatList = ({
 		setUnreadNotifications([]);
 		setVideoCallRequested([]);
 		for (let chat of chats) {
-			setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == userId.toString())]?.unread])
+			setUnreadNotifications(prev => [...prev,chat.members[chat.members.findIndex(member => member.userId.toString() == id.toString())]?.unread])
 			setVideoCallRequested(prev => [...prev,false]);
 		}
-  },[chats, userId])
+  },[chats, id])
 
   const acceptVideoCall = useCallback((id) => {
 		setOnVideoCall(true);
@@ -82,7 +84,7 @@ const ChatList = ({
     const { members } = chat;
     if (!chat.name) {
       let activeUser = 0;
-      if (members[0].userId.toString() == userId.toString()) activeUser = 1;
+      if (members[0].userId.toString() == id.toString()) activeUser = 1;
       const { profileImage, firstName, lastName, username } = members[activeUser];
       setProfileImage(profileImage);
       setFirstName(firstName);
@@ -113,7 +115,7 @@ const ChatList = ({
     }
     socket.emit("allRead",{
       reciver: chat._id,
-      userId,
+      id,
       group: chat.name ? true : false,
     })
     const preUnread = unreadNotifications.find((_,ind) => chats[ind]._id == chat._id);
@@ -139,11 +141,11 @@ const ChatList = ({
   }
 
   useEffect(() => {
-    if (defaultChat && chats.length > 0 && userId) {
+    if (defaultChat && chats.length > 0 && id) {
       const ind = chats.findIndex(chat => !chat.name ? chat.members[0].userId.toString() == defaultChat.toString() || chat.members[1].userId.toString() == defaultChat.toString() : chat._id == defaultChat);
       if (ind != -1) openChat(chats[ind]);
     }
-  },[chats, defaultChat, userId])
+  },[chats, defaultChat, id])
 
   useEffect(() => {
     const toSearch = chatSearch.trim().replace(/ +/g," ").toLowerCase();
@@ -153,7 +155,7 @@ const ChatList = ({
         if (chat.name) return chat.name.toLowerCase().includes(toSearch);
         else {
           let thisUser = 0;
-          if (chat.members[0].userId.toString() == userId.toString()) thisUser = 1;
+          if (chat.members[0].userId.toString() == id.toString()) thisUser = 1;
           thisUser = chat.members[thisUser];
           const matchString = thisUser.firstName.toLowerCase()+" "+thisUser.lastName.toLowerCase()+":"+thisUser.username.toLowerCase();
           return matchString.includes(toSearch);
@@ -197,7 +199,7 @@ const ChatList = ({
             let lastName;
             if (!chat.name) {
               let activeUser = 0;
-              if (members[0].userId.toString() == userId.toString()) activeUser = 1;
+              if (members[0].userId.toString() == id.toString()) activeUser = 1;
               profileImage = members[activeUser].profileImage;
               firstName = members[activeUser].firstName;
               lastName = members[activeUser].lastName;

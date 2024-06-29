@@ -7,22 +7,27 @@ import { NotificationProvider } from "./context/notifications";
 import { getData } from "./components/dataLoaders";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
+import { UserProvider } from "./context/user";
 
 const App = () => {
 	const socket = io.connect("http://localhost:3001");
 
-	const [userId, setUserId] = useState("");
+	const [id, setId] = useState("");
 	const [username, setUsername] = useState("");
-	const [userProfileImage, setUserProfileImage] = useState("");
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
+	const [profileImage, setProfileImage] = useState("");
 
 	useEffect(() => {
 		const getUser = async () => {
 			if (!localStorage.getItem("accessToken")) return;
 			const { user } = await getData("/users/activeUser", "get", true);
 			socket.emit("joinNotificationRoom", user._id);
-			setUserId(user._id);
+			setId(user._id);
 			setUsername(user.username);
-			setUserProfileImage(user.profileImage);
+			setFirstName(user.firstName);
+			setLastName(user.lastName);
+			setProfileImage(user.profileImage);
 		}
 		getUser();
 	})
@@ -82,18 +87,20 @@ const App = () => {
 	const [originalIdeas, setOriginalIdeas] = useState([]);
 
 	return (
-		<SocketProvider value={{ socket }}>
-			<NotificationProvider value={{ noOfMessages, setNoOfMessages, noOfSenders, setNoOfSenders, notifications, setNotifications, unreadNotifications, setUnreadNotifications, userId, setUserId, username, setUsername, userProfileImage, setUserProfileImage }}>
-				<IdeasProvider value={{ ideas, setIdeas, originalIdeas, setOriginalIdeas }}>
-					<Outlet/>
-					<Toaster
-						richColors={true}
-						theme="light"
-						position="top-center"
-					/>
-				</IdeasProvider>
-			</NotificationProvider>
-		</SocketProvider>
+		<UserProvider value={{ id, setId, firstName, setFirstName, lastName, setLastName, username, setUsername, profileImage, setProfileImage }}>
+			<SocketProvider value={{ socket }}>
+				<NotificationProvider value={{ noOfMessages, setNoOfMessages, noOfSenders, setNoOfSenders, notifications, setNotifications, unreadNotifications, setUnreadNotifications }}>
+					<IdeasProvider value={{ ideas, setIdeas, originalIdeas, setOriginalIdeas }}>
+						<Outlet/>
+						<Toaster
+							richColors={true}
+							theme="light"
+							position="top-center"
+						/>
+					</IdeasProvider>
+				</NotificationProvider>
+			</SocketProvider>
+		</UserProvider>
 	)
 }
 

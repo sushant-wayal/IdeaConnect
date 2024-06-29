@@ -25,6 +25,7 @@ import {
 } from "@remixicon/react"
 import { useNotification } from "../../context/notifications.js";
 import { Mic, MicOff, Paperclip, Send } from "lucide-react";
+import { useUser } from "../../context/user.js";
 
 const Chats = () => {
   let chats = [];
@@ -39,6 +40,7 @@ const Chats = () => {
 	},[])
 
   const socket = useSocket();
+	const { id: userId, username: activeUsername } = useUser();
 
   for (let chat of chats) socket.emit("joinRoom",chat._id);
 
@@ -55,8 +57,6 @@ const Chats = () => {
   const [originalUsername, setOriginalUsername] = useState("");
   const [currChat, setCurrChat] = useState({});
   const [message, setMessage] = useState("");
-  const [userId, setUserId] = useState("");
-  const [activeUsername, setActiveUsername] = useState("");
   const sendRef = useRef(null);
   const msgInput = useRef(null);
   const [onVideoCall, setOnVideoCall] = useState(false);
@@ -83,14 +83,6 @@ const Chats = () => {
 	const defaultChat = query.get("chat");
 
   useEffect(() => {
-		const getUserId = async () => {
-			const { authenticated, user } = await getData("/users/activeUser", "get", true);
-			if (authenticated) {
-				setUserId(user._id);
-				setActiveUsername(user.username);
-			}
-		};
-		getUserId();
 		msgInput.current.addEventListener("keyup", (e) => {
 			if (e.key == "Enter") sendRef.current.click();
 		});
@@ -306,7 +298,6 @@ const Chats = () => {
 						setMessages={setMessages}
 						send={send}
 						sendIdea={sendIdea}
-						userId={userId}
 						defaultChat={defaultChat}
 						setUnreadMessages={setUnreadMessages}
 						loading={loading}
@@ -324,9 +315,7 @@ const Chats = () => {
 								lastName={lastName}
 								gotVideoCall={gotVideoCall}
 								messages={messages}
-								activeUsername={activeUsername}
 								ideaMessages={ideaMessages}
-								userId={userId}
 								sendStreams={sendStreams}
 								originalUsername={originalUsername}
 								unreadMessages={unreadMessages}

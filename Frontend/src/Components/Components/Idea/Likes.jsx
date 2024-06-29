@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { getData } from "../../dataLoaders";
 import { useSocket } from "../../../context/socket";
+import { useUser } from "../../../context/user";
 
-const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, username, userId, title, ideaOf, userProfileImage, setLoading, className }) => {
+const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, title, ideaOf, setLoading, className }) => {
   const socket = useSocket();
+
+  const { id: userId, username, profileImage : userProfileImage } = useUser();
 
   const [noOfLikes, setNoOfLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);

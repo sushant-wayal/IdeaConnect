@@ -8,6 +8,7 @@ import { useSocket } from "../../context/socket";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RiLoader2Line } from "@remixicon/react";
+import { useUser } from "../../context/user";
 
 const Notification = ({}) => {
   const socket = useSocket();
@@ -34,21 +35,7 @@ const Notification = ({}) => {
     socket.emit("seenNotification", { notificationId: notifications[0]?._id });
   },[notifications, socket])
 
-  const [activeUsername, setActiveUsername] = useState("");
-  const [activeUserId, setActiveUserId] = useState("");
-  const [userProfileImage, setUserProfileImage] = useState("");
-
-  useEffect(() => {
-    const getUsername = async () => {
-      const { authenticated, user } = await getData("/users/activeUser", "get", true);
-      if (authenticated) {
-        setActiveUsername(user.username);
-        setActiveUserId(user._id);
-        setUserProfileImage(user.profileImage);
-      }
-    };
-    getUsername();
-  },[])
+  const { id: activeUserId, username : activeUsername, profileImage: userProfileImage } = useUser();
 
   const [notificationLength, setNotificationLength] = useState(0);
 

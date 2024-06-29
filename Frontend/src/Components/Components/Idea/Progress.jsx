@@ -4,8 +4,10 @@ import {
   useRef,
   useState
 } from "react";
+import { useUser } from "../../../context/user";
 
-const Progress = ({ ideaId, steps, progress, username, ideaOf, className }) => {
+const Progress = ({ ideaId, steps, progress, ideaOf, className }) => {
+  const { username } = useUser();
   const [seeing, setSeeing] = useState(false);
   const progressEleRef = useRef();
   const [ideaProgress, setIdeaProgress] = useState(progress);

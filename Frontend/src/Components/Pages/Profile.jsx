@@ -8,29 +8,20 @@ import { getData } from "../dataLoaders";
 import { useSocket } from "../../context/socket";
 import { RiLoader2Line } from "@remixicon/react";
 import { CirclePlus, UserPlus } from "lucide-react";
+import { useUser } from "../../context/user";
 
 const Profile = () => {
     const socket = useSocket();
     const { username } = useParams();
-    const [activeUsername, setActiveUsername] = useState("");
+    const { id: activeUserId, username: activeUsername } = useUser();
     const [user, setUser] = useState({});
     const [following, setFollowing] = useState(false);
     const [ideas, setIdeas] = useState([]);
     const [userFollowers, setUserFollowers] = useState(user.followers);
-    const [activeUserId, setActiveUserId] = useState("");
     const [loadingUserInfo, setLoadingUserInfo] = useState(0);
     const [loadingUserIdeas, setLoadingUserIdeas] = useState(true);
     const [makingFollow, setMakingFollow] = useState(false);
     useEffect(() => {
-        const getUsername = async () => {
-            const { authenticated, user } = await getData("/users/activeUser", "get", true);
-            if (authenticated) {
-                setActiveUsername(user.username);
-                setActiveUserId(user._id);
-                setLoadingUserInfo(prev => prev+1);
-            }
-        };
-        getUsername();
         const getUser = async () => {
             const data = await getData(`/users/profile/${username}`, "get", false);
             setUser(data);
@@ -76,7 +67,7 @@ const Profile = () => {
             <SideNav/>
             <div className="relative w-[98vw] left-1 lg:left-0 lg:w-[calc(100vw*5.4/6.5)] flex flex-col justify-center gap-2 min-h-[100vh]">
                 <div className="rounded-2xl p-2 h-full">
-                    {loadingUserInfo < 3 ?
+                    {loadingUserInfo < 2 ?
                         <div className="w-full flex justify-center items-center h-[40%]">
                             <RiLoader2Line className="animate-spin h-10 w-10"/>
                         </div>

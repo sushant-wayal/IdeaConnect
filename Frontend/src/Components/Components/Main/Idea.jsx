@@ -11,17 +11,16 @@ import {
 	useState
 } from "react";
 import { SeeComments } from "../Idea/Comment";
+import { useUser } from "../../../context/user";
 
 const Idea = ({ thisIdea }) => {
 	const { idea, profileImage, ideaOf, included, intrested } = thisIdea;
-	const [username,setUsername] = useState("");
+	const { username } = useUser();
 	const [isLiked,setIsLiked] = useState(false);
 	const [likedBy, setLikedBy] = useState([]);
 	const [seeingLikedBy, setSeeingLikedBy] = useState(false);
 	const [comments, setComments] = useState([]);
 	const [seeingComments, setSeeingComments] = useState(false);
-	const [userId, setUserId] = useState("");
-	const [userProfileImage, setUserProfileImage] = useState("");
 	const [loadingLikes, setLoadingLikes] = useState(false);
 	const [loadingComments, setLoadingComments] = useState(false);
 	useEffect(() =>{
@@ -31,17 +30,6 @@ const Idea = ({ thisIdea }) => {
 		}
 		checkLike();
 	},[username])
-	useEffect(() => {
-		const getUsername = async () => {
-			const { authenticated, user } = await getData("/users/activeUser", "get", true);
-			if (authenticated) {
-				setUsername(user.username);
-				setUserId(user._id);
-				setUserProfileImage(user.profileImage);
-			}
-		};
-		getUsername();
-	},[]);
     return (
 			<div className="relative w-full sm:w-[302px] h-[500px] sm:h-[450px] backdrop-blur-sm rounded-2xl p-2 flex flex-col gap-2 bg-[#797270]">
 				<div className="flex justify-center items-center relative border-b-2 border-b-black border-b-solid">
@@ -75,10 +63,7 @@ const Idea = ({ thisIdea }) => {
 						isIntrestedInitial={intrested}
 						isIncluded={included}
 						ideaOf={ideaOf}
-						username={username}
 						idea={idea}
-						userId={userId}
-						userProfileImage={userProfileImage}
 						className="absolute top-2 right-2"
 					/>
 			</div>
@@ -92,10 +77,7 @@ const Idea = ({ thisIdea }) => {
 						seeingComments={seeingComments}
 						setComments={setComments}
 						ideaOf={idea.ideaOf}
-						username={username}
-						userProfileImage={userProfileImage}
 						title={idea.title}
-						userId={userId}
 						loading={loadingLikes || loadingComments}
 						className="absolute bottom-[40px] bg-[#6C757D]"
 					/>
@@ -103,7 +85,6 @@ const Idea = ({ thisIdea }) => {
 						ideaId={idea._id}
 						steps={idea.steps}
 						progress={idea.progress}
-						username={username}
 						ideaOf={ideaOf}
 						className=""
 					/>
@@ -115,11 +96,8 @@ const Idea = ({ thisIdea }) => {
 								setLikedBy={setLikedBy}
 								seeingLikedBy={seeingLikedBy}
 								setSeeingLikedBy={setSeeingLikedBy}
-								username={username}
-								userId={userId}
 								title={idea.title}
 								ideaOf={idea.ideaOf}
-								userProfileImage={userProfileImage}
 								setLoading={setLoadingLikes}
 								className=""
 							/>

@@ -21,6 +21,7 @@ import {
 	Bell,
 	LogOut
 } from "lucide-react"
+import { useUser } from "../../../context/user";
 
 const Icons = ({condition, props}) => {
 	return condition ? <props.icon {...props}/> : null;
@@ -31,17 +32,13 @@ const SideNav = () => {
 
 	const socket = useSocket();
 
-	const [userId, setUserId] = useState("");
-	const [userProfileImage, setUserProfileImage] = useState("../../../../images/ProfileImageUpload/defaultOther.jpg");
+	const { id, username, profileImage } = useUser();
 
 	useEffect(() => {
-		const getUser = async () => {
-			const { user : { _id, profileImage } } = await getData("/users/activeUser", "get", true);
-			socket.emit("joinNotificationRoom", _id);
-			setUserId(_id);
-			setUserProfileImage(profileImage);
-		}
-		getUser();
+		socket.emit("joinNotificationRoom", id);
+	},[id])
+
+	useEffect(() => {
 		const getNoOfUnreadNotifications = async () => {
 			const { noOfNotifications } = await getData("/notifications/unread", "get", true);
 			setUnreadNotifications(noOfNotifications);
@@ -73,11 +70,10 @@ const SideNav = () => {
 	},[reciveUnreadMessages, socket]);
 
 	const openNotifications = () => {
-		socket.emit("seenAllNotification", { userId });
+		socket.emit("seenAllNotification", { id });
 		setUnreadNotifications(0);
 	}
 
-	const [username,setUsername] = useState("");
 	const navigate = useNavigate();
 	const active = (isActive, bottom) => {
 		let style = `relative p-[6px] rounded-full text-center w-full hover:bg-[#B0C0BC] flex items-center ${bottom ? "justify-center" : "justify-start"} gap-2`;
@@ -85,13 +81,6 @@ const SideNav = () => {
 		else style +=  " bg-[#C1EDCC]"
 		return style;
 	}
-	useEffect(() => {
-		const getUsername = async () => {
-			const { authenticated, user } = await getData("/users/activeUser", "get", true);
-			if (authenticated) setUsername(user.username);
-		};
-		getUsername();
-	},[])
 	const logout = async () => {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
@@ -172,7 +161,7 @@ const SideNav = () => {
 							className={({isActive}) => active(isActive, true)}
 							to={to}
 						>
-							{to == `/profile/${username}` ? <img src={userProfileImage} className="w-8 h-8 rounded-full" alt="Profile"/> : null}
+							{to == `/profile/${username}` ? <img src={profileImage} className="w-8 h-8 rounded-full" alt="Profile"/> : null}
 							{primaryText}	{responsiveText ? <p className="hidden xl:inline-block"> {responsiveText} </p> : null}
 						</NavLink>
 					))}

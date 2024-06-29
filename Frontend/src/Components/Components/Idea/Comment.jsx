@@ -3,9 +3,12 @@ import { getData, getHeaders } from "../../dataLoaders";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../context/socket"
+import { useUser } from "../../../context/user";
 
-const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, username, userProfileImage, loading }) => {
+const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
   const socket = useSocket();
+
+  const { id, username, profileImage } = useUser();
 
   const descriptionDivHeight = 272;
   const [comment, setComment] = useState("");
@@ -20,12 +23,12 @@ const Comment = ({ comments, setComments, ideaId, userId, title, ideaOf, usernam
     const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
     if (success) {
       setComments(prev => [newComment, ...prev]);
-      console.log("sending comment notification", userId, ideaId, title, ideaOf, userProfileImage, username);
-      socket.emit("commentedNotification", { userId, idea: {
+      console.log("sending comment notification", id, ideaId, title, ideaOf, profileImage, username);
+      socket.emit("commentedNotification", { id, idea: {
         _id: ideaId,
         title,
         ideaOf
-      }, username, profileImage: userProfileImage});
+      }, username, profileImage: profileImage});
     }
     setComment("");
     setSending(false);

@@ -1,13 +1,14 @@
 import { RiDownloadLine } from "@remixicon/react";
 import { useEffect } from "react";
+import { useUser } from "../../../../context/user";
 
 const DocumentMessage = ({
-  activeUsername,
   chatTitle,
   senderUsername,
   fileSrc,
   messageId
 }) => {
+  const { username } = useUser();
   const urlSplit = fileSrc.split("/");
   const fileName = urlSplit[urlSplit.length-1];
   const downloadFile = async () => {
@@ -28,7 +29,7 @@ const DocumentMessage = ({
   }
   useEffect(() => {
     console.log("DocumentMessage mounted");
-    console.log("DocumentMessage props", { activeUsername, chatTitle, senderUsername, fileSrc, messageId })
+    console.log("DocumentMessage props", { username, chatTitle, senderUsername, fileSrc, messageId })
     return () => {
       console.log("DocumentMessage unmounted");
     }
@@ -38,10 +39,10 @@ const DocumentMessage = ({
       <RiDownloadLine
         size={30}
         color="white"
-        className={`${senderUsername == activeUsername ? "hidden" : ""} p-1 cursor-pointer bg-black rounded-md`}
+        className={`${senderUsername == username ? "hidden" : ""} p-1 cursor-pointer bg-black rounded-md`}
         onClick={downloadFile}
       />
-      <p className="font-semibold text-md text-wrap">{`${senderUsername == activeUsername ? "Shared " : ""}${fileName}`}</p>
+      <p className="font-semibold text-md text-wrap">{`${senderUsername == username ? "Shared " : ""}${fileName}`}</p>
     </div>
   )
 }

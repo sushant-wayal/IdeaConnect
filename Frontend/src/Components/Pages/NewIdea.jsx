@@ -11,9 +11,10 @@ import Category from "../Components/NewIdea/Category";
 import { toast } from "sonner";
 import { RiLoader2Line } from "@remixicon/react";
 import { ImagePlus, Upload } from "lucide-react";
+import { useUser } from "../../context/user";
 
 const NewIdea = () => {
-    const [username,setUsername] = useState("");
+    const { username } = useUser();
     const [categories,setCategories] = useState([]);
     const [title,setTitle] = useState("");
     const [description,setDescription] = useState("");
@@ -39,14 +40,6 @@ const NewIdea = () => {
     const navigate = useNavigate();
 
     const newCategoryEleRef = useRef();
-
-    useEffect(() => {
-        const getUsername = async () => {
-            const { authenticated, user } = await getData('/users/activeUser', "get", true);
-            if (authenticated) setUsername(user.username);
-        };
-        getUsername();
-    })
 
     const addCategory = (e) => {
         if (e.key == "Enter") {

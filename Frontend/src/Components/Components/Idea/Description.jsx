@@ -7,8 +7,10 @@ import {
 import Comment from "./Comment";
 import { RiLoader2Line } from "@remixicon/react";
 import axios from "axios";
+import { useUser } from "../../../context/user";
 
-const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, userId, title, ideaOf, username, userProfileImage, loading, className }) => {
+const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, title, ideaOf, loading, className }) => {
+  const { profileImage: userProfileImage } = useUser();
   const [seeing, setSeeing] = useState(false);
   const descriptionEleRef = useRef();
   const handleClick = () => {
@@ -99,11 +101,8 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
               comments={comments}
               setComments={setComments}
               ideaId={ideaId}
-              userId={userId}
               title={title}
               ideaOf={ideaOf}
-              userProfileImage={userProfileImage}
-              username={username}
             />
             :
             description
