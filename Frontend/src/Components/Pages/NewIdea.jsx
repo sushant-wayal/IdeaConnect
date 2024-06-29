@@ -17,6 +17,7 @@ const NewIdea = () => {
     const { username } = useUser();
     const [categories,setCategories] = useState([]);
     const [title,setTitle] = useState("");
+    const [currCategory,setCurrCategory] = useState("");
     const [description,setDescription] = useState("");
     const [publishing,setPublishing] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -39,13 +40,11 @@ const NewIdea = () => {
 
     const navigate = useNavigate();
 
-    const newCategoryEleRef = useRef();
-
     const addCategory = (e) => {
         if (e.key == "Enter") {
             e.preventDefault();
-            if (!categories.includes(newCategoryEleRef.current.value)) setCategories(prev => [newCategoryEleRef.current.value, ...prev]);
-            newCategoryEleRef.current.value = "";
+            if (!categories.includes(currCategory)) setCategories(prev => [currCategory, ...prev]);
+            setCurrCategory("");
         }
     }
 
@@ -87,6 +86,29 @@ const NewIdea = () => {
 
     const publish = async (e) => {
         e.preventDefault();
+        if (!title) {
+            toast.error("Title is Required");
+            return;
+        }
+        if (!description) {
+            toast.error("Description is Required");
+            return;
+        }
+        if (categories.length == 0) {
+            toast.error("Atleast One Category is Required");
+            return;
+        }
+        const validMedia = false;
+        for (let i=1; i < media.length ; i++) {
+            if (media[i].type == "image") {
+                validMedia = true;
+                break;
+            }
+        }
+        if (!validMedia) {
+            toast.error("Atleast One Image is Required");
+            return;
+        }
         setPublishing(true);
         const toastId = toast.loading("Publishing Idea...");
         const { data : { data : { success } } } = await axios.post("http://localhost:3000/api/v1/ideas/publishIdea",{
@@ -178,7 +200,8 @@ const NewIdea = () => {
                                 <textarea
                                     className="w-full h-full bg-transparent resize-none focus:outline-none"
                                     onKeyDown={addCategory}
-                                    ref={newCategoryEleRef}
+                                    value={currCategory}
+                                    onChange={(e) => setCurrCategory(e.target.value)}
                                 ></textarea>
                             </div>
                         </div>
