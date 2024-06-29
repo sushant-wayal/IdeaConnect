@@ -49,7 +49,8 @@ const messanging = () => {
         message
       });
     });
-    socket.on("allRead", async ({ reciver, userId, group }) => {
+    socket.on("allRead", async ({ reciver, id, group }) => {
+      const userId = id;
       const room = reciver;
       const chatOrGroup = await getChatOrGroup(room, group);
       chatOrGroup.members[chatOrGroup.members.findIndex(member => member.userId.toString() === userId.toString())].unread = 0;
