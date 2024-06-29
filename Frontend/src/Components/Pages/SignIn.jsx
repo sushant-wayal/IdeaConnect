@@ -6,8 +6,11 @@ import axios from "axios";
 import { toast } from "sonner";
 import { RiLoader2Line } from "@remixicon/react";
 import { Eye, EyeOff } from "lucide-react";
+import { useUser } from "../../context/user";
 
 const SignIn = () => {
+    const { setId, setUsername : setFinalsUsername, setProfileImage, setFirstName, setLastName } = useUser();
+
     const [see, setSee] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [username, setUsername] = useState("");
@@ -21,6 +24,13 @@ const SignIn = () => {
         try {
             const { data : { data : {
                 authenticated,
+                user: {
+                    _id,
+                    username: finalsUsername,
+                    profileImage,
+                    firstName,
+                    lastName,
+                },
                 accessToken,
                 refreshToken 
             } } } = await axios.post("http://localhost:3000/api/v1/users/login", {
@@ -31,6 +41,11 @@ const SignIn = () => {
                 setErrorMsg("");
                 localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
+                setId(_id);
+                setFinalsUsername(finalsUsername);
+                setProfileImage(profileImage);
+                setFirstName(firstName);
+                setLastName(lastName);
                 navigate("/ideas");
                 toast.success("Logged In Successfully", { id: toastId });
             } else {

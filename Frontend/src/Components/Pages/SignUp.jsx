@@ -5,8 +5,10 @@ import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { RiLoader2Line } from "@remixicon/react";
+import { useUser } from "../../context/user";
 
 const SignUp = () => {
+    const { setId, setUsername : setFinalUsername, setProfileImage: setFinalProfileImage, setFirstName: setFinalFirstName, setLastName: setFinalLastName } = useUser();
     const [profileImage, setProfileImage] = useState("../../../../images/ProfileImageUpload/defaultOther.jpg");
     const [profileImageSet, setProfileImageSet] = useState(false);
     const [firstName, setFirstName] = useState("");
@@ -93,6 +95,13 @@ const SignUp = () => {
         const toastId = toast.loading("Registering & Logging In...")
         const { data : { data : {
             authenticated,
+            createdUser: {
+                username: finalUsername,
+                profileImage: finalProfileImage,
+                firstName: finalFirstName,
+                lastName: finalLastName,
+                _id,
+            },
             accessToken,
             refreshToken
         } } } = await axios.post("http://localhost:3000/api/v1/users/register",{
@@ -111,6 +120,11 @@ const SignUp = () => {
         if (authenticated) {
             localStorage.setItem("accessToken",accessToken);
             localStorage.setItem("refreshToken",refreshToken);
+            setId(_id);
+            setFinalUsername(finalUsername);
+            setFinalProfileImage(finalProfileImage);
+            setFinalFirstName(finalFirstName);
+            setFinalLastName(finalLastName);
             navigate("/ideas");
             toast.success("Registered & Logged In Successfully", { id: toastId });
         }

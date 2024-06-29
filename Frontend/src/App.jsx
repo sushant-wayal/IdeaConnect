@@ -30,7 +30,7 @@ const App = () => {
 			setProfileImage(user.profileImage);
 		}
 		getUser();
-	})
+	},[])
 
 	const [noOfMessages, setNoOfMessages] = useState(0);
 	const [noOfSenders, setNoOfSenders] = useState(0);
