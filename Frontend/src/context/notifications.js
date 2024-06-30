@@ -9,6 +9,8 @@ const NotificationContext = createContext({
   setNotifications: () => {},
   unreadNotifications: [],
   setUnreadNotifications: () => {},
+  gotNotification: false,
+  setGotNotification: () => {}
 })
 
 export const NotificationProvider = NotificationContext.Provider;

@@ -33,7 +33,8 @@ const SideNav = () => {
 		noOfSenders,
 		setNoOfSenders,
 		unreadNotifications,
-		setUnreadNotifications
+		setUnreadNotifications,
+		gotNotification
 	} = useNotification();
 
 	const socket = useSocket();
@@ -70,9 +71,13 @@ const SideNav = () => {
 		socket
 	])
 
+	const [gotChat, setGotChat] = useState(false);
+
 	const reciveUnreadMessages = useCallback(({ preUnread }) => {
 		setNoOfMessages(prev => prev + 1);
 		if (preUnread > 0) setNoOfSenders(prev => prev + 1);
+		setGotChat(true);
+		setTimeout(() => setGotChat(false), 750);
 	},[
 		setNoOfMessages,
 		setNoOfSenders
@@ -136,7 +141,7 @@ const SideNav = () => {
 							to={to == "/notifications" ? `/notifications?unread=${unreadNotifications}` : to}
 							onClick={to == "/notifications" ? openNotifications : null}
 						>
-							<div className="">
+							<div className={((to == "/chats" && gotChat) || (to == "/notifications" && gotNotification)) ? "animate-shake" : ""}>
 								{Icons({ condition: true, props: { icon } })}
 							</div>
 							<p>{primaryText}</p>

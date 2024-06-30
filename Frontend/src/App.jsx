@@ -17,6 +17,7 @@ const App = () => {
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [profileImage, setProfileImage] = useState("");
+	const [gotNotification, setGotNotification] = useState(false);
 
 	useEffect(() => {
 		const getUser = async () => {
@@ -73,6 +74,8 @@ const App = () => {
 		}
 		setNotifications(prev => [newNotification, ...prev]);
 		setUnreadNotifications(prev => prev + 1);
+		setGotNotification(true);
+		setTimeout(() => setGotNotification(false), 750);
 	},[setNotifications]);
 
 	useEffect(() => {
@@ -86,7 +89,7 @@ const App = () => {
 	return (
 		<UserProvider value={{ id, setId, firstName, setFirstName, lastName, setLastName, username, setUsername, profileImage, setProfileImage }}>
 			<SocketProvider value={{ socket }}>
-				<NotificationProvider value={{ noOfMessages, setNoOfMessages, noOfSenders, setNoOfSenders, notifications, setNotifications, unreadNotifications, setUnreadNotifications }}>
+				<NotificationProvider value={{ noOfMessages, setNoOfMessages, noOfSenders, setNoOfSenders, notifications, setNotifications, unreadNotifications, setUnreadNotifications, gotNotification, setGotNotification }}>
 					<IdeasProvider value={{ ideas, setIdeas, originalIdeas, setOriginalIdeas }}>
 						<Outlet/>
 						<Toaster
