@@ -9,6 +9,7 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RiLoader2Line } from "@remixicon/react";
 import { useUser } from "../../context/user";
+import { toast } from "sonner";
 
 const Notification = ({}) => {
   const socket = useSocket();
@@ -24,9 +25,13 @@ const Notification = ({}) => {
   const { notifications, setNotifications, setUnreadNotifications } = useNotification();
   useEffect(() => {
     const getNotifications = async () => {
-      const { notifications } = await getData("/notifications", "get", true);
-      setNotifications(notifications);
-      setLoading(false);
+      try {
+        const { notifications } = await getData("/notifications", "get", true);
+        setNotifications(notifications);
+        setLoading(false);
+      } catch (error) {
+        toast.error(error.response.data.message || "An error occurred. Please try again later.");
+      }
     }
     getNotifications();
   },[]);
@@ -64,39 +69,51 @@ const Notification = ({}) => {
   },[notificationLength])
 
   const follow = async (ind) => {
-    const { username, isFollowing, notifiedBy } = notifications[ind];
-    const { data : { data } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${username}`,{},{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    });
-    if (data.authenticated) {
-      if (isFollowing) setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isFollowing: false} : notification));
-      else setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isFollowing: true} : notification));
+    try {
+      const { username, isFollowing, notifiedBy } = notifications[ind];
+      const { data : { data } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${username}`,{},{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      if (data.authenticated) {
+        if (isFollowing) setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isFollowing: false} : notification));
+        else setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isFollowing: true} : notification));
+      }
+      socket.emit("followNotification", { follower: activeUserId, followed: notifiedBy});
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
     }
-    socket.emit("followNotification", { follower: activeUserId, followed: notifiedBy});
   };
 
   const include = async (ind) => {
-    const { ideaId, notifiedBy, title } = notifications[ind];
-    await getData(`/ideas/include/${ideaId}/${notifiedBy}`, "get", true);
-    setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isIncluded: true} : notification));
-    socket.emit("includedNotification", {
-      userId: activeUserId,
-      idea: {
-        _id: ideaId,
-        title: title
-      },
-      profileImage: userProfileImage,
-      username: activeUsername,
-      includedUser: notifiedBy,
-    });
+    try {
+      const { ideaId, notifiedBy, title } = notifications[ind];
+      await getData(`/ideas/include/${ideaId}/${notifiedBy}`, "get", true);
+      setNotifications(prev => prev.map((notification, index) => index == ind ? {...notification, isIncluded: true} : notification));
+      socket.emit("includedNotification", {
+        userId: activeUserId,
+        idea: {
+          _id: ideaId,
+          title: title
+        },
+        profileImage: userProfileImage,
+        username: activeUsername,
+        includedUser: notifiedBy,
+      });
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
+    }
   }
 
   const openGroup = async (ind) => {
     const { ideaId } = notifications[ind];
-    const { groupId } = await getData(`/ideas/groupId/${ideaId}`, "get", true);
-    navigate(`/chats?chat=${groupId}`)
+    try {
+      const { groupId } = await getData(`/ideas/groupId/${ideaId}`, "get", true);
+      navigate(`/chats?chat=${groupId}`)
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
+    }
   }
   return (
     <div>

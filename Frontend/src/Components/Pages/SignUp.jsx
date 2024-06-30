@@ -37,34 +37,42 @@ const SignUp = () => {
 
     const countryChange = async (e) => {
         setCountryCodeLoading(true);
-        const thisCountry = e.target.value;
-        setCountry(thisCountry);
-        setCountryCodes([]);
-        let { data } = await axios.get(`https://restcountries.com/v3.1/name/${thisCountry}?fullText=true`);
-        const { root, suffixes } = data[0].idd;
-        if (suffixes.length > 1) {
-            setCountryCodes(prev => [...prev, ["Select Country Code",true]]);
-            suffixes.forEach(suffix => setCountryCodes(prev => [...prev, [root+suffix,false]]));
-        }
-        else {
-            setCountryCodes([[root+suffixes[0],false]]);
-            setCountryCode(root+suffixes[0]);
+        try {
+            const thisCountry = e.target.value;
+            setCountry(thisCountry);
+            setCountryCodes([]);
+            let { data } = await axios.get(`https://restcountries.com/v3.1/name/${thisCountry}?fullText=true`);
+            const { root, suffixes } = data[0].idd;
+            if (suffixes.length > 1) {
+                setCountryCodes(prev => [...prev, ["Select Country Code",true]]);
+                suffixes.forEach(suffix => setCountryCodes(prev => [...prev, [root+suffix,false]]));
+            }
+            else {
+                setCountryCodes([[root+suffixes[0],false]]);
+                setCountryCode(root+suffixes[0]);
+            }
+        } catch (error) {
+            toast.error("Country Code Loading Failed. Please Try Again");
         }
         setCountryCodeLoading(false);
     }
 
     const upload = async (formData) => {
-        const { data : { success, data : { url } } } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
-            headers: {
-                "Content-Type": "multipart/form-data",
+        try {
+            const { data : { success, data : { url } } } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            })
+    
+            if (success) {
+                setProfileImageSet(true);
+                setProfileImage(url);
             }
-        })
-
-        if (success) {
-            setProfileImageSet(true);
-            setProfileImage(url);
+            else console.log("Check BackEnd");
+        } catch (error) {
+            toast.error("Image Upload Failed. Please Try Again");
         }
-        else console.log("Check BackEnd");
     }
     const fileChange = async (e) => {
         let formData = new FormData();
@@ -147,42 +155,45 @@ const SignUp = () => {
         }
         setLoading(true);
         const toastId = toast.loading("Registering & Logging In...")
-        const { data : { data : {
-            authenticated,
-            createdUser: {
-                username: finalUsername,
-                profileImage: finalProfileImage,
-                firstName: finalFirstName,
-                lastName: finalLastName,
-                _id,
-            },
-            accessToken,
-            refreshToken
-        } } } = await axios.post("http://localhost:3000/api/v1/users/register",{
-            username,
-            password,
-            firstName,
-            lastName,
-            countryCode,
-            phoneNumber,
-            email,
-            DOB,
-            gender,
-            bio,
-            profileImage,
-        });
-        if (authenticated) {
-            localStorage.setItem("accessToken",accessToken);
-            localStorage.setItem("refreshToken",refreshToken);
-            setId(_id);
-            setFinalUsername(finalUsername);
-            setFinalProfileImage(finalProfileImage);
-            setFinalFirstName(finalFirstName);
-            setFinalLastName(finalLastName);
-            navigate("/ideas");
-            toast.success("Registered & Logged In Successfully", { id: toastId });
+        try {
+            const { data : { data : {
+                authenticated,
+                createdUser: {
+                    username: finalUsername,
+                    profileImage: finalProfileImage,
+                    firstName: finalFirstName,
+                    lastName: finalLastName,
+                    _id,
+                },
+                accessToken,
+                refreshToken
+            } } } = await axios.post("http://localhost:3000/api/v1/users/register",{
+                username,
+                password,
+                firstName,
+                lastName,
+                countryCode,
+                phoneNumber,
+                email,
+                DOB,
+                gender,
+                bio,
+                profileImage,
+            });
+            if (authenticated) {
+                localStorage.setItem("accessToken",accessToken);
+                localStorage.setItem("refreshToken",refreshToken);
+                setId(_id);
+                setFinalUsername(finalUsername);
+                setFinalProfileImage(finalProfileImage);
+                setFinalFirstName(finalFirstName);
+                setFinalLastName(finalLastName);
+                navigate("/ideas");
+                toast.success("Registered & Logged In Successfully", { id: toastId });
+            }
+        } catch (error) {
+            toast.error(error.response.data.message || "An Error Occurred. Please Try Again", { id: toastId });
         }
-        else alert("Something went wrong. Please try Again");
         setLoading(false);
     }
     return (

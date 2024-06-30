@@ -65,9 +65,9 @@ const SignIn = () => {
                 toast.error("Invalid Credentials", { id: toastId });
                 setErrorMsg("Invalid Credentials");
             }
-        } catch {
-            toast.error("An Error Occurred. Try Again", { id: toastId });
-            setErrorMsg("An Error Occurred. Try Again");
+        } catch (error) {
+            toast.error(error.response.data.message || "An Error Occurred. Try Again", { id: toastId });
+            setErrorMsg(error.response.data.message || "An Error Occurred. Try Again");
         }
         setLoading(false);
     }

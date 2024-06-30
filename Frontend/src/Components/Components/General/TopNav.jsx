@@ -4,6 +4,7 @@ import {
 	useEffect,
 	useState
 } from "react"
+import { toast } from "sonner";
 
 const TopNav = ({ noSearchText }) => {
 	const [prompt, setPrompt] = useState("");
@@ -14,10 +15,14 @@ const TopNav = ({ noSearchText }) => {
 	}
 	useEffect(() => {
 		const id = setTimeout(async () => {
-			if (prompt == "") return;
-			const { ideas, authenticated } = await getData(`/ideas/search/${prompt}`, "get", true);
-			if (authenticated) setIdeas(ideas);
-			else setIdeas([]);
+			try {
+				if (prompt == "") return;
+				const { ideas, authenticated } = await getData(`/ideas/search/${prompt}`, "get", true);
+				if (authenticated) setIdeas(ideas);
+				else setIdeas([]);
+			} catch (error) {
+				toast.error(error.response.data.message || "An error occurred. Please try again later.");
+			}
 		}, 500);
 		return () => clearTimeout(id);
 	}, [prompt])

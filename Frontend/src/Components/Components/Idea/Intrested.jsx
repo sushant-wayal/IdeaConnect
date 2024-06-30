@@ -9,6 +9,7 @@ import {
 import { useSocket } from "../../../context/socket";
 import { RiLoader2Line } from "@remixicon/react";
 import { useUser } from "../../../context/user";
+import { toast } from "sonner";
 
 // Yet to fix : "Version Error" in backend when there is new intrested user
 
@@ -25,19 +26,23 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
   const [loading, setLoading] = useState(false);
   const include = async (e, id, ind) => {
     e.stopPropagation();
-    await getData(`/ideas/include/${ideaId}/${id}`, "get", true);
-    socket.emit("includedNotification", {
-      userId,
-      idea: {
-        _id: ideaId,
-        title: idea.title
-      },
-      profileImage: userProfileImage,
-      username,
-      includedUser: id,
-    });
-    setIntrestedUserInfo(intrestedUserInfo.filter((_, index) => index != ind));
-    setNoOfIntrested(prev => prev - 1);
+    try {
+      await getData(`/ideas/include/${ideaId}/${id}`, "get", true);
+      socket.emit("includedNotification", {
+        userId,
+        idea: {
+          _id: ideaId,
+          title: idea.title
+        },
+        profileImage: userProfileImage,
+        username,
+        includedUser: id,
+      });
+      setIntrestedUserInfo(intrestedUserInfo.filter((_, index) => index != ind));
+      setNoOfIntrested(prev => prev - 1);
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
+    }
   }
   const handleClick = async () => {
     if (ideaOf != username) return;
@@ -73,21 +78,25 @@ const Intrested = ({ ideaId, intrestedUser, intrested, isIntrestedInitial, isInc
     }
   }
   const setIntrestedStatus = useCallback(async () => {
-    const { alreadyIntrested } = await getData(`/ideas/intrested/${ideaId}`, "get", true);
-    if (!alreadyIntrested) {
-      console.log("Intrested", ideaId, userId, idea.title, idea.ideaOf, userProfileImage, username);
-      socket.emit("intrestedNotification", {
-        userId,
-        idea: {
-          _id: ideaId,
-          title: idea.title,
-          ideaOf: idea.ideaOf,
-        },
-        profileImage: userProfileImage,
-        username,
-      });
-    };
-    setIsIntrested(!alreadyIntrested);
+    try {
+      const { alreadyIntrested } = await getData(`/ideas/intrested/${ideaId}`, "get", true);
+      if (!alreadyIntrested) {
+        console.log("Intrested", ideaId, userId, idea.title, idea.ideaOf, userProfileImage, username);
+        socket.emit("intrestedNotification", {
+          userId,
+          idea: {
+            _id: ideaId,
+            title: idea.title,
+            ideaOf: idea.ideaOf,
+          },
+          profileImage: userProfileImage,
+          username,
+        });
+      };
+      setIsIntrested(!alreadyIntrested);
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
+    }
   },[username, ideaId, userId, idea, userProfileImage]);
   useEffect(() => {
     if (ideaOf == username && !isIncluded) return;

@@ -16,6 +16,7 @@ import {
 import { useNotification } from "../../../context/notifications";
 import { House } from "lucide-react";
 import { useUser } from "../../../context/user";
+import { toast } from "sonner"
 
 const ChatList = ({
   chats,
@@ -78,66 +79,72 @@ const ChatList = ({
   },[]);
 
   const openChat = async (chat) => {
-    setLoadingMessages(true);
-    document.querySelector("#messages").style.backgroundImage = "none";
-    setShow(true);
-    const { members } = chat;
-    if (!chat.name) {
-      let activeUser = 0;
-      if (members[0].userId.toString() == id.toString()) activeUser = 1;
-      const { profileImage, firstName, lastName, username } = members[activeUser];
-      setProfileImage(profileImage);
-      setFirstName(firstName);
-      setLastName(lastName);
-      setUsername(username);
-      setOriginalUsername(username);
-    } else {
-      const { profileImage, name } = chat;
-      setProfileImage(profileImage);
-      setFirstName(name);
-      setLastName("");
-      setUsername("");
-      setOriginalUsername("");
-    }
-    setCurrChat(chat);
-    let chatType = "chat";
-    if (chat.name) chatType = "group";
-    const { messages } = await getData(`/messages/${chat._id}?chatType=${chatType}`, "get", true);
-    for (let message of messages) {
-      const { messageType } = message
-      if (messageType == "idea") {
-        const data = await getData(`/ideas/specificIdea/${message.message}`, "get", true);
-        setIdeaMessages(prev => {
-          prev.set(message.message, data);
-          return prev;
-        });
+    try {
+      setLoadingMessages(true);
+      document.querySelector("#messages").style.backgroundImage = "none";
+      setShow(true);
+      const { members } = chat;
+      if (!chat.name) {
+        let activeUser = 0;
+        if (members[0].userId.toString() == id.toString()) activeUser = 1;
+        const { profileImage, firstName, lastName, username } = members[activeUser];
+        setProfileImage(profileImage);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setUsername(username);
+        setOriginalUsername(username);
+      } else {
+        const { profileImage, name } = chat;
+        setProfileImage(profileImage);
+        setFirstName(name);
+        setLastName("");
+        setUsername("");
+        setOriginalUsername("");
       }
+      setCurrChat(chat);
+      let chatType = "chat";
+      if (chat.name) chatType = "group";
+      const { messages } = await getData(`/messages/${chat._id}?chatType=${chatType}`, "get", true);
+      for (let message of messages) {
+        const { messageType } = message
+        if (messageType == "idea") {
+          const data = await getData(`/ideas/specificIdea/${message.message}`, "get", true);
+          setIdeaMessages(prev => {
+            prev.set(message.message, data);
+            return prev;
+          });
+        }
+      }
+      socket.emit("allRead",{
+        reciver: chat._id,
+        id,
+        group: chat.name ? true : false,
+      })
+      const preUnread = unreadNotifications.find((_,ind) => chats[ind]._id == chat._id);
+      if (preUnread > 0) {
+        setNoOfMessages(prev => prev - preUnread);
+        setNoOfSenders(prev => prev - 1);
+      }
+      setUnreadMessages(unreadNotifications.find((_,ind) => chats[ind]._id == chat._id));
+      setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
+      setMessages(messages);
+      if (sendIdea && !sent) {
+        const toastId = toast.loading("Sending Idea");
+        await getData(`/ideas/share/${sendIdea}`, "get", true);
+        const data = await getData(`/ideas/specificIdea/${sendIdea}`, "get", true);
+        setIdeaMessages(prev => {
+          const newMap = new Map(prev);
+          newMap.set(sendIdea, data);
+          return newMap;
+        });
+        send(chat, sendIdea, "idea");
+        setSent(true);
+        toast.success("Idea Shared", { id : toastId });
+      }
+      setLoadingMessages(false);
+    } catch (error) {
+      toast.error(error.response.data.message || "Failed to open chat", { position: "top-right" });
     }
-    socket.emit("allRead",{
-      reciver: chat._id,
-      id,
-      group: chat.name ? true : false,
-    })
-    const preUnread = unreadNotifications.find((_,ind) => chats[ind]._id == chat._id);
-    if (preUnread > 0) {
-      setNoOfMessages(prev => prev - preUnread);
-      setNoOfSenders(prev => prev - 1);
-    }
-    setUnreadMessages(unreadNotifications.find((_,ind) => chats[ind]._id == chat._id));
-    setUnreadNotifications(prev => prev.map((unread,ind) => chats[ind]._id == chat._id ? 0 : unread));
-    setMessages(messages);
-    if (sendIdea && !sent) {
-      await getData(`/ideas/share/${sendIdea}`, "get", true);
-      const data = await getData(`/ideas/specificIdea/${sendIdea}`, "get", true);
-      setIdeaMessages(prev => {
-        const newMap = new Map(prev);
-        newMap.set(sendIdea, data);
-        return newMap;
-      });
-      send(chat, sendIdea, "idea");
-      setSent(true);
-    }
-    setLoadingMessages(false);
   }
 
   useEffect(() => {

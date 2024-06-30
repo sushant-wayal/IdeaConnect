@@ -6,6 +6,7 @@ import {
   useEffect,
   useState
 } from "react";
+import { toast } from "sonner";
 
 const SpecificCategoryIdeas = () => {
   const { category } = useParams();
@@ -14,9 +15,13 @@ const SpecificCategoryIdeas = () => {
   const { setIdeas, setOriginalIdeas } = useIdeas();
   useEffect(() => {
     const getIdeas = async () => {
-      const { ideas, authenticated } = await getData(`/ideas/category/${category}`, "get", true);
-      setCategoryIdeas(ideas);
-      setAuthenticated(authenticated);
+      try {
+        const { ideas, authenticated } = await getData(`/ideas/category/${category}`, "get", true);
+        setCategoryIdeas(ideas);
+        setAuthenticated(authenticated);
+      } catch (error) {
+        toast.error(error.response.data.message || "Failed to get ideas.")
+      }
     }
     getIdeas();
   },[category]);

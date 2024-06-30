@@ -9,6 +9,7 @@ import { useSocket } from "../../context/socket";
 import { RiLoader2Line } from "@remixicon/react";
 import { CirclePlus, UserPlus } from "lucide-react";
 import { useUser } from "../../context/user";
+import { toast } from "sonner";
 
 const Profile = () => {
     const socket = useSocket();
@@ -23,9 +24,13 @@ const Profile = () => {
     const [makingFollow, setMakingFollow] = useState(false);
     useEffect(() => {
         const getUser = async () => {
-            const data = await getData(`/users/profile/${username}`, "get", false);
-            setUser(data);
-            setUserFollowers(data.followers);
+            try {
+                const data = await getData(`/users/profile/${username}`, "get", false);
+                setUser(data);
+                setUserFollowers(data.followers);
+            } catch (error) {
+                toast.error(error.response.data.message || "An error occurred. Please try again later.");
+            }
             setLoadingUserInfo(prev => prev+1);
         }
         getUser();
@@ -36,31 +41,40 @@ const Profile = () => {
         }
         checkFollow();
         const getIdeas = async () => {
-            const { ideas } = await getData(`/users/idea/${username}/${activeUsername}`, "get", false);
-            setIdeas(ideas);
+            try {
+                const { ideas } = await getData(`/users/idea/${username}/${activeUsername}`, "get", false);
+                setIdeas(ideas);
+            } catch (error) {
+                toast.error(error.response.data.message || "An error occurred. Please try again later.");
+            }
             setLoadingUserIdeas(false);
         }
         getIdeas();
     },[activeUsername, username])
     const follow = async () => {
-        setMakingFollow(true);
-        const { data : { data } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${user.username}`,{},{
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-        });
-        if (data.authenticated) {
-            if (following) {
-                setUserFollowers(prev => prev-1);
-                setFollowing(false);
+        try {
+            setMakingFollow(true);
+            const { data : { data } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${user.username}`,{},{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+            if (data.authenticated) {
+                if (following) {
+                    setUserFollowers(prev => prev-1);
+                    setFollowing(false);
+                }
+                else {
+                    setUserFollowers(prev => prev+1);
+                    setFollowing(true);
+                }
             }
-            else {
-                setUserFollowers(prev => prev+1);
-                setFollowing(true);
-            }
+            setMakingFollow(false);
+            socket.emit("followNotification", { follower: activeUserId, followed: user._id});
+        } catch (error) {
+            toast.error(error.response.data.message || "An error occurred. Please try again later.");
         }
-        setMakingFollow(false);
-        socket.emit("followNotification", { follower: activeUserId, followed: user._id});
+        
     };
     return (
         <div className="flex justify-end p-2">

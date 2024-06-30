@@ -5,6 +5,7 @@ import {
   useState
 } from "react";
 import { useUser } from "../../../context/user";
+import { toast } from "sonner";
 
 const Progress = ({ ideaId, steps, progress, ideaOf, className }) => {
   const { username } = useUser();
@@ -51,8 +52,12 @@ const Progress = ({ ideaId, steps, progress, ideaOf, className }) => {
           else break;
         }
       }
-      await getData(`/ideas/updateProgress/${ideaId}/${newProgress}`, "get", false);
-      setIdeaProgress(newProgress);
+      try {
+        await getData(`/ideas/updateProgress/${ideaId}/${newProgress}`, "get", false);
+        setIdeaProgress(newProgress);
+      } catch (error) {
+        toast.error(error.response.data.message || "An error occurred. Please try again later.");
+      }
       gsap.to(progressEle,{
         height: 8,
         zIndex: 0,

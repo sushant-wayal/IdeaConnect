@@ -64,7 +64,7 @@ export const login = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ username });
 	const isPasswordValid = await user.isPasswordValid(password);
 	if (!isPasswordValid) {
-		return res.status(400).json(new ApiResponse(400, null, 'Invalid username or password'));
+		return res.status(400).json(new ApiResponse(400, null, 'Incorrect username or password'));
 	}
 	const { accessToken, refreshToken } = await createAccessAndRefreshToken(user._id);
 	return res

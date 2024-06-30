@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../context/socket"
 import { useUser } from "../../../context/user";
+import { toast } from "sonner";
 
 const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
   const socket = useSocket();
@@ -20,15 +21,19 @@ const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
     setSending(true);
     setAnimate(true);
     setTimeout(() => setAnimate(false), 1500);
-    const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
-    if (success) {
-      setComments(prev => [newComment, ...prev]);
-      console.log("sending comment notification", id, ideaId, title, ideaOf, profileImage, username);
-      socket.emit("commentedNotification", { id, idea: {
-        _id: ideaId,
-        title,
-        ideaOf
-      }, username, profileImage: profileImage});
+    try {
+      const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
+      if (success) {
+        setComments(prev => [newComment, ...prev]);
+        console.log("sending comment notification", id, ideaId, title, ideaOf, profileImage, username);
+        socket.emit("commentedNotification", { id, idea: {
+          _id: ideaId,
+          title,
+          ideaOf
+        }, username, profileImage: profileImage});
+      }
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
     }
     setComment("");
     setSending(false);
@@ -104,10 +109,14 @@ export const SeeComments = ({ ideaId, setComments, noOfComments, seeingComments,
     }
     else {
       setLoading(true);
-      const data = await getData(`/comments/${ideaId}`, "get", false);
-      console.log("comments comments",data);
-      setComments(data.comments);
-      setSeeingComments(true);
+      try {
+        const data = await getData(`/comments/${ideaId}`, "get", false);
+        console.log("comments comments",data);
+        setComments(data.comments);
+        setSeeingComments(true);
+      } catch (error) {
+        toast.error(error.response.data.message || "An error occurred. Please try again later.");
+      }
       setLoading(false);
     }
   }

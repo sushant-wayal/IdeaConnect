@@ -26,6 +26,7 @@ import {
 import { useNotification } from "../../context/notifications.js";
 import { Mic, MicOff, Paperclip, Send } from "lucide-react";
 import { useUser } from "../../context/user.js";
+import { toast } from "sonner";
 
 const Chats = () => {
   let chats = [];
@@ -138,20 +139,24 @@ const Chats = () => {
 
   const reciveMessage = useCallback(async ({ room, message }) => {
 		if (room == currChat._id) {
-			if (message.messageType == "idea") {
-				const data = await getData(`/ideas/specificIdea/${message.message}`, "get", true);
-				setIdeaMessages(prev => {
-					const newMap = new Map(prev);
-					newMap.set(sendIdea, data);
-					return newMap;
+			try {
+				if (message.messageType == "idea") {
+					const data = await getData(`/ideas/specificIdea/${message.message}`, "get", true);
+					setIdeaMessages(prev => {
+						const newMap = new Map(prev);
+						newMap.set(sendIdea, data);
+						return newMap;
+					});
+				}
+				setMessages(prev => [...prev, message]);
+				socket.emit("allRead",{
+					reciver: currChat._id,
+					userId,
+					group: currChat.name ? true : false,
 				});
+			} catch (error) {
+				toast.error(error.response.data.message || "An error occurred. Please try again later.");
 			}
-			setMessages(prev => [...prev, message]);
-			socket.emit("allRead",{
-				reciver: currChat._id,
-				userId,
-				group: currChat.name ? true : false,
-			})
 		} else {
 			const preUnread = unreadNotifications.find((_, ind) => chats[ind]._id == room);
 			if (preUnread == 0) setNoOfSenders(prev => prev+1);
@@ -202,19 +207,23 @@ const Chats = () => {
   }, []);
 
   const upload = async () => {
-		let formData = new FormData();
-		formData.append("file",media);
-		const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
-			headers: {
-				"Content-Type": "multipart/form-data",
-			}
-		});
-		console.log("data",data);
-		if (data.success) return {
-			url: data.data.url,
-			type: data.data.type,
-		};
-		else console.log("Check BackEnd");
+		try {
+			let formData = new FormData();
+			formData.append("file",media);
+			const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
+				headers: {
+					"Content-Type": "multipart/form-data",
+				}
+			});
+			console.log("data",data);
+			if (data.success) return {
+				url: data.data.url,
+				type: data.data.type,
+			};
+			else console.log("Check BackEnd");
+		} catch (error) {
+			toast.error(error.response.data.message || "An error occurred. Please try again later.");
+		}
   }
 
   const fileChange = async (e) => {

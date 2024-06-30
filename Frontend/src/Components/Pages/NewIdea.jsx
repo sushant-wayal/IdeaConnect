@@ -49,19 +49,23 @@ const NewIdea = () => {
     }
 
     const upload = async (formData) => {
-        const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
-            headers: {
-                "Content-Type": "multipart/form-data",
+        try {
+            const { data } = await axios.post("http://localhost:3000/api/v1/images/upload",formData,{
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            })
+            if (data.success) {
+                setMedia(prev => [...prev, {
+                    src: data.data.url,
+                    type: data.data.type,
+                    alt: username+" "+data.data.type
+                }]);
             }
-        })
-        if (data.success) {
-            setMedia(prev => [...prev, {
-                src: data.data.url,
-                type: data.data.type,
-                alt: username+" "+data.data.type
-            }]);
+            else console.log("Check BackEnd");
+        } catch (error) {
+            toast.error(error.response.data.message || "An error occurred. Please try again later.");
         }
-        else console.log("Check BackEnd");
     }
 
     const fileChange = async (e) => {
@@ -98,7 +102,7 @@ const NewIdea = () => {
             toast.error("Atleast One Category is Required");
             return;
         }
-        const validMedia = false;
+        let validMedia = false;
         for (let i=1; i < media.length ; i++) {
             if (media[i].type == "image") {
                 validMedia = true;
@@ -111,18 +115,22 @@ const NewIdea = () => {
         }
         setPublishing(true);
         const toastId = toast.loading("Publishing Idea...");
-        const { data : { data : { success } } } = await axios.post("http://localhost:3000/api/v1/ideas/publishIdea",{
-            username,
-            title,
-            categories,
-            media: media.slice(1),
-            description,
-            steps : steps.map(step => step.value),
-            progress : steps.reduce((acc,step) => step.checked ? acc+1 : acc,0)
-        })
-        if (success) {
-            navigate(`/profile/${username}`);
-            toast.success("Idea Published Successfully", { id: toastId });
+        try {
+            const { data : { data : { success } } } = await axios.post("http://localhost:3000/api/v1/ideas/publishIdea",{
+                username,
+                title,
+                categories,
+                media: media.slice(1),
+                description,
+                steps : steps.map(step => step.value),
+                progress : steps.reduce((acc,step) => step.checked ? acc+1 : acc,0)
+            })
+            if (success) {
+                navigate(`/profile/${username}`);
+                toast.success("Idea Published Successfully", { id: toastId });
+            }
+        } catch (error) {
+            toast.error(error.response.data.message || "An error occurred. Please try again later.", { id: toastId });
         }
         setPublishing(false);
     }

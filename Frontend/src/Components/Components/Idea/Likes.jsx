@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getData } from "../../dataLoaders";
 import { useSocket } from "../../../context/socket";
 import { useUser } from "../../../context/user";
+import { toast } from "sonner";
 
 const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, title, ideaOf, setLoading, className }) => {
   const socket = useSocket();
@@ -13,10 +14,14 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
   const getLikes = async () => {
     if (!seeingLikedBy) {
       setLoading(true);
-      const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", true);
-      console.log("likedBy", likedBy);
-      setLikedBy(likedBy);
-      setSeeingLikedBy(true);
+      try {
+        const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", true);
+        console.log("likedBy", likedBy);
+        setLikedBy(likedBy);
+        setSeeingLikedBy(true);
+      } catch (error) {
+        toast.error(error.response.data.message || "An error occurred. Please try again later.");
+      }
       setLoading(false);
     }
     else {
@@ -25,17 +30,21 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
     }
   }
   const likeIdea = async () => {
-    const { liked } = await getData(`/ideas/likeIdea/${ideaId}/${username}`, "get", false);
-    console.log("like Idea", liked);
-    setNoOfLikes(liked ? noOfLikes-1 : noOfLikes+1);
-    setIsLiked(!liked);
-    if (!liked) {
-      console.log("emitting likedNotification");
-      socket.emit("likedNotification", { userId, idea: {
-        _id: ideaId,
-        title,
-        ideaOf
-      },  username, profileImage: userProfileImage});
+    try {
+      const { liked } = await getData(`/ideas/likeIdea/${ideaId}/${username}`, "get", false);
+      console.log("like Idea", liked);
+      setNoOfLikes(liked ? noOfLikes-1 : noOfLikes+1);
+      setIsLiked(!liked);
+      if (!liked) {
+        console.log("emitting likedNotification");
+        socket.emit("likedNotification", { userId, idea: {
+          _id: ideaId,
+          title,
+          ideaOf
+        },  username, profileImage: userProfileImage});
+      }
+    } catch (error) {
+      toast.error(error.response.data.message || "An error occurred. Please try again later.");
     }
   }
   useEffect(() => {
