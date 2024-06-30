@@ -1,22 +1,21 @@
+import { toast } from "sonner"
 import { Link } from "react-router-dom";
 import { getData } from "../../dataLoaders";
+import { useUser } from "../../../context/user";
 import { useChat } from "../../../context/chats";
 import { useSocket } from "../../../context/socket";
 import { useVideoCall } from "../../../context/videoCall";
+import { useNotification } from "../../../context/notifications";
 import {
-  RiHome5Line,
-  RiLoader2Line,
-  RiVideoOnLine
-} from "@remixicon/react";
+  House,
+  Loader,
+  Video
+} from "lucide-react";
 import {
   useCallback,
   useEffect,
   useState
 } from "react";
-import { useNotification } from "../../../context/notifications";
-import { House } from "lucide-react";
-import { useUser } from "../../../context/user";
-import { toast } from "sonner"
 
 const ChatList = ({
   chats,
@@ -195,7 +194,7 @@ const ChatList = ({
       </div>
       {loading ?
         <div className="flex justify-center items-center h-full w-full">
-          <RiLoader2Line className="animate-spin h-10 w-10"/>
+          <Loader className="animate-spin h-10 w-10"/>
         </div>
         :
         <div className="flex flex-col gap-2 py-2">
@@ -236,7 +235,7 @@ const ChatList = ({
                     <p className={`text-sm ${unreadNotifications[ind] > 0 ? "font-semibold" : ""}`}>{chat.lastMessage.length > 21 ? chat.lastMessage.slice(0,18)+"..." : chat.lastMessage}</p>
                   </div>
                 </div>
-                <RiVideoOnLine
+                <Video
                   onClick={() => acceptVideoCall(chat._id)}
                   className={`${videoCallRequested[ind] ? "" : "hidden"} absolute left-[90%] -translate-x-1/2 animate-connecting-md bg-[#C1EDCC] rounded-full`}
                 />

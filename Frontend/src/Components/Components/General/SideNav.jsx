@@ -1,16 +1,16 @@
-import { RiMenu3Line } from "@remixicon/react"
 import { getData } from "../../dataLoaders";
+import { useUser } from "../../../context/user";
+import { useSocket } from "../../../context/socket";
+import { useNotification } from "../../../context/notifications";
+import {
+	NavLink,
+	useNavigate
+} from "react-router-dom";
 import {
 	useCallback,
 	useEffect,
 	useState
 } from "react";
-import {
-	NavLink,
-	useNavigate
-} from "react-router-dom";
-import { useNotification } from "../../../context/notifications";
-import { useSocket } from "../../../context/socket";
 import {
 	Newspaper,
 	TelescopeIcon,
@@ -19,24 +19,34 @@ import {
 	MessageCircleHeart,
 	MessageSquare,
 	Bell,
-	LogOut
+	LogOut,
+	Menu,
+	X
 } from "lucide-react"
-import { useUser } from "../../../context/user";
 
-const Icons = ({condition, props}) => {
-	return condition ? <props.icon {...props}/> : null;
-}
+const Icons = ({condition, props}) => condition ? <props.icon {...props}/> : null;
 
 const SideNav = () => {
-	const { noOfMessages, noOfSenders, setNoOfMessages, setNoOfSenders, unreadNotifications, setUnreadNotifications } = useNotification();
+	const {
+		noOfMessages,
+		setNoOfMessages,
+		noOfSenders,
+		setNoOfSenders,
+		unreadNotifications,
+		setUnreadNotifications
+	} = useNotification();
 
 	const socket = useSocket();
 
-	const { id, username, profileImage } = useUser();
+	const {
+		id,
+		username,
+		profileImage
+	} = useUser();
 
 	useEffect(() => {
-		socket.emit("joinNotificationRoom", id);
-	},[id])
+		socket.emit("joinNotificationRoom", id)
+	}, [id])
 
 	useEffect(() => {
 		const getNoOfUnreadNotifications = async () => {
@@ -62,12 +72,18 @@ const SideNav = () => {
 	const reciveUnreadMessages = useCallback(({ preUnread }) => {
 		setNoOfMessages(prev => prev + 1);
 		if (preUnread > 0) setNoOfSenders(prev => prev + 1);
-	},[setNoOfMessages, setNoOfSenders]);
+	},[
+		setNoOfMessages,
+		setNoOfSenders
+	]);
 
 	useEffect(() => {
 		socket.on("unreadMessages", reciveUnreadMessages);
 		return () => socket.off("unreadMessages", reciveUnreadMessages)
-	},[reciveUnreadMessages, socket]);
+	},[
+		reciveUnreadMessages,
+		socket
+	]);
 
 	const openNotifications = () => {
 		socket.emit("seenAllNotification", { id });
@@ -99,11 +115,10 @@ const SideNav = () => {
 
 	const BottomContent = [
 		{to: `/profile/${username}`, primaryText: "Profile"},
-		// {to: "/settings", primaryText: "Settings"}
 	]
 	return (
 		<>
-			<RiMenu3Line
+			<Menu
 				onClick={() => setSeeing(!seeing)}
 				className="lg:hidden fixed left-[4vw] top-4 z-50 cursor-pointer"
 			/>
@@ -113,7 +128,7 @@ const SideNav = () => {
 						onClick={() => setSeeing(false)}
 						className="text-left lg:hidden"
 					>
-						X
+						<X/>
 					</button>
 					{TopContent.map(({ to, icon, primaryText, responsiveText }, index) => (
 						<NavLink
@@ -126,27 +141,17 @@ const SideNav = () => {
 								{Icons({ condition: true, props: { icon } })}
 							</div>
 							<p>{primaryText}</p>
-							{responsiveText ?
-								<p className="hidden xl:inline-block">
-									{responsiveText}
-								</p>
-								:
-								null
-							}
+							{responsiveText ? <p className="hidden xl:inline-block">{responsiveText}</p>	:	null}
 							{(to == "/chats" && noOfMessages > 0) ?
 								<div className="rounded-full bg-black text-white text-sm px-2 py-1 flex justify-center items-center">
-									<p>
-									{noOfMessages >= 100 ? "99+" : noOfMessages}/{noOfSenders >= 10 ? "9+" : noOfSenders}
-									</p>
+									<p>{noOfMessages >= 100 ? "99+" : noOfMessages}/{noOfSenders >= 10 ? "9+" : noOfSenders}</p>
 								</div>
 								:
 								null
 							}
 							{(to == "/notifications" && unreadNotifications > 0) ?
 								<div className="rounded-full bg-black text-white text-sm px-2 py-1 flex justify-center items-center">
-									<p>
-									{unreadNotifications >= 100 ? "99+" : unreadNotifications}
-									</p>
+									<p>{unreadNotifications >= 100 ? "99+" : unreadNotifications}</p>
 								</div>
 								:
 								null
@@ -161,7 +166,15 @@ const SideNav = () => {
 							className={({isActive}) => active(isActive, true)}
 							to={to}
 						>
-							{to == `/profile/${username}` ? <img src={profileImage} className="w-8 h-8 rounded-full" alt="Profile"/> : null}
+							{to == `/profile/${username}` ?
+								<img
+									src={profileImage}
+									className="w-8 h-8 rounded-full"
+									alt="Profile"
+								/>
+								:
+								null
+							}
 							{primaryText}	{responsiveText ? <p className="hidden xl:inline-block"> {responsiveText} </p> : null}
 						</NavLink>
 					))}

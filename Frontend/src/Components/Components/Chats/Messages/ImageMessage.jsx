@@ -1,4 +1,5 @@
-import { RiDownloadLine } from "@remixicon/react";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
 
 const ImageMessage = ({
   align,
@@ -7,6 +8,7 @@ const ImageMessage = ({
   imageSrc,
 }) => {
   const downloadImage = async () => {
+    const toastId = toast.loading("Downloading image...");
     try {
       const response = await fetch(imageSrc);
       const blob = await response.blob();
@@ -18,13 +20,14 @@ const ImageMessage = ({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success("Image downloaded successfully.", { id: toastId });
     } catch (error) {
-      console.error("Failed to download image", error);
+      toast.error(error.response.data.message || "Failed to download image.", { id: toastId });
     }
   }
   return (
     <div className="max-w-96 relative">
-      <RiDownloadLine
+      <Download
         size={30}
         color="white"
         className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[101%]" : "hidden"}`}

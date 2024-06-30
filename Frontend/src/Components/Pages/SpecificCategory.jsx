@@ -1,12 +1,12 @@
 import Feed from "../Components/Feed/Feed";
+import { toast } from "sonner";
+import { getData } from "../dataLoaders";
 import { useParams } from "react-router-dom";
 import { useIdeas } from "../../context/ideas";
-import { getData } from "../dataLoaders";
 import {
   useEffect,
   useState
 } from "react";
-import { toast } from "sonner";
 
 const SpecificCategoryIdeas = () => {
   const { category } = useParams();
@@ -16,7 +16,10 @@ const SpecificCategoryIdeas = () => {
   useEffect(() => {
     const getIdeas = async () => {
       try {
-        const { ideas, authenticated } = await getData(`/ideas/category/${category}`, "get", true);
+        const {
+          ideas,
+          authenticated
+        } = await getData(`/ideas/category/${category}`, "get", true);
         setCategoryIdeas(ideas);
         setAuthenticated(authenticated);
       } catch (error) {

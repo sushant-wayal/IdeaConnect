@@ -1,7 +1,7 @@
 import {
-  RiMicFill,
-  RiMicOffFill
-} from "@remixicon/react";
+  Mic,
+  MicOff
+} from "lucide-react";
 
 const VoiceMessage = ({
   align,
@@ -61,8 +61,11 @@ const VoiceMessage = ({
       />
       <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-blue-600 h-full w-80 rounded-full flex p-2 justify-between items-center`}>
         <button onClick={handleClick}>
-          <RiMicFill size={30}/>
-          <RiMicOffFill size={30} className="hidden"/>
+          <Mic size={30}/>
+          <MicOff
+            size={30}
+            className="hidden"
+          />
         </button>
         <input
           onChange={(e) => {

@@ -1,14 +1,17 @@
+import { toast } from "sonner";
 import { getData } from "../../dataLoaders";
 import { useIdeas } from "../../../context/ideas";
 import {
 	useEffect,
 	useState
 } from "react"
-import { toast } from "sonner";
 
 const TopNav = ({ noSearchText }) => {
 	const [prompt, setPrompt] = useState("");
-	const { originalIdeas, setIdeas } = useIdeas();
+	const {
+		originalIdeas,
+		setIdeas
+	} = useIdeas();
 	const handleOnChange = (e) => {
 		setPrompt(e.target.value);
 		if (e.target.value == "") setIdeas(originalIdeas);
@@ -17,7 +20,10 @@ const TopNav = ({ noSearchText }) => {
 		const id = setTimeout(async () => {
 			try {
 				if (prompt == "") return;
-				const { ideas, authenticated } = await getData(`/ideas/search/${prompt}`, "get", true);
+				const {
+					ideas,
+					authenticated
+				} = await getData(`/ideas/search/${prompt}`, "get", true);
 				if (authenticated) setIdeas(ideas);
 				else setIdeas([]);
 			} catch (error) {

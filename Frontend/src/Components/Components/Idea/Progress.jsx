@@ -1,13 +1,19 @@
 import gsap from "gsap";
+import { toast } from "sonner";
 import { getData } from "../../dataLoaders";
+import { useUser } from "../../../context/user";
 import {
   useRef,
   useState
 } from "react";
-import { useUser } from "../../../context/user";
-import { toast } from "sonner";
 
-const Progress = ({ ideaId, steps, progress, ideaOf, className }) => {
+const Progress = ({
+  ideaId,
+  steps,
+  progress,
+  ideaOf,
+  className
+}) => {
   const { username } = useUser();
   const [seeing, setSeeing] = useState(false);
   const progressEleRef = useRef();

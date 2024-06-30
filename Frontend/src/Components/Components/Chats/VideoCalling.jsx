@@ -7,13 +7,12 @@ import {
   useState
 } from "react";
 import {
-  RiMicFill,
-  RiMicOffFill,
-  RiPhoneFill,
-  RiVideoOffFill,
-  RiVideoOnLine
-} from "@remixicon/react";
-import { Mic, MicOff, Phone, Video, VideoOff } from "lucide-react";
+  Mic,
+  MicOff,
+  Phone,
+  Video,
+  VideoOff
+} from "lucide-react";
 
 const VideoCalling = ({
   peer,

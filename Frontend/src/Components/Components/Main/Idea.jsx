@@ -1,20 +1,26 @@
+import Likes from "../Idea/Likes";
 import MultiMedia from "./MultiMedia";
 import Category from "../Idea/Category";
+import Progress from "../Idea/Progress";
 import Intrested from "../Idea/Intrested";
 import Description from "../Idea/Description";
-import Progress from "../Idea/Progress";
-import Likes from "../Idea/Likes";
 import { Link } from "react-router-dom";
 import { getData } from "../../dataLoaders";
+import { SeeComments } from "../Idea/Comment";
+import { useUser } from "../../../context/user";
 import {
 	useEffect,
 	useState
 } from "react";
-import { SeeComments } from "../Idea/Comment";
-import { useUser } from "../../../context/user";
 
 const Idea = ({ thisIdea }) => {
-	const { idea, profileImage, ideaOf, included, intrested } = thisIdea;
+	const {
+		idea,
+		profileImage,
+		ideaOf,
+		included,
+		intrested
+	} = thisIdea;
 	const { username } = useUser();
 	const [isLiked,setIsLiked] = useState(false);
 	const [likedBy, setLikedBy] = useState([]);
@@ -38,9 +44,7 @@ const Idea = ({ thisIdea }) => {
 						src={profileImage}
 						alt="profile"
 					/>
-					<p>
-						{idea.title}
-					</p>
+					<p>{idea.title}</p>
 				</div>
 				<div className="w-full rounded-xl relative h-[330px] sm:h-[280px] flex-shrink">
 					<MultiMedia
@@ -121,9 +125,7 @@ const Idea = ({ thisIdea }) => {
 							</div>
 					</div>
 				</div>
-				<p className="-mt-2 ml-3 absolute bottom-1">
-					{ideaOf}
-				</p>
+				<p className="-mt-2 ml-3 absolute bottom-1">{ideaOf}</p>
 		</div>
 	)
 }

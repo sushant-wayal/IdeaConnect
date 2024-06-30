@@ -1,6 +1,10 @@
 import { X } from "lucide-react";
 
-const Category = ({ category, setCategories, ind }) => {
+const Category = ({
+  category,
+  setCategories,
+  ind
+}) => {
   const removeCategory = () => setCategories((prev) => prev.filter((_, i) => i !== ind));
   return (
     <div className="max-w-full bg-[#C1EDCC] p-2 rounded-2xl relative">

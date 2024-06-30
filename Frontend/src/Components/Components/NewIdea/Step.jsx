@@ -1,12 +1,24 @@
-import { Minus, Plus } from "lucide-react";
 import {
   useEffect,
   useRef
 } from "react";
+import {
+  Minus,
+  Plus
+} from "lucide-react";
 
-const Step = ({ step, setSteps, ind, stepsLength }) => {
+const Step = ({
+  step,
+  setSteps,
+  ind,
+  stepsLength
+}) => {
   const stepEleRef = useRef(null);
-  const { value, checked, isNew } = step;
+  const {
+    value,
+    checked,
+    isNew
+  } = step;
   const addStep = () => {
     setSteps(prev => {
       prev = prev.map(step => ({ ...step, isNew: false }));

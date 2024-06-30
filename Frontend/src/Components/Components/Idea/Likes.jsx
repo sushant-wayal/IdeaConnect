@@ -1,13 +1,31 @@
-import { useEffect, useState } from "react";
-import { getData } from "../../dataLoaders";
-import { useSocket } from "../../../context/socket";
-import { useUser } from "../../../context/user";
 import { toast } from "sonner";
+import { getData } from "../../dataLoaders";
+import { useUser } from "../../../context/user";
+import { useSocket } from "../../../context/socket";
+import {
+  useEffect,
+  useState
+} from "react";
 
-const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLikedBy, setSeeingLikedBy, title, ideaOf, setLoading, className }) => {
+const Likes = ({
+  ideaId,
+  noOfLikesInitial,
+  isLikedInitial,
+  setLikedBy,
+  seeingLikedBy,
+  setSeeingLikedBy,
+  title,
+  ideaOf,
+  setLoading,
+  className
+}) => {
   const socket = useSocket();
 
-  const { id: userId, username, profileImage : userProfileImage } = useUser();
+  const {
+    id: userId,
+    username,
+    profileImage : userProfileImage
+  } = useUser();
 
   const [noOfLikes, setNoOfLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -16,7 +34,6 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
       setLoading(true);
       try {
         const { likedBy } = await getData(`/ideas/likedBy/${ideaId}`, "get", true);
-        console.log("likedBy", likedBy);
         setLikedBy(likedBy);
         setSeeingLikedBy(true);
       } catch (error) {
@@ -32,11 +49,9 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
   const likeIdea = async () => {
     try {
       const { liked } = await getData(`/ideas/likeIdea/${ideaId}/${username}`, "get", false);
-      console.log("like Idea", liked);
       setNoOfLikes(liked ? noOfLikes-1 : noOfLikes+1);
       setIsLiked(!liked);
       if (!liked) {
-        console.log("emitting likedNotification");
         socket.emit("likedNotification", { userId, idea: {
           _id: ideaId,
           title,
@@ -50,10 +65,18 @@ const Likes = ({ ideaId, noOfLikesInitial, isLikedInitial, setLikedBy, seeingLik
   useEffect(() => {
     setNoOfLikes(noOfLikesInitial);
     setIsLiked(isLikedInitial);
-  },[noOfLikesInitial, isLikedInitial])
+  },[
+    noOfLikesInitial,
+    isLikedInitial
+  ])
   return (
     <div className={`flex gap-1 justify-center items-center cursor-pointer ${className}`}>
-      <img key={isLiked} onClick={likeIdea} className="h-4 w-4" src={isLiked ? "../../../../images/liked.svg" : "../../../../images/like.svg"}/>
+      <img
+        key={isLiked}
+        onClick={likeIdea}
+        src={isLiked ? "../../../../images/liked.svg" : "../../../../images/like.svg"}
+        className="h-4 w-4"
+      />
       <p onClick={getLikes}>{noOfLikes}</p>
     </div>
   )

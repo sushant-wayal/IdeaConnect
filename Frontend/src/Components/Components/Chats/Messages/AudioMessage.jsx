@@ -1,8 +1,9 @@
+import { toast } from "sonner";
 import {
-  RiDownloadLine,
-  RiPauseCircleFill,
-  RiPlayCircleFill,
-} from "@remixicon/react";
+  Download,
+  PauseCircle,
+  PlayCircle
+} from "lucide-react";
 
 const AudioMessage = ({
   align,
@@ -13,12 +14,10 @@ const AudioMessage = ({
   const handleClick = (e) => {
     e.stopPropagation();
     let currNode = e.target;
-    console.log("currNode", currNode);
     if (e.target.tagName == "svg") currNode = e.target.parentNode;
-    else if (e.target.tagName == "path") currNode = e.target.parentNode.parentNode;
-    console.log("currNode", currNode);
+    else if (e.target.tagName == "circle") currNode = e.target.parentNode.parentNode;
+    else if (e.target.tagName == "polygon") currNode = e.target.parentNode.parentNode;
     const audioNode = currNode.parentNode.previousSibling.previousSibling;
-    console.log("audioNode", audioNode);
     const playNode = currNode.firstChild;
     const pauseNode = currNode.lastChild;
     if (audioNode.paused) audioNode.play();
@@ -60,6 +59,7 @@ const AudioMessage = ({
     });
   }
   const downloadAudio = async () => {
+    const toastId = toast.loading("Downloading Audio...");
     try {
       const response = await fetch(audioSrc);
       const blob = await response.blob();
@@ -71,8 +71,9 @@ const AudioMessage = ({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success("Audio Downloaded Successfully", { id: toastId });
     } catch (error) {
-      console.error("Failed to download image", error);
+      toast.error(error.response.data.message || "An Error Occurred. Try Again", { id: toastId });
     }
   }
   return (
@@ -81,7 +82,7 @@ const AudioMessage = ({
         controls
         src={audioSrc}
       />
-      <RiDownloadLine
+      <Download
         size={30}
         color="white"
         className={`p-1 cursor-pointer bg-gray-600 rounded-lg absolute ${align == "start" ? "left-[108%]" : "hidden"}`}
@@ -89,8 +90,11 @@ const AudioMessage = ({
       />
       <div className={`absolute top-0 ${align == "start" ? "left-0" : "right-0"} bg-green-600 h-full w-80 rounded-full flex p-2 justify-between items-center`}>
         <button onClick={handleClick}>
-          <RiPlayCircleFill size={40}/>
-          <RiPauseCircleFill size={40} className="hidden"/>
+          <PlayCircle size={40}/>
+          <PauseCircle
+            size={40}
+            className="hidden"
+          />
         </button>
         <input
           onChange={(e) => {

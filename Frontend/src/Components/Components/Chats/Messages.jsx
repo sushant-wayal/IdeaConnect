@@ -6,16 +6,18 @@ import AudioMessage from "./Messages/AudioMessage";
 import VoiceMessage from "./Messages/VoiceMessage";
 import DocumentMessage from "./Messages/DocumentMessage";
 import { Link } from "react-router-dom";
-import { RiDeleteBin5Fill, RiLoader2Line, RiVideoChatLine } from "@remixicon/react";
-import { useSocket } from "../../../context/socket";
+import { useUser } from "../../../context/user";
 import { useChat } from "../../../context/chats";
+import { useSocket } from "../../../context/socket";
 import { useVideoCall } from "../../../context/videoCall";
 import {
 	useCallback,
 	useEffect,
-	useState
 } from "react";
-import { useUser } from "../../../context/user";
+import {
+	Loader,
+	Video
+} from "lucide-react";
 
 const Messages = ({
 	firstName,
@@ -46,14 +48,10 @@ const Messages = ({
 		setVideoCallStatus
 	} = useVideoCall();
 
-	const { id, username: activeUsername } = useUser();
-
-	const [seeDelete, setSeeDelete] = useState([]);
-	const [messageDeleted, setMessageDeleted] = useState(false);
-
-	useEffect(() => {
-		setSeeDelete(messages.map(() => false));
-	},[messages])
+	const {
+		id,
+		username: activeUsername
+	} = useUser();
 	
 	const requestVideoCall = useCallback(() => {
 		setOnVideoCall(true);
@@ -62,10 +60,6 @@ const Messages = ({
   },[_id]);
 
 	useEffect(() => {
-		if (messageDeleted) {
-			setMessageDeleted(false);
-			return;
-		}
 		let messageEle = document.querySelector("#message");
 		messageEle.scrollTo({
 			top: messageEle.scrollHeight,
@@ -108,7 +102,7 @@ const Messages = ({
 					</div>
 				</div>
 				<div className={`${name ? "hidden" : "flex"} justify-center gap-5 items-center bg-[#C1EDCC] hover:bg-[#B0C0BC] p-2 rounded-full`}>
-					<RiVideoChatLine
+					<Video
 						id="videoCallIcon"
 						size={30}
 						onClick={() => {
@@ -128,7 +122,7 @@ const Messages = ({
 			>
 				{loading ?
 					<div className="flex justify-center items-center h-full w-full">
-						<RiLoader2Line className="animate-spin h-10 w-10"/>
+						<Loader className="animate-spin h-10 w-10"/>
 					</div>
 					:
 					messages.length == 0 ?
@@ -154,58 +148,46 @@ const Messages = ({
 									key={_id}
 									className={`flex flex-col ${align == "start" ? "items-start" : "items-end"} mb-1 relative`}
 								>
-									<div
-										onClick={() => setSeeDelete(seeDelete.map((val, index) => index == ind ? !val : val))}
-										className="flex items-start gap-2"
-									>
-										{messageType == "text" && (
-											<TextMessage
-												displayMessage={message}
-											/>
-										)}
-										{messageType == "image" && (
-											<ImageMessage
-												align={align}
-												chatTitle={name ? name : username}
-												messageId={_id}
-												imageSrc={message}
-											/>
-										)}
-										{messageType == "video" && (
-											<VideoMessage
-												align={align}
-												chatTitle={name ? name : username}
-												messageId={_id}
-												videoSrc={message}
-											/>
-										)}
-										{messageType == "audio" && (
-											<AudioMessage
-												align={align}
-												chatTitle={name ? name : username}
-												messageId={_id}
-												audioSrc={message}
-											/>
-										)}
-										{messageType == "voice" && (
-											<VoiceMessage
-												align={align}
-												voiceSrc={message}
-											/>
-										)}
-										{messageType == "idea" && (
-											<IdeaMessage thisIdea={ideaMessages.get(message)} />
-										)}
-										{messageType == "document" && (
-											<DocumentMessage
-												chatTitle={name ? name : username}
-												senderUsername={senderUsername}
-												fileSrc={message}
-												messageId={_id}
-											/>
-										)}
-										<RiDeleteBin5Fill color="red" size={24} className={senderUsername == activeUsername && seeDelete[ind] ? "" : "hidden"}/>
-									</div>
+									{messageType == "text" && <TextMessage displayMessage={message}/>}
+									{messageType == "image" && (
+										<ImageMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											imageSrc={message}
+										/>
+									)}
+									{messageType == "video" && (
+										<VideoMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											videoSrc={message}
+										/>
+									)}
+									{messageType == "audio" && (
+										<AudioMessage
+											align={align}
+											chatTitle={name ? name : username}
+											messageId={_id}
+											audioSrc={message}
+										/>
+									)}
+									{messageType == "voice" && (
+										<VoiceMessage
+											align={align}
+											voiceSrc={message}
+										/>
+									)}
+									{messageType == "idea" && <IdeaMessage thisIdea={ideaMessages.get(message)}/>}
+									{messageType == "document" && (
+										<DocumentMessage
+											chatTitle={name ? name : username}
+											senderUsername={senderUsername}
+											fileSrc={message}
+											messageId={_id}
+										/>
+									)}
 									<p className={`${(ind < messages.length-1 && messages[ind+1]?.sender == sender) ? "hidden" : ""} text-sm font-semibold bg-[#C1EDCC] rounded-full px-2 py-1 mt-1`}>{senderUsername == activeUsername ? "You" : senderUsername}</p>
 								</div>
 							</>

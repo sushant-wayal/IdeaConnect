@@ -2,10 +2,13 @@ import Idea from "../Main/Idea";
 import SideNav from "../General/SideNav";
 import TopNav from "../General/TopNav";
 import Footer from "../General/Footer";
+import { Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { useIdeas } from "../../../context/ideas";
-import { RiLoader2Line } from "@remixicon/react";
+import {
+  useEffect,
+  useState
+} from "react";
 
 const Feed = ({ authenticated, noIdea }) => {
   const { ideas } = useIdeas();
@@ -24,7 +27,7 @@ const Feed = ({ authenticated, noIdea }) => {
       <TopNav/>
       {loading ? 
         <div key={"2"} id="ideas" className="fixed lg:right-2 h-[calc(90vh-22px)] top-[calc(10vh+2vw)] lg:top-[calc(10vh+16px)] lg:w-[calc(100vw*(5.4/6.5))] w-100vw flex justify-center items-center gap-4 p-2 pb-0 flex-wrap overflow-scroll">
-          <RiLoader2Line className="w-20 h-20 animate-spin"/>
+          <Loader className="w-20 h-20 animate-spin"/>
           <Footer styling={"border-2 border-black border-solid rounded-2xl pr-5 absolute bottom-0 right-0 sm:backdrop-blur-sm"}/>
         </div>
         :

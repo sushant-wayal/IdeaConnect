@@ -1,5 +1,5 @@
-import { RiDownloadLine } from "@remixicon/react";
-import { useEffect } from "react";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
 import { useUser } from "../../../../context/user";
 
 const DocumentMessage = ({
@@ -12,6 +12,7 @@ const DocumentMessage = ({
   const urlSplit = fileSrc.split("/");
   const fileName = urlSplit[urlSplit.length-1];
   const downloadFile = async () => {
+    const toastId = toast.loading("Downloading file...");
     try {
       const response = await fetch(fileSrc);
       const blob = await response.blob();
@@ -23,20 +24,14 @@ const DocumentMessage = ({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success("File downloaded successfully.", { id: toastId });
     } catch (error) {
-      console.error("Failed to download image", error);
+      toast.error(error.response.data.message || "Failed to download file.", { id: toastId });
     }
   }
-  useEffect(() => {
-    console.log("DocumentMessage mounted");
-    console.log("DocumentMessage props", { username, chatTitle, senderUsername, fileSrc, messageId })
-    return () => {
-      console.log("DocumentMessage unmounted");
-    }
-  })
   return (
     <div className="bg-[#908D8D] rounded-md flex justify-center items-center p-2 gap-4">
-      <RiDownloadLine
+      <Download
         size={30}
         color="white"
         className={`${senderUsername == username ? "hidden" : ""} p-1 cursor-pointer bg-black rounded-md`}

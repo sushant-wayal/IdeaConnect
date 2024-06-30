@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { Menu } from "lucide-react"
 import { NavLink } from "react-router-dom"
-import { RiMenu3Line } from "@remixicon/react"
 
 const SignInUpNav = () => {
 	const active = (isActive) => {
@@ -12,7 +12,11 @@ const SignInUpNav = () => {
 	const [seeing, setSeeing] = useState(false);
 	return (
 		<div className="bg-[#797270] fixed w-[99%] flex h-12 py-8 px-2 pr-5 justify-between items-center z-50 sm:z-10 rounded-2xl">
-			<img className="w-[15vmax]" src="../../../../images/logo.png" alt="IdeaConnect"/>
+			<img
+				className="w-[15vmax]"
+				src="../../../../images/logo.png"
+				alt="IdeaConnect"
+			/>
 			<div className="hidden sm:flex justify-center gap-10">
 					<NavLink
 						className={({isActive}) => active(isActive)}
@@ -27,8 +31,11 @@ const SignInUpNav = () => {
 						Sign Up
 					</NavLink>
 			</div>
-			<div className="sm:hidden relative"onClick={() => setSeeing(!seeing)}>
-				<RiMenu3Line/>
+			<div
+				className="sm:hidden relative"
+				onClick={() => setSeeing(!seeing)}
+			>
+				<Menu/>
 				<div className={`${seeing ? "flex" : "hidden"} flex-col absolute right-0 top-8 w-[400%] backdrop-blur-sm p-1 rounded-xl`}>
 					<NavLink
 						className={({isActive}) => active(isActive)}

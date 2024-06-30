@@ -4,14 +4,23 @@ import {
   useState
 } from "react";
 import {
-  RiArrowLeftWideLine,
-  RiArrowRightWideLine,
-  RiLoader2Line,
-  RiVolumeMuteLine,
-  RiVolumeUpLine
-} from "@remixicon/react";
+  ChevronLeft,
+  ChevronRight,
+  Loader,
+  Volume2,
+  VolumeX
+} from "lucide-react";
 
-const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClassName, uploading, containerClassName }) => {
+const MultiMedia = ({
+  medias,
+  start,
+  id,
+  navigationSize,
+  soundSize,
+  wrapperClassName,
+  uploading,
+  containerClassName
+}) => {
   const [index, setIndex] = useState(start);
   const container = useRef(null);
   const [muted, setMuted] = useState(new Array(medias.length).fill(true));
@@ -34,7 +43,7 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
   }
   useEffect(() => {
     moveTo(0, start);
-  },[start]);
+  } ,[start]);
   useEffect(() => {
     if (uploading) {
       container.current.scrollTo({
@@ -51,7 +60,11 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
         ref={container}
       >
         {medias.map((media, ind) => {
-          const { src, type, alt } = media;
+          const {
+            src,
+            type,
+            alt
+          } = media;
           return (
             <div
               key={src}
@@ -74,14 +87,14 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
                       className="h-full w-full object-cover"
                     />
                     {muted[ind] ? 
-                      <RiVolumeMuteLine
+                      <VolumeX
                         onClick={(e) => muteUnmute(e.target.parentNode.firstChild, ind)}
                         size={soundSize}
                         color="white"
                         className="absolute bottom-3 right-3 rounded-full bg-black border-2 border-white p-1"
                       />
                       :
-                      <RiVolumeUpLine
+                      <Volume2
                         onClick={(e) => muteUnmute(e.target.parentNode.firstChild, ind)}
                         size={soundSize}
                         color="white"
@@ -96,7 +109,7 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
         })}
         {uploading &&
           <div className="flex justify-center items-center h-full w-full flex-shrink-0">
-            <RiLoader2Line className="h-[10%] aspect-square animate-spin"/>
+            <Loader className="h-[10%] aspect-square animate-spin"/>
           </div>
         }
       </div>
@@ -105,7 +118,7 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
           onClick={() => moveTo(index, index-1)}
           className={`${index == 0 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}
         >
-          <RiArrowLeftWideLine
+          <ChevronLeft
             size={navigationSize}
             color="white"
           />
@@ -114,7 +127,7 @@ const MultiMedia = ({ medias, start, id, navigationSize, soundSize, wrapperClass
           onClick={() => moveTo(index, index+1)}
           className={`${index == medias.length-1 ? "hidden" : ""} bg-black p-2 rounded-full border-2 border-white`}
         >
-          <RiArrowRightWideLine
+          <ChevronRight
             size={navigationSize}
             color="white"
           />

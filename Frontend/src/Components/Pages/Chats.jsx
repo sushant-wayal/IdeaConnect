@@ -3,10 +3,13 @@ import peer from "../../services/peer.js";
 import ChatList from "../Components/Chats/ChatList.jsx";
 import Messages from "../Components/Chats/Messages.jsx";
 import VideoCalling from "../Components/Chats/VideoCalling.jsx";
+import { toast } from "sonner";
 import { getData } from "../dataLoaders.js";
+import { useUser } from "../../context/user.js";
 import { useSocket } from "../../context/socket.js";
 import { ChatProvider } from "../../context/chats.js";
 import { VideoCallProvider } from "../../context/videoCall.js";
+import { useNotification } from "../../context/notifications.js";
 import {
 	useLoaderData,
 	useLocation
@@ -18,19 +21,18 @@ import {
   useState,
 } from "react";
 import {
-  RiMicFill,
-  RiAttachment2,
-  RiLoaderLine,
-  RiMicLine
-} from "@remixicon/react"
-import { useNotification } from "../../context/notifications.js";
-import { Mic, MicOff, Paperclip, Send } from "lucide-react";
-import { useUser } from "../../context/user.js";
-import { toast } from "sonner";
+	Mic,
+	MicOff,
+	Paperclip,
+	Send
+} from "lucide-react";
 
 const Chats = () => {
   let chats = [];
-  const { authenticated, chatsAndGroups } = useLoaderData();
+  const {
+		authenticated,
+		chatsAndGroups
+	} = useLoaderData();
   if (authenticated) chats = chatsAndGroups;
 
 	const [loading, setLoading] = useState(true);
@@ -41,11 +43,17 @@ const Chats = () => {
 	},[])
 
   const socket = useSocket();
-	const { id: userId, username: activeUsername } = useUser();
+	const {
+		id: userId,
+		username: activeUsername
+	} = useUser();
 
   for (let chat of chats) socket.emit("joinRoom",chat._id);
 
-	const { setNoOfMessages, setNoOfSenders } = useNotification();
+	const {
+		setNoOfMessages,
+		setNoOfSenders
+	} = useNotification();
 
   const [unreadNotifications, setUnreadNotifications] = useState([]);
 	const [unreadMessages, setUnreadMessages] = useState(0);
@@ -215,12 +223,10 @@ const Chats = () => {
 					"Content-Type": "multipart/form-data",
 				}
 			});
-			console.log("data",data);
 			if (data.success) return {
 				url: data.data.url,
 				type: data.data.type,
 			};
-			else console.log("Check BackEnd");
 		} catch (error) {
 			toast.error(error.response.data.message || "An error occurred. Please try again later.");
 		}
@@ -263,7 +269,6 @@ const Chats = () => {
 		thisMediaRecorder.start();
 		setMessage("Listening...");
 		msgInput.current.disabled = true;
-		console.log("Listening...");
   }
 
   const stopListening = () => {
@@ -383,7 +388,6 @@ const Chats = () => {
 										else {
 											let { url, type } = await upload();
 											if (mediaRecorder) type = "voice";
-											console.log("type", type);
 											send(currChat, url, type);
 											msgInput.current.disabled = false;
 											setMedia(null);
@@ -394,7 +398,8 @@ const Chats = () => {
 									className="h-full w-24 rounded-full bg-[#C1EDCC] text-black font-semibold flex justify-center items-center gap-2 hover:bg-[#B0C0BC]"
 									ref={sendRef}
 								>
-									<Send className={sending ? "animate-flying-infinite" : ""}/> <p>{sending ? "Sending" : "Send"}</p>
+									<Send className={sending ? "animate-flying-infinite" : ""}/>
+									<p>{sending ? "Sending" : "Send"}</p>
 								</button>
 							</div>
 						</div>

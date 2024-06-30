@@ -1,15 +1,27 @@
 import gsap from "gsap";
+import axios from "axios";
+import Comment from "./Comment";
+import { Loader } from "lucide-react";
+import { useUser } from "../../../context/user";
 import {
   useEffect,
   useRef,
   useState
 } from "react";
-import Comment from "./Comment";
-import { RiLoader2Line } from "@remixicon/react";
-import axios from "axios";
-import { useUser } from "../../../context/user";
 
-const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingComments, comments, setComments, title, ideaOf, loading, className }) => {
+const Description = ({
+  ideaId,
+  description,
+  seeingLikedBy,
+  likedBy,
+  seeingComments,
+  comments,
+  setComments,
+  title,
+  ideaOf,
+  loading,
+  className
+}) => {
   const { profileImage: userProfileImage } = useUser();
   const [seeing, setSeeing] = useState(false);
   const descriptionEleRef = useRef();
@@ -50,7 +62,10 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
         duration: 0.3,
       })
     }
-  }, [seeingLikedBy, seeingComments])
+  }, [
+    seeingLikedBy,
+    seeingComments
+  ])
   const follow = async (ind) => {
     const { data : { data : { authenticated } } } = await axios.post(`http://localhost:3000/api/v1/users/follow/${likedBy[ind].username}`,{},{
       headers: {
@@ -67,7 +82,7 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
     >
       {loading ?
         <div className="h-full w-full flex justify-center items-center">
-          <RiLoader2Line className="h-[10%] aspect-square animate-spin"/>
+          <Loader className="h-[10%] aspect-square animate-spin"/>
         </div>
         :
         seeingLikedBy ?
@@ -79,7 +94,10 @@ const Description = ({ ideaId, description, seeingLikedBy, likedBy, seeingCommen
           likedBy.map(({ profileImage, username, firstName, lastName, following}, ind) => (
               <div className="flex px-2 py-1 justify-between items-center border-b-2 border-b-black">
                 <div className="flex items-center gap-3">
-                  <img src={profileImage} className="h-7 w-7 rounded-full"/>
+                  <img
+                    src={profileImage}
+                    className="h-7 w-7 rounded-full"
+                  />
                   <div className="flex flex-col items-start justify-between">
                     <p><b>{username}</b></p>
                     <p>{firstName} {lastName}</p>

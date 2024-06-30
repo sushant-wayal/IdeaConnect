@@ -1,15 +1,33 @@
-import { RiSendPlaneFill } from "@remixicon/react";
-import { getData, getHeaders } from "../../dataLoaders";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
-import { useSocket } from "../../../context/socket"
-import { useUser } from "../../../context/user";
 import { toast } from "sonner";
+import { Send } from "lucide-react";
+import { useUser } from "../../../context/user";
+import { useSocket } from "../../../context/socket"
+import {
+  getData,
+  getHeaders
+} from "../../dataLoaders";
+import {
+  useEffect,
+  useRef,
+  useState
+} from "react";
 
-const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
+const Comment = ({
+  comments,
+  setComments,
+  ideaId,
+  title,
+  ideaOf,
+  loading
+}) => {
   const socket = useSocket();
 
-  const { id, username, profileImage } = useUser();
+  const {
+    id,
+    username,
+    profileImage
+  } = useUser();
 
   const descriptionDivHeight = 272;
   const [comment, setComment] = useState("");
@@ -22,10 +40,12 @@ const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
     setAnimate(true);
     setTimeout(() => setAnimate(false), 1500);
     try {
-      const { data : { data : { success, newComment } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
+      const { data : { data : {
+        success,
+        newComment
+      } } } = await axios.post(`http://localhost:3000/api/v1/comments/add`,{ ideaId, comment }, getHeaders());
       if (success) {
         setComments(prev => [newComment, ...prev]);
-        console.log("sending comment notification", id, ideaId, title, ideaOf, profileImage, username);
         socket.emit("commentedNotification", { id, idea: {
           _id: ideaId,
           title,
@@ -52,8 +72,11 @@ const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
     if (descriptionDivHeight <= clientHeight) setScrollable(true);
   }, [comments]);
   return (
-    <>
-    <div className={`${scrollable ? "relative overflow-y-scroll" : ""}`} ref={commentsEleRef} onScroll={handleScroll}>
+    <div
+      className={`${scrollable ? "relative overflow-y-scroll" : ""}`}
+      ref={commentsEleRef}
+      onScroll={handleScroll}
+    >
       {loading ?
         <div className="flex justify-center items-center h-full w-full">
           <RiLoader2Line size={24}/>
@@ -78,7 +101,10 @@ const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
           </div>
         )
       )}
-      <div className="w-full absolute flex px-2 py-1 gap-1 bg-[#A7A7A9]" ref={addCommentEleRef}>
+      <div
+        className="w-full absolute flex px-2 py-1 gap-1 bg-[#A7A7A9]"
+        ref={addCommentEleRef}
+      >
         <input
           type="text"
           placeholder="Add Comment..."
@@ -91,17 +117,27 @@ const Comment = ({ comments, setComments, ideaId, title, ideaOf, loading }) => {
           disabled={sending}
           onClick={addComment}
         >
-          <RiSendPlaneFill className={animate ? "animate-flying" : ""} size={24}/>
+          <Send
+            className={animate ? "animate-flying" : ""}
+            size={24}
+          />
         </button>
       </div>
     </div>
-    </>
   )
 }
 
 export default Comment;
 
-export const SeeComments = ({ ideaId, setComments, noOfComments, seeingComments, setSeeingComments, setLoading, className }) => {
+export const SeeComments = ({
+  ideaId,
+  setComments,
+  noOfComments,
+  seeingComments,
+  setSeeingComments,
+  setLoading,
+  className
+}) => {
   const getComments = async () => {
     if (seeingComments) {
       setSeeingComments(false);
@@ -111,7 +147,6 @@ export const SeeComments = ({ ideaId, setComments, noOfComments, seeingComments,
       setLoading(true);
       try {
         const data = await getData(`/comments/${ideaId}`, "get", false);
-        console.log("comments comments",data);
         setComments(data.comments);
         setSeeingComments(true);
       } catch (error) {
