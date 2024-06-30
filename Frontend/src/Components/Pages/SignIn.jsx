@@ -110,7 +110,7 @@ const SignIn = () => {
                     /> Remember Me
                 </label>
                 <button
-                    className="bg-[#C1EDCC] p-2 rounded-2xl sm:text-sm text-2xl sm:w-20 w-32"
+                    className="bg-[#C1EDCC] p-2 rounded-2xl sm:text-sm text-2xl sm:w-20 w-32 flex items-center justify-center gap-1"
                     type="submit"
                     disabled={loading}
                 >
