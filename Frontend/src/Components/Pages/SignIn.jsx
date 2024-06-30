@@ -2,7 +2,7 @@ import axios from "axios";
 import Footer from "../Components/General/Footer";
 import SignInUpNav from "../Components/General/SignInUpNav"
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../context/user";
 import {
 	Link,
@@ -27,8 +27,15 @@ const SignIn = () => {
 	const [errorMsg, setErrorMsg] = useState("");
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+	const [rememberMe, setRememberMe] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		const rememberMe = localStorage.getItem("rememberMe");
+		if (rememberMe && localStorage.getItem("accessToken")) navigate("/ideas");
+	},[])
+
 	const login = async (e) => {
 		e.preventDefault();
 		if (!username || !password) {
@@ -66,6 +73,7 @@ const SignIn = () => {
 				setErrorMsg("");
 				localStorage.setItem("accessToken", accessToken);
 				localStorage.setItem("refreshToken", refreshToken);
+				localStorage.setItem("rememberMe", rememberMe);
 				setId(_id);
 				setFinalsUsername(finalsUsername);
 				setProfileImage(profileImage);
@@ -125,6 +133,8 @@ const SignIn = () => {
 						name="rememberMe"
 						id="rememberMe"
 						type="checkbox"
+						checked={rememberMe}
+						onChange={() => setRememberMe(prev => !prev)}
 					/> Remember Me
 				</label>
 				<button

@@ -100,6 +100,7 @@ const SideNav = () => {
 	const logout = async () => {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
+		localStorage.removeItem("rememberMe");
 		navigate("/");
 	}
 	const [seeing, setSeeing] = useState(false);
