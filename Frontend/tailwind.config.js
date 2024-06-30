@@ -48,6 +48,17 @@ export default {
             transform: 'translate(0px)',
             opacity: 1
           }
+        },
+        'uploading': {
+          '0%': {
+            transform: 'translateY(20px)',
+          },
+          '50%': {
+            transform: 'translateY(0px)',
+          },
+          '100%': {
+            transform: 'translateY(-2px)',
+          }
         }
       },
       animation: {
@@ -55,6 +66,7 @@ export default {
         'connecting-lg': 'connecting-lg 1s ease-in-out infinite',
         'flying': 'flying 1.5s linear 1',
         'flying-infinite': 'flying 1.5s linear infinite',
+        'uploading': 'uploading 2s linear infinite',
       },
     },
   },

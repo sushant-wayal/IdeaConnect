@@ -4,15 +4,12 @@ import Footer from "../Components/General/Footer";
 import SideNav from "../Components/General/SideNav";
 import Category from "../Components/NewIdea/Category";
 import MultiMedia from "../Components/Main/MultiMedia";
+import Uploading from "../Components/General/Uploading";
 import { toast } from "sonner";
 import { useState } from "react";
+import { ImagePlus } from "lucide-react";
 import { useUser } from "../../context/user";
 import { useNavigate } from "react-router-dom";
-import {
-	ImagePlus,
-	Loader,
-	Upload
-} from "lucide-react";
 
 const NewIdea = () => {
 	const { username } = useUser();
@@ -219,17 +216,8 @@ const NewIdea = () => {
 						disabled={publishing}
 					>
 						<div className="flex justify-center items-center gap-2">
-							{publishing ?
-								<>
-									<Loader color="white" className="animate-spin h-5 w-5"/>
-									<p>Publishing...</p>
-								</>
-								:
-								<>
-									<Upload/>
-									<p>Publish</p>
-								</>
-							}
+								<Uploading loading={publishing}/>
+								<p>Publish{publishing ? "ing..." : ""}</p>
 						</div>
 					</button>
 				</form>

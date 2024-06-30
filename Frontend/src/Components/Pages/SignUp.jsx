@@ -9,6 +9,7 @@ import {
 	useLoaderData,
 	useNavigate
 } from "react-router-dom";
+import Uploading from "../Components/General/Uploading";
 
 const SignUp = () => {
 	const {
@@ -217,10 +218,7 @@ const SignUp = () => {
 				>
 					{uploading ?
 						<div className="flex justify-center items-center h-40 w-40 object-cover rounded-full border-2 border-black border-solid relative left-1/2 -translate-x-1/2">
-							<Loader
-								size={24}
-								className="animate-spin"
-							/>
+							<Uploading size={40} loading={uploading}/>
 						</div>
 						:
 						<img

@@ -6,10 +6,10 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  Loader,
   Volume2,
   VolumeX
 } from "lucide-react";
+import Uploading from "../General/Uploading";
 
 const MultiMedia = ({
   medias,
@@ -108,8 +108,8 @@ const MultiMedia = ({
           )
         })}
         {uploading &&
-          <div className="flex justify-center items-center h-full w-full flex-shrink-0">
-            <Loader className="h-[10%] aspect-square animate-spin"/>
+          <div className="flex justify-center items-center h-full w-full flex-shrink-0 bg-white">
+            <Uploading size={120} loading={uploading}/>
           </div>
         }
       </div>
