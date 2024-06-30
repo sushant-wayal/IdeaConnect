@@ -72,16 +72,13 @@ const App = () => {
 			)
 		}
 		setNotifications(prev => [newNotification, ...prev]);
-		setUnreadNotifications(prev => {
-			console.log("unreadNotifications",prev);
-			return prev + 1;
-		});
-	},[setNotifications, socket]);
+		setUnreadNotifications(prev => prev + 1);
+	},[setNotifications]);
 
 	useEffect(() => {
 		socket.on("notification", reciveNotification);
 		return () => socket.off("notification", reciveNotification);
-	},[setNotifications, socket]);
+	},[setNotifications]);
 
 	const [ideas, setIdeas] = useState([]);
 	const [originalIdeas, setOriginalIdeas] = useState([]);

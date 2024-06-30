@@ -45,6 +45,7 @@ const SideNav = () => {
 	} = useUser();
 
 	useEffect(() => {
+		if (!id) return;
 		socket.emit("joinNotificationRoom", id)
 	}, [id])
 
@@ -80,13 +81,10 @@ const SideNav = () => {
 	useEffect(() => {
 		socket.on("unreadMessages", reciveUnreadMessages);
 		return () => socket.off("unreadMessages", reciveUnreadMessages)
-	},[
-		reciveUnreadMessages,
-		socket
-	]);
+	},[reciveUnreadMessages]);
 
 	const openNotifications = () => {
-		socket.emit("seenAllNotification", { id });
+		socket.emit("seenAllNotification", { userId: id });
 		setUnreadNotifications(0);
 	}
 

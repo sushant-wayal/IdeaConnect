@@ -159,7 +159,7 @@ const Chats = () => {
 				setMessages(prev => [...prev, message]);
 				socket.emit("allRead",{
 					reciver: currChat._id,
-					userId,
+					id: userId,
 					group: currChat.name ? true : false,
 				});
 			} catch (error) {

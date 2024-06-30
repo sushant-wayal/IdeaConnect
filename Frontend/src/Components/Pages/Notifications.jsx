@@ -44,7 +44,7 @@ const Notification = ({}) => {
   useEffect(() => {
     setUnreadNotifications(0);
     socket.emit("seenNotification", { notificationId: notifications[0]?._id });
-  },[notifications, socket])
+  },[notifications])
 
   const {
     id: activeUserId,
@@ -162,7 +162,7 @@ const Notification = ({}) => {
                 isIncluded
               }, ind) => (
                 <>
-                  {ind == unread && unread > 0 &&
+                  {(ind == unread && unread) > 0 ?
                     <div className="flex justify-center items-center gap-2">
                       <div className="h-0 flex-grow border-2 border-black"></div>
                       <p className="text-lg backdrop-blur-sm p-1 rounded-xl border-2 border-black">
@@ -170,6 +170,8 @@ const Notification = ({}) => {
                       </p>
                       <div className="h-0 flex-grow border-2 border-black"></div>
                     </div>
+                    :
+                    <> </>
                   }
                   <div
                     key={_id}
