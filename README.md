@@ -77,7 +77,7 @@ To set up the project locally, follow these steps:
 
 ## Credits
 
-This project was developed by [Sushant Wayal]
+This project was developed by [Sushant Wayal](https://sushant-wayal-portfolio.vercel.app)
 
 
 
