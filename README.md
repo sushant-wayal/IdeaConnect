@@ -22,7 +22,7 @@ To set up the project locally, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/sushant-wayal/ideaconnect.git
+   git clone https://github.com/sushant-wayal/IdeaConnect
 2. **Install the dependencies:**
    ```bash
    cd ideaconnect
