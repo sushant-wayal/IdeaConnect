@@ -91,11 +91,11 @@ const Chats = () => {
   const sendIdea = query.get("shareIdea");
 	const defaultChat = query.get("chat");
 
-  useEffect(() => {
-		msgInput.current.addEventListener("keyup", (e) => {
-			if (e.key == "Enter") sendRef.current.click();
-		});
-  },[])
+  // useEffect(() => {
+	// 	msgInput.current.addEventListener("keyup", (e) => {
+	// 		if (e.key == "Enter") sendRef.current.click();
+	// 	});
+  // },[])
 
   const moveToTop = (array, ind) => {
 		const ele = array[ind];
@@ -198,6 +198,54 @@ const Chats = () => {
 		currChat,
 		reciveMessage,
 	])
+
+	const [suggestionText, setSuggestionText] = useState("");
+	const suggestionRef = useRef(null);
+
+	const reciveSuggestions = useCallback(({ suggestion }) => {
+		console.log("suggestion", suggestion);
+		setSuggestionText(suggestion);
+	},[]);
+
+	useEffect(() => {
+		socket.on("reciveSuggestions", reciveSuggestions);
+		return () => socket.off("reciveSuggestions", reciveSuggestions);
+	},[socket, reciveSuggestions]);
+	
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			socket.emit("requestSuggestions", { text: message });
+		}, 500);
+		return () => clearTimeout(timeout);
+	}, [message]);
+	
+	const includeSuggestionByTab = useCallback((e) => {
+		if (e.key == "Tab") {
+			e.preventDefault();
+			setMessage(message + " " + suggestionText);
+			setSuggestionText("");
+		}
+	}, [message, suggestionText]);
+
+	const includeSuggestionByClick = useCallback((e) => {
+		e.preventDefault();
+		setMessage(message + " " + suggestionText);
+		setSuggestionText("");
+	}, [message, suggestionText]);
+
+	useEffect(() => {
+		msgInput.current.addEventListener("keydown", includeSuggestionByTab);
+		msgInput.current.addEventListener("click", includeSuggestionByClick);
+		return () => {
+			msgInput.current.removeEventListener("keydown", includeSuggestionByTab);
+			msgInput.current.removeEventListener("click", includeSuggestionByClick);
+		}
+	},[msgInput.current, includeSuggestionByTab, includeSuggestionByClick]);
+
+	useEffect(() => {
+		msgInput.current.focus();
+		msgInput.current.setSelectionRange(message.length, message.length);
+	}, [suggestionText]);
 	
   const typing = (msg) => {
 		socket.emit("typing",{
@@ -342,16 +390,23 @@ const Chats = () => {
 								moveToTop={moveToTop}
 								setGotVideoCall={setGotVideoCall}
 							/>
-							<div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-14 gap-5 items-center">
-								<input
-									value={message}
+							<div className="px-1 py-2 flex justify-between border-t-[1px] border-black border-solid h-auto gap-5 items-end">
+								<textarea
+									value={message + (suggestionText.length > 0 ? " // " : "") + suggestionText}
 									onChange={(e) => {
-										setMessage(e.target.value);
-										typing(e.target.value);
+										let text = e.target.value;
+										if (text.includes("//")) {
+											const [msg] = text.split("//");
+											text = msg;
+										}
+										setMessage(text);
+										typing(text);
+										setSuggestionText("");
+										e.target.style.height = "auto";
+    								e.target.style.height = `${e.target.scrollHeight-40}px`;
 									}}
 									id="input"
-									className="bg-[#C1EDCC] rounded-full py-2 px-4 flex-grow placeholder:text-black/90 text-black"
-									type="text"
+									className="min-h-10 max-h-30 bg-[#C1EDCC] rounded-3xl py-2 px-4 flex-grow placeholder:text-black/90 text-black focus:outline-none resize-none h-10 max-h-40 overflow-y-auto"
 									placeholder="Type Something..."
 									ref={msgInput}
 								/>
@@ -395,7 +450,7 @@ const Chats = () => {
 										}
 										setSending(false);
 									}}
-									className="h-full w-24 rounded-full bg-[#C1EDCC] text-black font-semibold flex justify-center items-center gap-2 hover:bg-[#B0C0BC]"
+									className="h-full max-h-10 w-24 rounded-full bg-[#C1EDCC] text-black font-semibold flex justify-center items-center gap-2 hover:bg-[#B0C0BC]"
 									ref={sendRef}
 								>
 									<Send className={sending ? "animate-flying-infinite" : ""}/>

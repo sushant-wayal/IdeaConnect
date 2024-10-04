@@ -54,6 +54,7 @@ import "./sockets/signalling.js";
 import { signalling } from './sockets/signalling.js';
 import "./sockets/notification.js";
 import { notification } from './sockets/notification.js';
+import { textSuggestions } from './sockets/textSuggestions.js';
 
 
 const PORT = process.env.WEBSOCKET_PORT || 3001;
@@ -66,6 +67,7 @@ server.listen(PORT, () => {
 messanging();
 signalling();
 notification();
+textSuggestions();
 
 export { 
   app,
