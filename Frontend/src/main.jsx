@@ -16,7 +16,7 @@ import {
 	SignIn, 
 	SignUp,
 	SpecificCategoryIdeas,
-} from './components/index.js'
+} from './components/index'
 import {
 	fecthData,
 	getChats,
