@@ -1,8 +1,8 @@
 import axios from "axios"
 import peer from "../../services/peer.js";
-import ChatList from "../Components/Chats/ChatList.jsx";
-import Messages from "../Components/Chats/Messages.jsx";
-import VideoCalling from "../Components/Chats/VideoCalling.jsx";
+import ChatList from "../SubComponents/Chats/ChatList.jsx";
+import Messages from "../SubComponents/Chats/Messages.jsx";
+import VideoCalling from "../SubComponents/Chats/VideoCalling.jsx";
 import { toast } from "sonner";
 import { getData } from "../../dataLoaders.js";
 import { useUser } from "../../context/user.js";

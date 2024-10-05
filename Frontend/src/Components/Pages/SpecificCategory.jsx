@@ -1,4 +1,4 @@
-import Feed from "../Components/Feed/Feed";
+import Feed from "../SubComponents/Feed/Feed";
 import { toast } from "sonner";
 import { getData } from "../../dataLoaders";
 import { useParams } from "react-router-dom";

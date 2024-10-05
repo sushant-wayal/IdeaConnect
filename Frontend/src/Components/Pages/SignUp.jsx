@@ -1,6 +1,6 @@
 import axios from "axios";
-import Footer from "../Components/General/Footer"
-import SignInUpNav from "../Components/General/SignInUpNav"
+import Footer from "../SubComponents/General/Footer"
+import SignInUpNav from "../SubComponents/General/SignInUpNav"
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader } from "lucide-react";
@@ -9,7 +9,7 @@ import {
 	useLoaderData,
 	useNavigate
 } from "react-router-dom";
-import Uploading from "../Components/General/Uploading";
+import Uploading from "../SubComponents/General/Uploading";
 
 const SignUp = () => {
 	const {

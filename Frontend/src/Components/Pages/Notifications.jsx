@@ -1,7 +1,7 @@
 import axios from "axios";
-import Footer from "../Components/General/Footer";
-import TopNav from "../Components/General/TopNav";
-import SideNav from "../Components/General/SideNav";
+import Footer from "../SubComponents/General/Footer";
+import TopNav from "../SubComponents/General/TopNav";
+import SideNav from "../SubComponents/General/SideNav";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { getData } from "../../dataLoaders";

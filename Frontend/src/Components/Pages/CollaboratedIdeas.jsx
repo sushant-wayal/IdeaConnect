@@ -1,4 +1,4 @@
-import Feed from "../Components/Feed/Feed";
+import Feed from "../SubComponents/Feed/Feed";
 import { useEffect } from "react";
 import { useIdeas } from "../../context/ideas";
 import { useLoaderData } from "react-router-dom";

@@ -1,10 +1,10 @@
 import axios from "axios";
-import Step from "../Components/NewIdea/Step";
-import Footer from "../Components/General/Footer";
-import SideNav from "../Components/General/SideNav";
-import Category from "../Components/NewIdea/Category";
-import MultiMedia from "../Components/Main/MultiMedia";
-import Uploading from "../Components/General/Uploading";
+import Step from "../SubComponents/NewIdea/Step";
+import Footer from "../SubComponents/General/Footer";
+import SideNav from "../SubComponents/General/SideNav";
+import Category from "../SubComponents/NewIdea/Category";
+import MultiMedia from "../SubComponents/Main/MultiMedia";
+import Uploading from "../SubComponents/General/Uploading";
 import { toast } from "sonner";
 import { useState } from "react";
 import { ImagePlus } from "lucide-react";

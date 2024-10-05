@@ -1,6 +1,6 @@
 import axios from "axios";
-import Footer from "../Components/General/Footer";
-import SignInUpNav from "../Components/General/SignInUpNav"
+import Footer from "../SubComponents/General/Footer";
+import SignInUpNav from "../SubComponents/General/SignInUpNav"
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user";

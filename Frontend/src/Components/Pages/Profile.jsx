@@ -1,7 +1,7 @@
 import axios from "axios";
-import Idea from "../Components/Main/Idea";
-import Footer from "../Components/General/Footer";
-import SideNav from "../Components/General/SideNav";
+import Idea from "../SubComponents/Main/Idea";
+import Footer from "../SubComponents/General/Footer";
+import SideNav from "../SubComponents/General/SideNav";
 import { toast } from "sonner";
 import { getData } from "../../dataLoaders";
 import { useUser } from "../../context/user";
