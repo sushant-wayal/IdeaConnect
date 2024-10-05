@@ -6,7 +6,7 @@
   "scripts": {
     "backend": "node -r dotenv/config --experimental-json-modules Backend/src/index.js",
     "frontend": "cd Frontend && vite",
-    "build": "npm install && cd Frontend && vite build",
+    "build": "npm install",
     "start": "node -r dotenv/config --experimental-json-modules Backend/src/index.js"
   },
   "author": "Sushant Wayal",
