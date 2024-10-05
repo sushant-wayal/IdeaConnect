@@ -234,11 +234,11 @@ const Chats = () => {
 	}, [message, suggestionText]);
 
 	useEffect(() => {
-		msgInput.current.addEventListener("keydown", includeSuggestionByTab);
-		msgInput.current.addEventListener("click", includeSuggestionByClick);
+		msgInput.current?.addEventListener("keydown", includeSuggestionByTab);
+		msgInput.current?.addEventListener("click", includeSuggestionByClick);
 		return () => {
-			msgInput.current.removeEventListener("keydown", includeSuggestionByTab);
-			msgInput.current.removeEventListener("click", includeSuggestionByClick);
+			msgInput.current?.removeEventListener("keydown", includeSuggestionByTab);
+			msgInput.current?.removeEventListener("click", includeSuggestionByClick);
 		}
 	},[msgInput.current, includeSuggestionByTab, includeSuggestionByClick]);
 

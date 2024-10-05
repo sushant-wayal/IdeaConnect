@@ -42,6 +42,7 @@ To set up the project locally, follow these steps:
     npm run dev
     ```
 5. **Start Frontend Client:**
+    - Open a new terminal window.
     ```bash
     cd Frontend
     npm run dev
