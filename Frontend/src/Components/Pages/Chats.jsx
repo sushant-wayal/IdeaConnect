@@ -200,7 +200,6 @@ const Chats = () => {
 	])
 
 	const [suggestionText, setSuggestionText] = useState("");
-	const suggestionRef = useRef(null);
 
 	const reciveSuggestions = useCallback(({ suggestion }) => {
 		console.log("suggestion", suggestion);
