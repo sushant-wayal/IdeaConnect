@@ -3,32 +3,20 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './global.css'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromChildren } from 'react-router-dom'
-// import { 
-// 	Chats,
-// 	CollaboratedIdeas,
-// 	ExploreIdeas,
-// 	Ideas,
-// 	IntrestedIdeas,
-// 	MyIdeas,
-// 	NewIdea,
-// 	Notification,
-// 	Profile,
-// 	SignIn, 
-// 	SignUp,
-// 	SpecificCategoryIdeas,
-// } from './components/index.js'
-import Chats from './components/Pages/Chats.jsx'
-import CollaboratedIdeas from './components/Pages/CollaboratedIdeas.jsx'
-import ExploreIdeas from './components/Pages/ExploreIdeas.jsx'
-import Ideas from './components/Pages/Ideas.jsx'
-import IntrestedIdeas from './components/Pages/IntrestedIdeas.jsx'
-import MyIdeas from './components/Pages/MyIdeas.jsx'
-import NewIdea from './components/Pages/NewIdea.jsx'
-import Notification from './components/Pages/Notifications.jsx'
-import Profile from './components/Pages/Profile.jsx'
-import SignIn from './components/Pages/SignIn.jsx'
-import SignUp from './components/Pages/SignUp.jsx'
-import SpecificCategoryIdeas from './components/Pages/SpecificCategory.jsx'
+import { 
+	Chats,
+	CollaboratedIdeas,
+	ExploreIdeas,
+	Ideas,
+	IntrestedIdeas,
+	MyIdeas,
+	NewIdea,
+	Notification,
+	Profile,
+	SignIn, 
+	SignUp,
+	SpecificCategoryIdeas,
+} from './Components/index.js'
 import {
 	fecthData,
 	getChats,
