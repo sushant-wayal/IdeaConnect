@@ -25,7 +25,7 @@ import {
 	getFeed,
 	getIntrestedIdeas,
 	getMyIdeas
-} from './components/dataLoaders.js'
+} from './dataLoaders.js'
 
 const router = createBrowserRouter(
 	createRoutesFromChildren(

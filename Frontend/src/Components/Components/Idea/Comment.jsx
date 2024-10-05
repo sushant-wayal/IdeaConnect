@@ -6,7 +6,7 @@ import { useSocket } from "../../../context/socket"
 import {
   getData,
   getHeaders
-} from "../../dataLoaders";
+} from "../../../dataLoaders";
 import {
   useEffect,
   useRef,

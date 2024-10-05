@@ -5,7 +5,7 @@ import Progress from "../Idea/Progress";
 import Intrested from "../Idea/Intrested";
 import Description from "../Idea/Description";
 import { Link } from "react-router-dom";
-import { getData } from "../../dataLoaders";
+import { getData } from "../../../dataLoaders";
 import { SeeComments } from "../Idea/Comment";
 import { useUser } from "../../../context/user";
 import {

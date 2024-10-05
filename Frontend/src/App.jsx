@@ -4,7 +4,7 @@ import { IdeasProvider } from "./context/ideas"
 import { useCallback, useEffect, useState } from "react";
 import { SocketProvider } from "./context/socket";
 import { NotificationProvider } from "./context/notifications";
-import { getData } from "./components/dataLoaders";
+import { getData } from "./dataLoaders";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import { UserProvider } from "./context/user";

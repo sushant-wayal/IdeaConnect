@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { getData } from "../../dataLoaders";
+import { getData } from "../../../dataLoaders";
 import { useUser } from "../../../context/user";
 import { useSocket } from "../../../context/socket";
 import {

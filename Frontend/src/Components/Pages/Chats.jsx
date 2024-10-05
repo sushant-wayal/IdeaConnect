@@ -4,7 +4,7 @@ import ChatList from "../Components/Chats/ChatList.jsx";
 import Messages from "../Components/Chats/Messages.jsx";
 import VideoCalling from "../Components/Chats/VideoCalling.jsx";
 import { toast } from "sonner";
-import { getData } from "../dataLoaders.js";
+import { getData } from "../../dataLoaders.js";
 import { useUser } from "../../context/user.js";
 import { useSocket } from "../../context/socket.js";
 import { ChatProvider } from "../../context/chats.js";

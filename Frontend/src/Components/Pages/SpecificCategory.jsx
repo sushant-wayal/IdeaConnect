@@ -1,6 +1,6 @@
 import Feed from "../Components/Feed/Feed";
 import { toast } from "sonner";
-import { getData } from "../dataLoaders";
+import { getData } from "../../dataLoaders";
 import { useParams } from "react-router-dom";
 import { useIdeas } from "../../context/ideas";
 import {

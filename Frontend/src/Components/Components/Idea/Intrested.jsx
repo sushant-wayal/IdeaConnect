@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { toast } from "sonner";
 import { Loader } from "lucide-react"
-import { getData } from "../../dataLoaders";
+import { getData } from "../../../dataLoaders";
 import { useUser } from "../../../context/user";
 import { useSocket } from "../../../context/socket";
 import {

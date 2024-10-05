@@ -1,6 +1,6 @@
 import { toast } from "sonner"
 import { Link } from "react-router-dom";
-import { getData } from "../../dataLoaders";
+import { getData } from "../../../dataLoaders";
 import { useUser } from "../../../context/user";
 import { useChat } from "../../../context/chats";
 import { useSocket } from "../../../context/socket";

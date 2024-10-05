@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { getData } from "../../dataLoaders";
+import { getData } from "../../../dataLoaders";
 import { useIdeas } from "../../../context/ideas";
 import {
 	useEffect,

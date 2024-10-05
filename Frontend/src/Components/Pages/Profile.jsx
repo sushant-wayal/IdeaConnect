@@ -3,7 +3,7 @@ import Idea from "../Components/Main/Idea";
 import Footer from "../Components/General/Footer";
 import SideNav from "../Components/General/SideNav";
 import { toast } from "sonner";
-import { getData } from "../dataLoaders";
+import { getData } from "../../dataLoaders";
 import { useUser } from "../../context/user";
 import { useSocket } from "../../context/socket";
 import {
