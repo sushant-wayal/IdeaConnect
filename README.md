@@ -22,32 +22,43 @@ To set up the project locally, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/sushant-wayal/ideaconnect.git
+   git clone https://github.com/sushant-wayal/IdeaConnect
 2. **Install the dependencies:**
    ```bash
    cd ideaconnect
    npm install
 3. **Set up the environment variables:**
-   - Create a `.env` file in the root directory.
+   - Create a `.env` file in the ./Backend directory.
    - Add the following environment variables to the file:
      ```env
-     PORT=5000
+     PORT=3001
+     WEBSOCKET_PORT = 3001
      MONGODB_URI=<your_mongodb_uri>
-     JWT_SECRET=<your_jwt_secret>
+     CORS_ORIGIN = *
+
+     ACCESS_TOKEN_SECRET = <your_access_token_secret>
+     ACCESS_TOKEN_EXPIRY = <your_access_token_expiry>
+     REFRESH_TOKEN_SECRET = <your_refresh_token_secret>
+     REFRESH_TOKEN_EXPIRY = <your_refresh_token_expiry>
+      
+     CLOUDINARY_CLOUD_NAME = <your_cloudinary_cloud_name>
+     CLOUDINARY_API_KEY = <your_cloudinary_api_key>
+     CLOUDINARY_API_SECRET = <your_cloudinary_api_secret>
+      
+     GOOGLE_GEN_AI_API_KEY = <your_google_gen_ai_api_key>
      ```
-     Replace `<your_mongodb_uri>` with the MongoDB connection string and `<your_jwt_secret>` with a secret key for JWT token generation.
 4. **Start the development server:**
     ```bash
     cd Backend
     npm run dev
     ```
 5. **Start Frontend Client:**
-    - Open a new terminal window.
+   - Open a new terminal window.
     ```bash
     cd Frontend
     npm run dev
     ```
-6. **Open the application:**
+7. **Open the application:**
     - Open [http://localhost:5173](http://localhost:5173) in your browser to access the application.
     - if 5173 port is already in use, it will automatically switch to the next available port.
 
@@ -64,19 +75,9 @@ To set up the project locally, follow these steps:
 5. **Track Progress:**
     -Users can track the progress of their ideas, set milestones, and update collaborators.
 
-## Contributing
-
-Contributions are welcome! Here's how you can contribute to the project:
-- Fork the repository.
-- Create a new branch (`git checkout -b feature-branch`).
-- Make changes and commit them (`git commit -am 'Add new feature'`).
-- Push the changes to the branch (`git push origin feature-branch`).
-- Create a new pull request.
-- Submit a pull request. Ensure your code follows the project's coding standards and passes all tests before submitting.
-
 ## Credits
 
-This project was developed by [Sushant Wayal]
+This project was developed by [Sushant Wayal](https://sushant-wayal-portfolio.vercel.app)
 
 
 
