@@ -26,6 +26,7 @@ import {
 	Paperclip,
 	Send
 } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 const Chats = () => {
   let chats = [];
@@ -325,6 +326,10 @@ const Chats = () => {
 
   return (
     <div className="h-lvh w-lvw flex p-2 gap-2">
+			<Helmet>
+				<title>Ideaconnet | Chats</title>
+				<meta name="description" content="Chats with your friends and colleagues" />
+			</Helmet>
 			<ChatProvider
 				value={{
 					unreadNotifications,

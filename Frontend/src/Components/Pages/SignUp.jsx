@@ -10,6 +10,7 @@ import {
 	useNavigate
 } from "react-router-dom";
 import Uploading from "../SubComponents/General/Uploading";
+import { Helmet } from "react-helmet";
 
 const SignUp = () => {
 	const {
@@ -210,6 +211,13 @@ const SignUp = () => {
 	}
 	return (
 		<div className="flex flex-col justify-between items-center">
+			<Helmet>
+				<title>Ideaconnet | Sign Up</title>
+				<meta
+					name="description"
+					content="Sign up to Ideaconnet."
+				/>
+			</Helmet>
 			<SignInUpNav/>
 			<div className="flex flex-col justify-between gap-5 items-center w-full relative top-20">
 				<form

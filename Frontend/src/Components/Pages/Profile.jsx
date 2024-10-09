@@ -19,6 +19,7 @@ import {
 	Loader,
 	UserPlus
 } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 const Profile = () => {
 	const socket = useSocket();
@@ -92,6 +93,13 @@ const Profile = () => {
 	};
 	return (
 		<div className="flex justify-end p-2">
+			<Helmet>
+				<title>Ideaconnet | {username}</title>
+				<meta
+					name="description"
+					content="View your profile and ideas."
+				/>
+			</Helmet>
 			<SideNav/>
 			<div className="relative w-[98vw] left-1 lg:left-0 lg:w-[calc(100vw*5.4/6.5)] flex flex-col justify-center gap-2 min-h-[100vh]">
 				<div className="rounded-2xl p-2 h-full">

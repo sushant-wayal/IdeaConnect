@@ -7,6 +7,7 @@ import {
   useEffect,
   useState
 } from "react";
+import { Helmet } from "react-helmet";
 
 const SpecificCategoryIdeas = () => {
   const { category } = useParams();
@@ -43,10 +44,19 @@ const SpecificCategoryIdeas = () => {
     setOriginalIdeas
   ]);
   return (
-    <Feed
-      authenticated={authenticated}
-      noIdea={`No ideas in the ${category} category.`}
-    />
+    <>
+      <Helmet>
+        <title>Ideaconnet | {category} Ideas</title>
+        <meta
+          name="description"
+          content={`View all the ideas in the ${category} category.`}
+        />
+      </Helmet>
+      <Feed
+        authenticated={authenticated}
+        noIdea={`No ideas in the ${category} category.`}
+      />
+    </>
   )
 }
 

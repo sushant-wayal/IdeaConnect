@@ -13,6 +13,7 @@ import {
 	EyeOff,
 	Loader
 } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 const SignIn = () => {
 	const {
@@ -93,6 +94,13 @@ const SignIn = () => {
 	}
 	return (
 		<div className="h-lvh w-lvw flex flex-col justify-between items-center">
+			<Helmet>
+				<title>Ideaconnet | Log In</title>
+				<meta
+					name="description"
+					content="Log in to Ideaconnet."
+				/>
+			</Helmet>
 			<SignInUpNav/>
 			<form
 				onSubmit={login}

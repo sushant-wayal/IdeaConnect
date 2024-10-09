@@ -10,6 +10,7 @@ import { useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { useUser } from "../../context/user";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const NewIdea = () => {
 	const { username } = useUser();
@@ -134,6 +135,13 @@ const NewIdea = () => {
 
 	return (
 		<div className="w-lvh flex justify-center">
+			<Helmet>
+				<title>Ideaconnet | Publish New Idea</title>
+				<meta
+					name="description"
+					content="Publish a new idea on Ideaconnet."
+				/>
+			</Helmet>
 			<SideNav/>
 			<div className="w-lvw left-1 lg:w-[calc(100vw*5.4/6.5)] relative lg:left-32 flex flex-col items-center p-3 gap-5">
 				<p className="text-center text-4xl text-white">Publish New Idea</p>

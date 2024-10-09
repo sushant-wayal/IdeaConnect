@@ -16,6 +16,7 @@ import {
   useLocation,
   useNavigate
 } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const Notification = ({}) => {
   const socket = useSocket();
@@ -134,6 +135,13 @@ const Notification = ({}) => {
   }
   return (
     <div>
+      <Helmet>
+        <title>Ideaconnet | Notifications</title>
+        <meta
+          name="description"
+          content="View all your notifications."
+        />
+      </Helmet>
       <SideNav/>
       <TopNav noSearchText={"Notifications"}/>
       {loading ?
