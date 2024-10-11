@@ -1,8 +1,37 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import googlePkg from 'passport-google-oauth20';
+import dotenv from 'dotenv';
+import session from 'express-session';
+import { googleAuth, googleAuthResponse } from './authStratergies/google.js';
+
+dotenv.config({
+  path: './.env',
+});
+
+const project_mode = process.env.PROJECT_MODE || 'development';
 
 const app = express();
+
+app.use(session({
+  secret: 'heyheyheyhohoho',  // Replace with your own secret key
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: project_mode == "production" ? true : false }  // Set to true if using HTTPS
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
 
 app.use(cors({
   origin:  process.env.CORS_ORIGIN || 'http://localhost:5173',
@@ -68,6 +97,21 @@ messanging();
 signalling();
 notification();
 textSuggestions();
+
+// authentication
+
+const { Strategy: GoogleStrategy } = googlePkg;
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: '/auth/google/callback',
+}, googleAuth));
+
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google/callback', passport.authenticate('google', {
+  failureRedirect: project_mode == 'production' ? '/' : 'http://localhost:5173',
+}), googleAuthResponse);
 
 export { 
   app,

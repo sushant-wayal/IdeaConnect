@@ -1,6 +1,13 @@
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export const getHeaders = () => {
+  if (!localStorage.getItem("accessToken")) {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const accessToken = queryParams.get('accessToken');
+    localStorage.setItem("accessToken", accessToken);
+  }
   return {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
