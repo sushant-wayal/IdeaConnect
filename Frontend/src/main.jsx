@@ -13,6 +13,7 @@ import {
 	NewIdea,
 	Notification,
 	Profile,
+	ResetPassword,
 	SignIn, 
 	SignUp,
 	SpecificCategoryIdeas,
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
 		<Route path="/" element={<App/>}>
 			<Route path="" element={<SignIn/>}/>
 			<Route loader={fecthData} path="/signUp" element={<SignUp/>}/>
+			<Route path="/resetPassword" element={<ResetPassword/>}/>
 			<Route loader={getFeed} path="/ideas" element={<Ideas/>}/>
 			<Route loader={getMyIdeas} path='/myIdeas' element={<MyIdeas/>}/>
 			<Route loader={getExploreIdeas} path="/exploreIdeas" element={<ExploreIdeas/>}/>

@@ -9,7 +9,9 @@ import {
   follow,
   isFollowing,
   getIdeas,
-  logout
+  logout,
+  forgotPassword,
+  resetPassword
 } from "../controllers/user.controllers.js";
 import { isLoggedIn } from "../middlewares/authenticate.middleware.js";
 
@@ -17,6 +19,8 @@ const router = Router();
 
 router.route('/register').post(registerUser);
 router.route('/login').post(login);
+router.route("/forgotPassword").post(forgotPassword);
+router.route("/resetPassword").post(resetPassword);
 router.route("/activeUser").get(isLoggedIn, activeUser);
 router.route("/feed").get(isLoggedIn, feed);
 router.route("/profile/:username").get(Profile);

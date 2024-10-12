@@ -120,6 +120,23 @@ const SignIn = () => {
 		}
 		setLoading(false);
 	}
+	const forgotPassword = async () => {
+		if (!username) {
+			toast.error("Username is Required");
+			setErrorMsg("Username is Required");
+			return;
+		}
+		const toastId = toast.loading("Sending Email...")
+		try {
+			const { data : { message } } = await axios.post(`${project_mode == "production" ? "" : "http://localhost:3000"}/api/v1/users/forgotPassword`, {
+				username
+			})
+			toast.success(message, { id: toastId });
+		} catch (error) {
+			toast.error(error.response.data.message || "An Error Occurred. Try Again", { id: toastId });
+			setErrorMsg(error.response.data.message || "An Error Occurred. Try Again");
+		}
+	}
 	return (
 		<div className="h-lvh w-lvw flex flex-col justify-between items-center">
 			<Helmet>
@@ -161,47 +178,52 @@ const SignIn = () => {
 					}
 				</div>
 				<p className="absolute left-5 top-48 text-red-600 font-semibold text-sm"> {errorMsg} </p>
-				<label
-					className="relative -left-20"
-					htmlFor="rememberMe"
-				>
-					<input
-						name="rememberMe"
-						id="rememberMe"
-						type="checkbox"
-						checked={rememberMe}
-						onChange={() => setRememberMe(prev => !prev)}
-					/> Remember Me
-				</label>
+				<div className="flex flex-col items-center gap-2">
+					<label
+						className="relative -left-20"
+						htmlFor="rememberMe"
+					>
+						<input
+							name="rememberMe"
+							id="rememberMe"
+							type="checkbox"
+							checked={rememberMe}
+							onChange={() => setRememberMe(prev => !prev)}
+						/> Remember Me
+					</label>
+					<p className="text-sm underline italic cursor-pointer" onClick={forgotPassword}>Forgot Password?</p>
+				</div>
 				<hr className="w-full"/>
-				<Link to={`${project_mode == "production" ? "/auth/google" : "http://localhost:3000/auth/google"}`} className="w-full flex justify-start gap-5 px-5 items-center bg-[#C1EDCC] rounded-3xl py-1">
-					<img
-						src="../../../authLogo/google.webp"
-						alt="Google"
-						className="h-5 rounded-full aspect-square object-cover"
-					/>
-					<p className="text-md">Log in with Google</p>
-				</Link>
-				<button
-					className="bg-[#C1EDCC] p-2 rounded-2xl sm:text-sm text-2xl sm:w-20 w-32 flex items-center justify-center gap-1"
-					type="submit"
-					disabled={loading}
-				>
-					{loading ?
-						<>
-							<Loader className="animate-spin h-7 w-7" />
-							<p>Logging in...</p>
-						</>
-						:
-						"Log    in"
-					}
-				</button>
-				<Link
-					className="underline sm:text-sm text-lg"
-					to="/signUp"
-				>
-					<i> Create New Account </i>
-				</Link>
+				<div className="w-full flex flex-col items-center gap-4">
+					<Link to={`${project_mode == "production" ? "/auth/google" : "http://localhost:3000/auth/google"}`} className="w-full flex justify-start gap-5 px-5 items-center bg-[#C1EDCC] rounded-3xl py-1">
+						<img
+							src="../../../authLogo/google.webp"
+							alt="Google"
+							className="h-5 rounded-full aspect-square object-cover"
+						/>
+						<p className="text-md">Log in with Google</p>
+					</Link>
+					<button
+						className="bg-[#C1EDCC] p-2 rounded-2xl sm:text-sm text-2xl sm:w-20 w-32 flex items-center justify-center gap-1"
+						type="submit"
+						disabled={loading}
+					>
+						{loading ?
+							<>
+								<Loader className="animate-spin h-7 w-7" />
+								<p>Logging in...</p>
+							</>
+							:
+							"Log    in"
+						}
+					</button>
+					<Link
+						className="underline sm:text-sm text-lg"
+						to="/signUp"
+					>
+						<i> Create New Account </i>
+					</Link>
+				</div>
 			</form>
 			<Footer styling={"w-[98%] relative bottom-2 rounded-2xl"}/>
 		</div>

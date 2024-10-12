@@ -2,6 +2,7 @@ import SignInUpNav from "./SubComponents/General/SignInUpNav.jsx";
 import SignIn from "./Pages/SignIn.jsx";
 import Footer from "./SubComponents/General/Footer.jsx";
 import SignUp from "./Pages/SignUp.jsx";
+import ResetPassword from "./Pages/ResetPassword.jsx";
 import Ideas from "./Pages/Ideas.jsx";
 import SideNav from "./SubComponents/General/SideNav.jsx";
 import TopNav from "./SubComponents/General/TopNav.jsx";
@@ -22,6 +23,7 @@ export {
     SignIn,
     Footer,
     SignUp,
+    ResetPassword,
     Ideas,
     SideNav,
     TopNav,

@@ -3,6 +3,7 @@ import { User } from '../models/user.model.js';
 import { Idea } from '../models/idea.model.js';
 import { Chat } from '../models/chat.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { sendEmail } from '../utils/mailer.js';
 
 const cookieOptions = {
   httpOnly: true,
@@ -75,6 +76,28 @@ export const login = asyncHandler(async (req, res) => {
 		accessToken,
 		refreshToken,
 	}, 'Login successful'));
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+	const { username } = req.body;
+	const user = await User.findOne({ username });
+	if (!user) {
+		return res.status(404).json(new ApiResponse(404, null, 'User not found'));
+	}
+	const email = user.email;
+	const mailResponse = await sendEmail(email, username);
+	return res.status(200).json(new ApiResponse(200, mailResponse, 'Email sent successfully'));
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+	const { username, password } = req.body;
+	const user = await User.findOne({ username });
+	if (!user) {
+		return res.status(404).json(new ApiResponse(404, null, 'User not found'));
+	}
+	user.password = password;
+	await user.save({ validateBeforeSave: false });
+	return res.status(200).json(new ApiResponse(200, null, 'Password reset successful'));
 });
 
 export const logout = asyncHandler(async (req, res) => {
