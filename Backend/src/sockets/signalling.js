@@ -5,6 +5,9 @@ const signalling = () => {
     socket.on('disconnect', () => {
       console.log('User disconnected');
     });
+    socket.on("requestStream", ({ reciver }) => {
+      socket.to(reciver).emit("requestingStream", { reciver });
+    });
     socket.on("requestCall", ({reciver}) => {
       socket.to(reciver).emit("callRequested", { reciver });
     })
@@ -28,6 +31,12 @@ const signalling = () => {
     });
     socket.on("leaveCall", ({ reciver }) => {
       socket.to(reciver).emit("leaveCall");
+    });
+    socket.on("toggleVideo", ({ reciver }) => {
+      socket.to(reciver).emit("toggleVideo");
+    });
+    socket.on("toggleAudio", ({ reciver }) => {
+      socket.to(reciver).emit("toggleAudio");
     });
   });
 }

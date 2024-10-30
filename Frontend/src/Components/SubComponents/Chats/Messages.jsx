@@ -56,6 +56,7 @@ const Messages = ({
 	const requestVideoCall = useCallback(() => {
 		setOnVideoCall(true);
 		setVideoCallStatus("Calling");
+		sendStreams();
 		socket.emit("requestCall",{reciver: _id});
   },[_id]);
 
@@ -107,7 +108,10 @@ const Messages = ({
 						size={30}
 						onClick={() => {
 							if (gotVideoCall) {
-								if (_id == gotVideoCall) sendStreams();
+								if (_id == gotVideoCall) {
+									sendStreams();
+									socket.emit("requestStream", { reciver: _id });
+								}
 							}
 							else requestVideoCall();
 						}}

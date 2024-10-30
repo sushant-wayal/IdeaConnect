@@ -48,6 +48,7 @@ const VideoCalling = ({
   const [localStream, setLocalStream] = useState(null);
   const [video, setVideo] = useState(true);
   const [audio, setAudio] = useState(true);
+  const [remoteMuted, setRemoteMuted] = useState(true);
 
   const makeVideoCall = useCallback(async () => {
 		setVideoCallStatus("Ringing")
@@ -71,6 +72,7 @@ const VideoCalling = ({
 		setLocalStream(stream);
 		const answer = await peer.createAnswer(offer);
 		socket.emit("answerCall",{reciver: _id, answer});
+    setRemoteMuted(false);
   },[_id]);
 
   const answerResponseEvent = useCallback(async ({answer}) => {
@@ -98,8 +100,12 @@ const VideoCalling = ({
 
   const handleNegoNeedFinal = useCallback(async ({ answer }) => {
 		await peer.setAnswer(answer);
-		socket.emit("requestStream", { reciver: _id });
+		// socket.emit("requestStream", { reciver: _id });
   }, [_id, socket]);
+
+  useEffect(() => {
+    if (videoCallStatus == "Ringing") socket.emit("requestStream", { reciver: _id });
+  },[videoCallStatus])
 
   const leaveCall = useCallback(() => {
 		if (localStream) localStream.getTracks().forEach(track => track.stop());
@@ -127,6 +133,11 @@ const VideoCalling = ({
     setVideoCallRequested(prev => prev.map((val,ind) => chats[ind]._id == chatId ? false : val));
   },[]);
 
+  const handleStreamRequest = useCallback(() => {
+    console.log("Got Stream Request");
+    sendStreams();
+  },[]);
+
   useEffect(() => {
 		document.addEventListener("beforunload", leaveCall);
 		return () => document.removeEventListener("beforunload", leaveCall);
@@ -141,6 +152,7 @@ const VideoCalling = ({
 		socket.on("negotiationNeeded", handleNegoNeedIncomming);
 		socket.on("negotiationFinal",handleNegoNeedFinal);
 		socket.on("leaveCall", leaveCall);
+    socket.on("requestingStream", handleStreamRequest);
 		return () => {
 			socket.off("callRequested", videoCallRequestEvent);
 			socket.off("videoCallAccepted", makeVideoCall)
@@ -150,6 +162,7 @@ const VideoCalling = ({
 			socket.off("negotiationNeeded", handleNegoNeedIncomming);
 			socket.off("negotiationFinal", handleNegoNeedFinal);
 			socket.off("leaveCall", leaveCall);
+      socket.off("requestingStream", handleStreamRequest);
 		}
   },[
 		socket,
@@ -173,18 +186,53 @@ const VideoCalling = ({
   },[localStream]);
 
   const toggleVideo = () => {
-		const videoTrack = localStream.getTracks().find(track => track.kind == "video");
-		videoTrack.enabled = !videoTrack.enabled;
-		setVideo(videoTrack.enabled);
-		peer.peer.getSenders().find(sender => sender.track.kind == "video").replaceTrack(videoTrack);
+		// const videoTrack = localStream.getTracks().find(track => track.kind == "video");
+		// videoTrack.enabled = !videoTrack.enabled;
+		// setVideo(videoTrack.enabled);
+		// peer.peer.getSenders().find(sender => sender.track.kind == "video").replaceTrack(videoTrack);
+    socket.emit("toggleVideo", { reciver: _id });
+    setVideo(prev => !prev);
   }
 
+  const handleToggleVideo = useCallback(() => {
+    if (videoCallStatus == "connected") setVideoCallStatus("Video Off");
+    else if (videoCallStatus == "Video Off") setVideoCallStatus("connected");
+  },[videoCallStatus])
+
   const toggleAudio = () => {
-		const audioTrack = localStream.getTracks().find(track => track.kind == "audio");
-		audioTrack.enabled = !audioTrack.enabled;
-		setAudio(audioTrack.enabled);
-		peer.peer.getSenders().find(sender => sender.track.kind == "audio").replaceTrack(audioTrack);
+		// const audioTrack = localStream.getTracks().find(track => track.kind == "audio");
+		// audioTrack.enabled = !audioTrack.enabled;
+		// setAudio(audioTrack.enabled);
+		// peer.peer.getSenders().find(sender => sender.track.kind == "audio").replaceTrack(audioTrack);
+    socket.emit("toggleAudio", { reciver: _id });
+    setAudio(prev => !prev);
   }
+
+  const handleToggleAudio = useCallback(() => {
+    setRemoteMuted(prev => !prev);
+  },[setRemoteMuted])
+
+  useEffect(() => {
+    if (onVideoCall) {
+      sendStreams();
+      // socket.emit("requestStream", { reciver: _id });
+    }
+  },[onVideoCall])
+
+  // useEffect(() => {
+  //   while (!document.querySelector("#remoteStream").srcObject) {
+  //     if (onVideoCall) socket.emit("requestStream", { reciver: _id });
+  //   }
+  // }, [])
+
+  useEffect(() => {
+    socket.on("toggleVideo", handleToggleVideo);
+    socket.on("toggleAudio", handleToggleAudio);
+    return () => {
+      socket.off("toggleVideo", handleToggleVideo);
+      socket.off("toggleAudio", handleToggleAudio);
+    }
+  },[socket, handleToggleVideo, handleToggleAudio])
 
   return (
     <div className={`${onVideoCall ? "" : "hidden"} flex-grow w-full overflow-hidden p-2 relative`}>
@@ -198,15 +246,18 @@ const VideoCalling = ({
         </div>
       </div>
       <video
+        // key={remoteMuted}
         id="remoteStream"
         autoPlay
         playsInline
+        muted={remoteMuted}
         className={`${videoCallStatus == "connected" ? "" : "hidden" } top-0 left-0 h-full w-full object-cover`}
       />
       <video
         id="localStream"
         autoPlay
         playsInline
+        muted
         className="h-1/5 w-1/5 absolute bottom-[1%] right-[-3%]"
       />
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-10 pb-5">
