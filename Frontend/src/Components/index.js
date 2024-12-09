@@ -17,6 +17,9 @@ import IntrestedIdeas from "./Pages/IntrestedIdeas.jsx";
 import SpecificCategoryIdeas from "./Pages/SpecificCategory.jsx";
 import MultiMedia from "./SubComponents/Main/MultiMedia.jsx";
 import Notification from "./Pages/Notifications.jsx";
+import AICode from "./Pages/AICode.jsx";
+import CodeHistory from "./SubComponents/AICode/codeHistory.jsx";
+
 
 export {
     SignInUpNav,
@@ -37,5 +40,7 @@ export {
     IntrestedIdeas,
     SpecificCategoryIdeas,
     MultiMedia,
-    Notification
+    Notification,
+    AICode,
+    CodeHistory
 }

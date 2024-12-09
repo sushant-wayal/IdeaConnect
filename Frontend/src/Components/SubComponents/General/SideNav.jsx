@@ -21,7 +21,8 @@ import {
 	Bell,
 	LogOut,
 	Menu,
-	X
+	X,
+	Code2
 } from "lucide-react"
 
 const Icons = ({condition, props}) => condition ? <props.icon {...props}/> : null;
@@ -114,7 +115,8 @@ const SideNav = () => {
 		{to: "/collaboratedIdeas", icon: Users, primaryText: "Collaborated"},
 		{to: "/intrestedIdeas", icon: MessageCircleHeart, primaryText: "Intrested", responsiveText: "Ideas"},
 		{to: "/chats", icon: MessageSquare, primaryText: "Chats"},
-		{to: "/notifications", icon: Bell, primaryText: "Notifications"}
+		{to: "/notifications", icon: Bell, primaryText: "Notifications"},
+		{to: "/aicode", icon: Code2, primaryText: "Code with AI"}
 	]
 
 	const BottomContent = [

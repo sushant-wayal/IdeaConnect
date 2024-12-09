@@ -17,7 +17,7 @@ export const getHeaders = () => {
 
 const backendUrl = "http://localhost:3000/api/v1";
 
-export const getData = async (url, request, authorized) => {
+export const getData = async (url, request, authorized, body) => {
   url = `${backendUrl}${url}`
   const headers = {
     headers: {
@@ -29,7 +29,7 @@ export const getData = async (url, request, authorized) => {
       const { data : { data } } = await axios.get(url, headers);
       return data;
     } else if (request == "post") {
-      const { data : { data } } = await axios.post(url, headers);
+      const { data : { data } } = await axios.post(url, headers, body);
       return data;
     } else if (request == "put") {
       const { data : { data } } = await axios.put(url, headers);
@@ -52,7 +52,7 @@ export const getData = async (url, request, authorized) => {
       const { data : { data } } = await axios.get(url);
       return data;
     } else if (request == "post") {
-      const { data : { data } } = await axios.post(url);
+      const { data : { data } } = await axios.post(url, body);
       return data;
     } else if (request == "put") {
       const { data : { data } } = await axios.put(url);

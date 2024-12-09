@@ -6,6 +6,10 @@ import googlePkg from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import { googleAuth, googleAuthResponse } from './authStratergies/google.js';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAi = new GoogleGenerativeAI(process.env.GOOGLE_GEN_AI_API_KEY);
+export const model = genAi.getGenerativeModel({model: "gemini-1.5-flash"})
 
 dotenv.config({
   path: './.env',
@@ -52,6 +56,7 @@ import chatRoutes from './routes/chatAndGroup.route.js';
 import messageRoutes from './routes/message.route.js';
 import commentRoutes from './routes/comment.route.js';
 import notificationRoutes from './routes/notification.route.js';
+import codeRoutes from './routes/code.route.js';
 
 // use routes
 
@@ -62,6 +67,7 @@ app.use('/api/v1/chats', chatRoutes);
 app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/codes', codeRoutes);
 
 // websocket stepup
 

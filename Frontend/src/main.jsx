@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './global.css'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromChildren } from 'react-router-dom'
 import { 
+	AICode,
 	Chats,
 	CollaboratedIdeas,
 	ExploreIdeas,
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
 			<Route path="/newIdea" element={<NewIdea/>}/>
 			<Route loader={getChats} path="/chats" element={<Chats/>}/>
 			<Route path="/notifications" element={<Notification/>}/>
+			<Route path="/aicode" element={<AICode/>}/>
 			{/* <Route loader={getChats} path='/structuredChats' element={<StructuredChats/>}/> */}
 		</Route>
 	)

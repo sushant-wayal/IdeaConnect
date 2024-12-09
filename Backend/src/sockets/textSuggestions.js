@@ -1,8 +1,4 @@
-import { io } from "../app.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAi = new GoogleGenerativeAI(process.env.GOOGLE_GEN_AI_API_KEY);
-const model = genAi.getGenerativeModel({model: "gemini-1.5-flash"})
+import { io, model } from "../app.js";
 
 const textSuggestions = () => {
   io.on("connection", (socket) => {
