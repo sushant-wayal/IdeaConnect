@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FileSystem from "./fileSystem";
-import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/themes/prism.css';
+import Editor from '@monaco-editor/react';
+import { WebContainer } from "@webcontainer/api";
+import { Loader } from "lucide-react";
 
 const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
   const newFileSystem = [...fileSystem];
@@ -30,95 +28,129 @@ const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
   return newFileSystem;
 };
 
+const updateContent = (fileSystem, name, content) => {
+  const newFileSystem = [...fileSystem];
+  const fileIndex = newFileSystem.findIndex(({ name : fileName }) => fileName === name);
+  if (fileIndex !== -1) {
+    newFileSystem[fileIndex] = {
+      ...newFileSystem[fileIndex],
+      content,
+    };
+  } else {
+    newFileSystem.forEach((file, ind) => {
+      if (file.files) {
+        newFileSystem[ind] = {
+          ...file,
+          files: updateContent(file.files, name, content),
+        };
+      }
+    });
+  }
+  return newFileSystem;
+}
 
-const CodeFiles = ({ codeFiles, codeTitle }) => {
+const convertTofileSystemTree = (fileSystem) => {
+  const fileSystemTree = {};
+  fileSystem.forEach(({ name, content, files }) => {
+    if (files) {
+      fileSystemTree[name] = {
+        directory: convertTofileSystemTree(files),
+      };
+    } else {
+      fileSystemTree[name] = {
+        file: {
+          contents : content,
+        }
+      }
+    }
+  });
+  return fileSystemTree;
+}
+
+const getFileLanguage = (name) => {
+  const extension = name.split(".").pop();
+  switch (extension) {
+    case "js":
+      return "javascript";
+    case "jsx":
+      return "javascript";
+    case "ts":
+      return "typescript";
+    case "tsx":
+      return "typescript";
+    case "css":
+      return "tailwindcss";
+    case "html":
+      return "html";
+    case "json":
+      return "json";
+    case "md":
+      return "markdown";
+    case "svg":
+      return "xml";
+    default:
+      return "plaintext";
+  }
+}
+
+const CodeFiles = ({ codeFiles, codeTitle, setCodeStatus }) => {
   const [fileSystem, setFileSystem] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
-  const demoCodeFiles = [
-    {
-      name: "main.py",
-      content: "print('Hello World')",
-      path: "main.py",
-    },
-    {
-      name: "index.js",
-      content: "console.log('Hello World')",
-      path: "src/index.js",
-    },
-    {
-      name: "index.html",
-      content: `
-        import Head from 'next/head';
-    import { useState } from 'react';
-    import styles from '../styles/Home.module.css';
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [webContainer, setWebContainer] = useState(null);
+  const [isFirstPreview, setIsFirstPreview] = useState(true);
+  const [isWebContainerReady, setIsWebContainerReady] = useState(false);
 
-    export default function Home() {
-      const [todos, setTodos] = useState([]);
-      const [newTodo, setNewTodo] = useState('');
-
-      const addTodo = () => {
-        if (newTodo.trim() !== '') {
-          setTodos([...todos, { text: newTodo, completed: false }]);
-          setNewTodo('');
-        }
-      };
-
-      const toggleComplete = (index) => {
-        const updatedTodos = [...todos];
-        updatedTodos[index].completed = !updatedTodos[index].completed;
-        setTodos(updatedTodos);
-      };
-
-      const deleteTodo = (index) => {
-        const updatedTodos = todos.filter((_, i) => i !== index);
-        setTodos(updatedTodos);
-      };
-
-      return (
-        &lt;div className={styles.container}&gt;
-          &lt;Head&gt;
-            &lt;title&gt;Simple Todo App&lt;/title&gt;
-          &lt;/Head&gt;
-
-          &lt;h1 className={styles.title}&gt;Simple Todo App&lt;/h1&gt;
-
-          &lt;div className={styles.inputContainer}&gt;
-            &lt;input
-              type="text"
-              value={newTodo}
-              onChange={(e) =&gt; setNewTodo(e.target.value)}
-              placeholder="Add a new todo"
-            /&gt;
-            &lt;button onClick={addTodo}&gt;Add&lt;/button&gt;
-          &lt;/div&gt;
-
-          &lt;ul className={styles.todoList}&gt;
-            {todos.map((todo, index) =&gt; (
-              &lt;li key={index} className={styles.todoItem}&gt;
-                &lt;input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() =&gt; toggleComplete(index)}
-                /&gt;
-                &lt;span
-                  className={todo.completed ? styles.completed : ''}
-                &gt;
-                  {todo.text}
-                &lt;/span&gt;
-                &lt;button onClick={() =&gt; deleteTodo(index)}&gt;
-                  Delete
-                &lt;/button&gt;
-              &lt;/li&gt;
-            ))}
-          &lt;/ul&gt;
-        &lt;/div&gt;
-      );
+  useEffect(() => {
+    const initialize = async () => {
+      const webContainerInstance = await WebContainer.boot();
+      setWebContainer(webContainerInstance);
+      setIsWebContainerReady(true);
+    };
+    initialize();
+  }, []);  
+  
+  const startDevServer = useCallback(async () => {
+    if (!isFirstPreview) return;
+    console.log("Starting dev server");
+    setIsFirstPreview(false);
+    if (!isWebContainerReady) {
+      console.error("Web container not initialized");
+      return;
     }
-      `,
-      path: "public/index.html",
-    },
-  ];
-  // codeFiles = demoCodeFiles;
+    console.log("Mounting file system");
+    setCodeStatus("Mounting files");
+    const fileSystemTree = convertTofileSystemTree(fileSystem);
+    if (!fileSystemTree["package.json"]) {
+      setIsFirstPreview(true);
+      console.error("Error: package.json is missing in the file system tree");
+      setCodeStatus("")
+      return;
+    }
+    await webContainer.mount(fileSystemTree);
+    console.log("File system mounted");
+    console.log("Installing dependencies");
+    setCodeStatus("Installing dependencies");
+    const installProcess = await webContainer.spawn("npm", ["install"]);
+    const exitCode = await installProcess.exit;
+    if (exitCode !== 0) {
+      setIsFirstPreview(true);
+      console.error("npm install failed.");
+      setCodeStatus("");
+      return;
+    }
+    console.log("Dependencies installed");
+    console.log("Starting dev server");
+    setCodeStatus("Starting dev server");
+    await webContainer.spawn("npm", ["run", "dev"]);
+    webContainer.on("server-ready", (_port, url) => {
+      console.log("Server ready at", url);
+      setPreviewUrl(url);
+      setCodeStatus("");
+    });
+  }, [webContainer, fileSystem]);
+  
   useEffect(() => {
     let updatedFileSystem = [];
     codeFiles.forEach(({ path, name, content }) => {
@@ -131,8 +163,35 @@ const CodeFiles = ({ codeFiles, codeTitle }) => {
       }
       return prev;
     });
-  }, [codeFiles]);
-  
+  }, [codeFiles, webContainer]);
+
+  const handlePreview = async () => {
+    if (!showPreview) await startDevServer();
+    setShowPreview((prev) => !prev);
+  };
+
+  const handleFileContentChange = (newContent) => {
+    console.log("File content changed to", newContent);
+    setIsFirstPreview(true);
+    // const newFileSystem = [...fileSystem];
+    // const updatedFileSystem = newFileSystem.map((file) => {
+    //   if (file.name === currentFile.name) {
+    //     return {
+    //       ...file,
+    //       content: newContent,
+    //     };
+    //   }
+    //   return file;
+    // });
+    // setFileSystem(updatedFileSystem);
+    const updatedFileSystem = updateContent(fileSystem, currentFile.name, newContent);
+    setFileSystem(updatedFileSystem);
+    setCurrentFile({
+      ...currentFile,
+      content: newContent,
+    })
+    console.log("File system updated", updatedFileSystem);
+  }
   
   if (codeFiles.length === 0) {
     return (
@@ -145,7 +204,7 @@ const CodeFiles = ({ codeFiles, codeTitle }) => {
     <div className="bg-[#797270] rounded-2xl flex-grow h-full p-2 flex flex-col justify-between items-center">
       <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center">
         <p className="text-2xl font-semibold text-center">
-          {codeTitle}
+          {codeTitle || "Code Files"}
         </p>
       </div>
       <div className="w-full flex-grow flex p-2 justify-between gap-2 overflow-y-scroll">
@@ -153,20 +212,35 @@ const CodeFiles = ({ codeFiles, codeTitle }) => {
           <FileSystem system={fileSystem} setCurrentFile={setCurrentFile}/>
         </div>
         <div className="h-full flex-grow flex flex-col items-center justify-start gap-2">
-          <h3 className="text-xl w-full h-10 rounded-2xl text-center items-center bg-[#C1EDCC]">{currentFile?.name}</h3>
-          <div className="bg-[#333333] w-full rounded-2xl flex-grow overflow-y-scroll">
-            {/* <textarea className="w-full h-full resize-none bg-transparent focus:outline-none"
-              value={currentFile?.content}
-              rows={currentFile?.content.split("\n").length + 1}
-            ></textarea> */}
-            {currentFile && (
-              <Editor
-                value={currentFile.content}
-                highlight={code => highlight(code, languages.js)}
-                padding={10}
-                className="text-white w-[650px] whitespace-pre-wrap"
-              />
-            )}
+          <div className="w-full h-10 rounded-2xl items-center bg-[#C1EDCC] flex justify-between p-2">
+            <h3 className="text-xl h-full text-center ">{currentFile?.name}</h3>
+            <div className="flex gap-1">
+              <button
+                onClick={handlePreview}
+                className="px-2 py-1 rounded-2xl text-white bg-[#333333]"
+              >
+                {showPreview ? "Go to Code" : "See Preview"}
+              </button>
+            </div>
+          </div>
+          <div className={`${showPreview ? "" : "bg-[#333333]"} w-full rounded-2xl flex-grow overflow-y-scroll`}>
+            {showPreview ? 
+              <iframe src={previewUrl} className="w-full h-full border-2 border-black rounded-2xl"/>
+              :
+              currentFile && (
+                <Editor
+                  value={currentFile.content}
+                  onChange={(code) => handleFileContentChange(code)}
+                  loading={
+                    <Loader size={24} className="animate-spin" color="white"/>
+                  }
+                  language={getFileLanguage(currentFile.name)}
+                  padding={10}
+                  theme="vs-dark"
+                  className="text-white w-[650px] whitespace-pre-wrap focus:outline-none focus:border-none"
+                />
+              )
+            }
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ const router = Router();
 
 router.route("/").get(isLoggedIn, getCodes);
 router.route("/codeFiles/:codeId").get(isLoggedIn, getCodeFiles);
-router.route("/chats/:codeId").get(isLoggedIn, getChats);
-router.route("/createCode").post(createCode);
+router.route("/codeChats/:codeId").get(isLoggedIn, getChats);
+router.route("/createCode").post(isLoggedIn, createCode);
 
 export default router;

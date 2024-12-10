@@ -3,14 +3,16 @@ import { Link } from "react-router-dom";
 import { getData } from "../../../dataLoaders";
 import { useEffect, useState } from "react";
 
-const CodeHistory = ({ setCodeId, setCodeTitle, className }) => {
-  const [codes, setCodes] = useState([]);
+const CodeHistory = ({ codes, setCodes, setCodeId, setCodeTitle, className }) => {
   const [codeSearch, setCodeSearch] = useState("");
   useEffect(() => {
     const fetchCodes = async () => {
-      const userCodes = await getData("/codes", "get", true);
+      let { codes : userCodes } = await getData("/codes/", "get", true);
+      console.log("userCodes :", userCodes);
+      userCodes = userCodes.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
+      console.log("userCodes :", userCodes);
       setCodes(userCodes);
-      setCodes(prev => prev.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)));
+      // setCodes(prev => prev.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)));
     }
     fetchCodes();
   }, []);
@@ -46,7 +48,7 @@ const CodeHistory = ({ setCodeId, setCodeTitle, className }) => {
           <p className="absolute top-1/2 -translate-y-1/2 left-2">🔎</p>
         </div>
       </div>
-      <div onClick={setCodeId(null)} className="flex w-full rounded-2xl justify-start items-center px-2 mt-3 bg-[#C1EDCC] hover:bg-[#B0C0BC] cursor-pointer">
+      <div onClick={() => setCodeId(null)} className="flex w-full rounded-2xl justify-start items-center px-2 mt-3 bg-[#C1EDCC] hover:bg-[#B0C0BC] cursor-pointer">
         <Plus className="w-10 h-10"/>
         <p className="text-lg font-semibold text-center">New Code</p>
       </div>

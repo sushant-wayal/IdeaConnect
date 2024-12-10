@@ -3,7 +3,7 @@ import { Folder } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 
 const FileSystem = ({ name, system, setCurrentFile }) => {
-  const subPathRef = useRef<HTMLDivElement>(null);
+  const subPathRef = useRef(null);
   const handleClick = () => {
     if (subPathRef.current) {
       subPathRef.current.classList.toggle('hidden');

@@ -1,6 +1,6 @@
 export const templatePrompt = `
   Respond just in one words
-  ReactJS, NextJS, or NodeJS
+  ReactJS or NodeJS
 
   Your response should be answer to the what it best to built the web application, which user asked for.
 
@@ -71,7 +71,7 @@ export const basePrompt = (template) => `
   You have a task of creating a web application.
   ${
     template == "ReactJS" || "NextJS" ?
-      "The web application frontend should be beautiful , responsive and user friendly. User should be able to interact with the application easily. Use the images and icons in the application. Use best font styles and colors in the application."
+      "The web application frontend should be beautiful , responsive and user friendly. User should be able to interact with the application easily. Use the demo images and icons, available on internet in the application. Use best font styles and colors in the application."
       :
       ""
     }
@@ -94,6 +94,22 @@ export const basePrompt = (template) => `
       {code in the file}
     </content>
   </file>
+  for example if a file named example.js is in the root directory, then it should be mentioned as
+  <file>
+    <name>example.js</name>
+    <path>example.js</path>
+    <content>
+      console.log('Hello World');
+    </content>
+  </file>
+  for example if a file named example.js is in the src directory, then it should be mentioned as
+  <file>
+    <name>example.js</name>
+    <path>src/example.js</path>
+    <content>
+      console.log('Hello World');
+    </content>
+  </file>
 
   you should provide the entire code for all the files required to build this application.
 
@@ -106,6 +122,15 @@ export const basePrompt = (template) => `
 
   Also, mention the title according to you of this application in title tag, like 
   <title>My Web Application</title>
+
+  Consider following things to avoid errors in application:
+    1. The application should be built in ${template}.
+    2. The application should contain all the files required to build this application.
+    3. The files should be mentioned in the specific format.
+    4. Make sure you provide the files, which you have imported in other files.
+  
+  Make sure you create a beautiful, responsive and user friendly web application, with fantastic and interactive ui/ux.
+  Make sure you include all the packages latest versions in the package.json file, which you have used in the application.
 
   you should provide the entire code for all the files required to build this application.
   Do not provide any unnecessary information, diverting from givem format.

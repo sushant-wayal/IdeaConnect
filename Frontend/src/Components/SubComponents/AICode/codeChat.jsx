@@ -1,9 +1,8 @@
-import { Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { getData } from "../../../dataLoaders";
 import axios from "axios";
 
-const CodeChat = ({ codeChats, setCodeFiles, setCodeTitle }) => {
+const CodeChat = ({ codeStatus, codeChats, codes, setCodeChats, setCodeFiles, setCodeTitle, setCodeId, setCodes }) => {
   const [question, setQuestion] = useState("");
   const messagesEndRef = useRef(null);
   useEffect(() => {
@@ -11,37 +10,50 @@ const CodeChat = ({ codeChats, setCodeFiles, setCodeTitle }) => {
   }, [codeChats]);
   const handleSend = async () => {
     if (question) {
-      // const { files, title } = await getData("/codes/createCode", "post", true, { prompt : question });
-      let { data : { files, title } } = await axios.post("http://localhost:3000/api/v1/codes/createCode", { prompt : question }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+      let { data : { data : { files, title, codeId, answer }} } = await axios.post("http://localhost:3000/api/v1/codes/createCode", { prompt : question }, { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
       files = files.map((file) => ({ ...file, name : file.name.split("/").pop() }));
       console.log("files :", files);
       console.log("title :", title);
       setCodeFiles(files);
       setCodeTitle(title);
+      setCodeId(codeId);
+      const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
+      if (!alreadyExists) setCodes(prev => [{ codeId, title }, ...prev]);
+      else setCodes(prev => prev.map((code) => code.codeId === codeId ? { ...code, title } : code));
+      console.log("question :", question);
+      console.log("answer :", answer);
+      setCodeChats(prev => [
+        ...prev,
+        {
+          chatType: "question",
+          content: question
+        },
+        {
+          chatType: "answer",
+          content: answer
+        }
+      ]);
       setQuestion("");
-      // console.log("response :", response);
     }
   };
   return (
     <div className="h-full w-72 flex-col justify-between items-center relative p-2 bg-[#797270] rounded-2xl">
-      <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center">
+      <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center gap-2">
+        {codeStatus && <Loader2 size={24} className="animate-spin"/>}
         <p className="text-xl font-semibold text-center">
-          Code Chats
+          {codeStatus || "Code Chat"}
         </p>
       </div>
       <div className="w-full h-0 border-[1px] mt-1 border-black"></div>
-      <div className="h-[calc(100%-84px)] overflow-x-hidden overflow-y-scroll" ref={messagesEndRef}>
+      <div className="h-[calc(100%-84px)] overflow-x-hidden overflow-y-scroll flex justify-start items-center flex-col gap-3 pt-2" ref={messagesEndRef}>
         {codeChats?.length > 0 ? 
           codeChats.map(({ chatType, content }, ind) => (
-            <textarea
+            <p
               key={ind}
-              className={`w-full p-2 resize-none ${chatType === "question" ? "bg-[#C1EDCC]" : "bg-[#908D8D]"} rounded-2xl`}
-              style={{ height: "auto" }}
-              rows={content.split("\n").length+1}
-              readOnly
+              className={`w-full p-2 ${chatType === "question" ? "bg-[#C1EDCC]" : "bg-[#908D8D]"} rounded-2xl`}
             >
               {content}
-            </textarea>
+            </p>
           ))
           :
           <div className="flex justify-center items-center h-full w-full">
