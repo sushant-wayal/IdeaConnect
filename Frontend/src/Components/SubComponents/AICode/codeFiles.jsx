@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import FileSystem from "./fileSystem";
 import Editor from '@monaco-editor/react';
-import { WebContainer } from "@webcontainer/api";
 import { Loader } from "lucide-react";
 
 const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
@@ -93,29 +92,28 @@ const getFileLanguage = (name) => {
   }
 }
 
-const CodeFiles = ({ codeFiles, codeTitle, setCodeStatus }) => {
+const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, setCodeStatus, webContainer }) => {
   const [fileSystem, setFileSystem] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
-  const [webContainer, setWebContainer] = useState(null);
-  const [isFirstPreview, setIsFirstPreview] = useState(true);
-  const [isWebContainerReady, setIsWebContainerReady] = useState(false);
 
   useEffect(() => {
-    const initialize = async () => {
-      const webContainerInstance = await WebContainer.boot();
-      setWebContainer(webContainerInstance);
-      setIsWebContainerReady(true);
-    };
-    initialize();
-  }, []);  
+    return () => {
+      if (webContainer) {
+        console.log("Unmounting file system");
+        webContainer.fs.rm("/", { recursive: true });
+        setIsFirstPreview(true);
+        console.log("File system unmounted");
+      }
+    }
+  },[])
   
   const startDevServer = useCallback(async () => {
     if (!isFirstPreview) return;
     console.log("Starting dev server");
     setIsFirstPreview(false);
-    if (!isWebContainerReady) {
+    if (!webContainer) {
       console.error("Web container not initialized");
       return;
     }
@@ -133,6 +131,11 @@ const CodeFiles = ({ codeFiles, codeTitle, setCodeStatus }) => {
     console.log("Installing dependencies");
     setCodeStatus("Installing dependencies");
     const installProcess = await webContainer.spawn("npm", ["install"]);
+    installProcess.output.pipeTo(new WritableStream({
+      write(data) {
+        console.log(data);
+      }
+    }));
     const exitCode = await installProcess.exit;
     if (exitCode !== 0) {
       setIsFirstPreview(true);
@@ -143,7 +146,12 @@ const CodeFiles = ({ codeFiles, codeTitle, setCodeStatus }) => {
     console.log("Dependencies installed");
     console.log("Starting dev server");
     setCodeStatus("Starting dev server");
-    await webContainer.spawn("npm", ["run", "dev"]);
+    const startProcess = await webContainer.spawn("npm", ["run", "dev"]);
+    startProcess.output.pipeTo(new WritableStream({
+      write(data) {
+        console.log(data);
+      }
+    }));
     webContainer.on("server-ready", (_port, url) => {
       console.log("Server ready at", url);
       setPreviewUrl(url);
@@ -173,17 +181,6 @@ const CodeFiles = ({ codeFiles, codeTitle, setCodeStatus }) => {
   const handleFileContentChange = (newContent) => {
     console.log("File content changed to", newContent);
     setIsFirstPreview(true);
-    // const newFileSystem = [...fileSystem];
-    // const updatedFileSystem = newFileSystem.map((file) => {
-    //   if (file.name === currentFile.name) {
-    //     return {
-    //       ...file,
-    //       content: newContent,
-    //     };
-    //   }
-    //   return file;
-    // });
-    // setFileSystem(updatedFileSystem);
     const updatedFileSystem = updateContent(fileSystem, currentFile.name, newContent);
     setFileSystem(updatedFileSystem);
     setCurrentFile({

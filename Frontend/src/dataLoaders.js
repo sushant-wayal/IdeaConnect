@@ -26,9 +26,7 @@ export const getData = async (url, request, authorized, body) => {
   }
   if (authorized) {
     if (request == "get") {
-      console.log("get request to ", url);
       const { data : { data } } = await axios.get(url, headers);
-      console.log("data :", data);
       return data;
     } else if (request == "post") {
       const { data : { data } } = await axios.post(url, headers, body);

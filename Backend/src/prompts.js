@@ -78,11 +78,11 @@ export const basePrompt = (template) => `
   You should give me the entire codes for all the files required to build this application.
   Your response should be in the specific format as shown below.
 
-  You should build this application in ${template}.
+  ${template ? `You should build this application in ${template}.
 
   Your application should contain all basic files required to build this application.
   like
-  ${template === 'ReactJS' ? reactTemplate : template === 'NextJS' ? nextTemplate : template === 'NodeJS' ? nodeTemplate : ""}
+  ${template === 'ReactJS' ? reactTemplate : template === 'NextJS' ? nextTemplate : template === 'NodeJS' ? nodeTemplate : ""}` : ""}
 
   then, all the files which are required to build this application should be mentioned in the specific format.
   where it should be under file tag, name tag should contain the name of the file, path tag should contain the path of the file and content tag should contain the content of the file.
@@ -124,16 +124,26 @@ export const basePrompt = (template) => `
   <title>My Web Application</title>
 
   Consider following things to avoid errors in application:
-    1. The application should be built in ${template}.
-    2. The application should contain all the files required to build this application.
-    3. The files should be mentioned in the specific format.
-    4. Make sure you provide the files, which you have imported in other files.
+    1. The application should contain all the files required to build this application.
+    2. The files should be mentioned in the specific format.
+    3. Make sure you provide the files, which you have imported in other files.
   
   Make sure you create a beautiful, responsive and user friendly web application, with fantastic and interactive ui/ux.
   Make sure you include all the packages latest versions in the package.json file, which you have used in the application.
+  Make sure to use characters directlt, instead of using there codes, 
+  for example, use single quotes instead of using &#39;.
+               use < instead of using &lt;.
+               use > instead of using &gt;.
+               and etc.
 
   you should provide the entire code for all the files required to build this application.
   Do not provide any unnecessary information, diverting from givem format.
 
   Now, your task is to : 
+`
+
+export const modificationPrompt = (codes) => `
+  ${basePrompt()} Modify the following code to statisfy some demands.
+  ${codes}
+  Demands are : 
 `

@@ -1,6 +1,6 @@
 import { model } from "../app.js";
 import { Code } from "../models/code.model.js";
-import { basePrompt, templatePrompt } from "../prompts.js";
+import { basePrompt, modificationPrompt, templatePrompt } from "../prompts.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
@@ -46,6 +46,12 @@ export const getChats = async (req, res) => {
 }
 
 function parseResponse(xmlText) {
+  xmlText = xmlText.replace(/&#39;/g, "'");
+  xmlText = xmlText.replace(/&lt;/g, "<");
+  xmlText = xmlText.replace(/&gt;/g, ">");
+  xmlText = xmlText.replace(/&quot;/g, "\"");
+  xmlText = xmlText.replace(/&amp;/g, "&");
+
   const files = [];
   const responseRegex = /<response>([\s\S]*?)<\/response>/;
   const titleRegex = /<title>([\s\S]*?)<\/title>/;
@@ -103,4 +109,44 @@ export const createCode = async (req, res) => {
   });
   const codeId = newCode._id;
   return res.status(201).json(new ApiResponse(201, { template, title, files, answer, codeId }));
+}
+
+const stringifyCodeFiles = (codeFiles) => {
+  let codeFilesString = "";
+  codeFiles.forEach(({ name, path, content }) => {
+    codeFilesString +=
+    `<file>
+      <name>${name}</name>
+      <path>${path}</path>
+      <content>
+        ${content}
+      </content>
+    </file>\n`;
+  });
+  return codeFilesString;
+}
+
+export const updateCode = async (req, res) => {
+  const { codeId } = req.params;
+  const { prompt } = req.body;
+  const { codeFiles, chats } = await Code.findOne({ _id: codeId });
+  const filesString = stringifyCodeFiles(codeFiles);
+  const { response } = await model.generateContent(modificationPrompt(filesString) + prompt);
+  const { files, answer } = parseResponse(response.text().trim());
+  console.log("files :", files);
+  console.log("answer :", answer);
+  await Code.findOneAndUpdate({ _id: codeId }, {
+    codeFiles: files,
+    chats: [
+      ...chats,
+      {
+        chatType: "question",
+        content: prompt
+      },{
+        chatType: "answer",
+        content: answer
+      }
+    ]
+  }, { new: true });
+  return res.status(200).json(new ApiResponse(200, { files, answer }));
 }
