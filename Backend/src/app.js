@@ -91,7 +91,6 @@ import "./sockets/notification.js";
 import { notification } from './sockets/notification.js';
 import { textSuggestions } from './sockets/textSuggestions.js';
 
-
 const PORT = process.env.WEBSOCKET_PORT || 3001;
 server.listen(PORT, () => {
   console.log(`WebSocket Server running on port ${PORT}`);
@@ -118,6 +117,43 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 app.get('/auth/google/callback', passport.authenticate('google', {
   failureRedirect: project_mode == 'production' ? '/' : 'http://localhost:5173',
 }), googleAuthResponse);
+
+// streaming
+
+import { streamResponse } from './stream/code.stream.js';
+import jwt from 'jsonwebtoken';
+
+app.get('/stream-code', async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const { token } = req.query;
+
+  if (token) {
+		try {
+			const decoded = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+			req.user = decoded;
+		} catch (error) {
+			console.log("jwt error", error);
+			res.status(401).json(new ApiResponse(401, {
+				authenticated: false,
+			}, 'You are not logged in'));
+      res.end();
+		}
+	} else {
+    res.status(401).json(new ApiResponse(401, {
+      authenticated: false,
+    }, 'You are not logged in'));
+    res.end();
+  }
+
+  streamResponse(req, res);
+
+  req.on('close', () => {
+    res.end();
+  })
+})
 
 export { 
   app,

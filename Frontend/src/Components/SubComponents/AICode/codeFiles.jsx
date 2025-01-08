@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import FileSystem from "./fileSystem";
 import Editor from '@monaco-editor/react';
 import { Loader } from "lucide-react";
 
-const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
+export const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
   const newFileSystem = [...fileSystem];
   if (start === pathArray.length - 1) {
     newFileSystem.push({
@@ -27,7 +27,7 @@ const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
   return newFileSystem;
 };
 
-const updateContent = (fileSystem, name, content) => {
+export const updateContent = (fileSystem, name, content) => {
   const newFileSystem = [...fileSystem];
   const fileIndex = newFileSystem.findIndex(({ name : fileName }) => fileName === name);
   if (fileIndex !== -1) {
@@ -92,9 +92,9 @@ const getFileLanguage = (name) => {
   }
 }
 
-const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, setCodeStatus, webContainer }) => {
+const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, setCodeStatus, webContainer, currentFile, setCurrentFile, generatingCode }) => {
   const [fileSystem, setFileSystem] = useState([]);
-  const [currentFile, setCurrentFile] = useState(null);
+  // const [currentFile, setCurrentFile] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
 
@@ -206,19 +206,19 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
       </div>
       <div className="w-full flex-grow flex p-2 justify-between gap-2 overflow-y-scroll">
         <div className="bg-[#908D8D] h-full w-64 overflow-scroll rounded-2xl">
-          <FileSystem system={fileSystem} setCurrentFile={setCurrentFile}/>
+          <FileSystem system={fileSystem} setCurrentFile={setCurrentFile} currentFile={currentFile} generatingCode={generatingCode}/>
         </div>
         <div className="h-full flex-grow flex flex-col items-center justify-start gap-2">
           <div className="w-full h-10 rounded-2xl items-center bg-[#C1EDCC] flex justify-between p-2">
             <h3 className="text-xl h-full text-center ">{currentFile?.name}</h3>
-            <div className="flex gap-1">
+            {/* <div className="flex gap-1">
               <button
                 onClick={handlePreview}
                 className="px-2 py-1 rounded-2xl text-white bg-[#333333]"
               >
                 {showPreview ? "Go to Code" : "See Preview"}
               </button>
-            </div>
+            </div> */}
           </div>
           <div className={`${showPreview ? "" : "bg-[#333333]"} w-full rounded-2xl flex-grow overflow-y-scroll`}>
             {showPreview ? 

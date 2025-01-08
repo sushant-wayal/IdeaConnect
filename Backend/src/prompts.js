@@ -87,41 +87,41 @@ export const basePrompt = (template) => `
   then, all the files which are required to build this application should be mentioned in the specific format.
   where it should be under file tag, name tag should contain the name of the file, path tag should contain the path of the file and content tag should contain the content of the file.
   for example,
-  <file>
-    <name>{file name}</name>
-    <path>{file path}</path>
-    <content>
+  <IdeaConnectFile>
+    <IdeaConnectName>{file name}</IdeaConnectName>
+    <IdeaConnectPath>{file path}</IdeaConnectPath>
+    <IdeaConnectContent>
       {code in the file}
-    </content>
-  </file>
+    </IdeaConnectContent>
+  </IdeaConnectFile>
   for example if a file named example.js is in the root directory, then it should be mentioned as
-  <file>
-    <name>example.js</name>
-    <path>example.js</path>
-    <content>
+  <IdeaConnectFile>
+    <IdeaConnectName>example.js</IdeaConnectName>
+    <IdeaConnectPath>example.js</IdeaConnectPath>
+    <IdeaConnectContent>
       console.log('Hello World');
-    </content>
-  </file>
+    </IdeaConnectContent>
+  </IdeaConnectFile>
   for example if a file named example.js is in the src directory, then it should be mentioned as
-  <file>
-    <name>example.js</name>
-    <path>src/example.js</path>
-    <content>
+  <IdeaConnectFile>
+    <IdeaConnectName>example.js</IdeaConnectName>
+    <IdeaConnectPath>src/example.js</IdeaConnectPath>
+    <IdeaConnectContent>
       console.log('Hello World');
-    </content>
-  </file>
+    </IdeaConnectContent>
+  </IdeaConnectFile>
 
   you should provide the entire code for all the files required to build this application.
 
   after that you should provide your generel text information about the application in the specific format, like inside response tag.
   for example,
-  <response>
+  <IdeaConnectResponse>
     This is a web application which is built using HTML, CSS and JavaScript.
     It is a simple web application which displays a welcome message.
-  </response>
+  </IdeaConnectResponse>
 
   Also, mention the title according to you of this application in title tag, like 
-  <title>My Web Application</title>
+  <IdeaConnectTitle>My Web Application</IdeaConnectTitle>
 
   Consider following things to avoid errors in application:
     1. The application should contain all the files required to build this application.

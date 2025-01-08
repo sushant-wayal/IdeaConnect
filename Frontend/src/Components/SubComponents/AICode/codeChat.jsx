@@ -2,7 +2,7 @@ import { Loader2, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
-const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setCodeFiles, setCodeTitle, setCodeId, setCodes, setIsFirstPreview }) => {
+const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setCodeFiles, setCodeTitle, setCodeId, setCodes, setIsFirstPreview, setCurrentFile, setGeneratingCode }) => {
   const [question, setQuestion] = useState("");
   const messagesEndRef = useRef(null);
   useEffect(() => {
@@ -13,38 +13,123 @@ const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setC
   }, [codeChats]);
   const handleSend = async () => {
     if (question) {
-      let updateCode = codes.length > 0;
-      let { data : { data : { files, title, codeId, answer }} } = await axios.post(`http://localhost:3000/api/v1/codes/${updateCode ? `updateCode/${currCodeId}` : "createCode"}`, { prompt : question }, { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
-      files = files.map((file) => ({ ...file, name : file.name.split("/").pop() }));
-      console.log("files :", files);
-      console.log("title :", title);
-      setCodeFiles(files);
-      if (title) setCodeTitle(title);
-      if (codeId) setCodeId(codeId);
-      setIsFirstPreview(true);
-      const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
-      if (!alreadyExists) setCodes(prev => [{ codeId, title }, ...prev]);
-      else setCodes(prev => {
-        const updatedCodes = [...prev];
-        const index = updatedCodes.findIndex(({ codeId : id }) => id === codeId);
-        const thisCode = updatedCodes[index];
-        updatedCodes.splice(index, 1);
-        updatedCodes.unshift(thisCode);
-        return updatedCodes;
-      })
-      console.log("question :", question);
-      console.log("answer :", answer);
+      // let updateCode = codes.length > 0;
+      // let { data : { data : { files, title, codeId, answer }} } = await axios.post(`http://localhost:3000/api/v1/codes/${updateCode ? `updateCode/${currCodeId}` : "createCode"}`, { prompt : question }, { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
+      // files = files.map((file) => ({ ...file, name : file.name.split("/").pop() }));
+      // console.log("files :", files);
+      // console.log("title :", title);
+      // setCodeFiles(files);
+      // if (title) setCodeTitle(title);
+      // if (codeId) setCodeId(codeId);
+      // setIsFirstPreview(true);
+      // const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
+      // if (!alreadyExists) setCodes(prev => [{ codeId, title }, ...prev]);
+      // else setCodes(prev => {
+      //   const updatedCodes = [...prev];
+      //   const index = updatedCodes.findIndex(({ codeId : id }) => id === codeId);
+      //   const thisCode = updatedCodes[index];
+      //   updatedCodes.splice(index, 1);
+      //   updatedCodes.unshift(thisCode);
+      //   return updatedCodes;
+      // })
+      // console.log("question :", question);
+      // console.log("answer :", answer);
+      // setCodeChats(prev => [
+      //   ...prev,
+      //   {
+      //     chatType: "question",
+      //     content: question
+      //   },
+      //   {
+      //     chatType: "answer",
+      //     content: answer
+      //   }
+      // ]);
       setCodeChats(prev => [
         ...prev,
         {
           chatType: "question",
           content: question
-        },
-        {
-          chatType: "answer",
-          content: answer
         }
       ]);
+
+      let eventSource = new EventSource(`http://localhost:3000/stream-code?prompt=${question}&token=${localStorage.getItem("accessToken")}`);
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("data", data);
+        if (data.codeId) {
+          console.log("data.codeId :", data.codeId);
+          setCodeId(data.codeId);
+          setIsFirstPreview(true);
+          const { codeId , title } = data;
+          const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
+          if (!alreadyExists) {
+            setCodes(prev => [{ codeId, title }, ...prev]);
+            console.log("codes :", codes);
+          }
+          else setCodes(prev => {
+            const updatedCodes = [...prev];
+            const index = updatedCodes.findIndex(({ codeId : id }) => id === codeId);
+            const thisCode = updatedCodes[index];
+            updatedCodes.splice(index, 1);
+            updatedCodes.unshift(thisCode);
+            return updatedCodes;
+          })
+        } else if (data.title) setCodeTitle(data.title);
+        else if (data.name && data.path) {
+          if (data.name != undefined) setGeneratingCode(data.name);
+          if (!data.content) {
+            setCodeFiles(prev => {
+              if (prev.find((file) => file.name === data.name)) return prev;
+              return [...prev, { name: data.name, path: data.path, content: "" }]
+            });
+            setCurrentFile({ name: data.name, path: data.path, content: "" });
+            const pathArray = data.path.split("/");
+            for (let i = 0; i < pathArray.length-1; i++) {
+              const folderName = pathArray[i];
+              document.getElementById(folderName)?.classList.remove("hidden");
+            }
+          } else {
+            setCurrentFile({ name: data.name, path: data.path, content: data.content });
+            const pathArray = data.path.split("/");
+            for (let i = 0; i < pathArray.length-1; i++) {
+              const folderName = pathArray[i];
+              document.getElementById(folderName)?.classList.remove("hidden");
+            }
+            if (data.end) {
+              setCodeFiles(prev => prev.map((file) => {
+                if (file.name === data.name) return { ...file, content: data.content };
+                return file;
+              }));
+            }
+          }
+        } else if (data.response) {
+          setGeneratingCode(null);
+          if (data.response.length == 1) {
+            setCodeChats(prev => [
+              ...prev,
+              {
+                chatType: "answer",
+                content: data.response
+              }
+            ]);
+          } else {
+            setCodeChats(prev => prev.map((chat, ind) => {
+              if (ind === prev.length - 1) return { ...chat, content: data.response };
+              return chat;
+            }));
+          }
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        console.log("error", error);
+      };
+
+      eventSource.onopen = () => {
+        console.log("eventSource open");
+      };
       setQuestion("");
     }
   };

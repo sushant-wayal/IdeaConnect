@@ -1,8 +1,8 @@
 import { RiFile2Line } from '@remixicon/react';
-import { Folder } from 'lucide-react';
+import { Folder, Loader } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 
-const FileSystem = ({ name, system, setCurrentFile }) => {
+const FileSystem = ({ name, system, setCurrentFile, generatingCode }) => {
   const subPathRef = useRef(null);
   const handleClick = () => {
     if (subPathRef.current) {
@@ -23,11 +23,11 @@ const FileSystem = ({ name, system, setCurrentFile }) => {
           <p> {name} </p>
         </div>
       }
-      <div className={`ml-1 ${name ? "hidden" : ""}`} ref={subPathRef}>
+      <div id={name} className={`ml-1 ${name ? "hidden" : ""}`} ref={subPathRef}>
         {system && system.map((file, index) => {
           if (file.files) {
             return (
-              <FileSystem key={index} name={file.name} system={file.files} setCurrentFile={setCurrentFile}/>
+              <FileSystem key={index} name={file.name} system={file.files} setCurrentFile={setCurrentFile} generatingCode={generatingCode}/>
             )
           } else {
             return (
@@ -38,7 +38,11 @@ const FileSystem = ({ name, system, setCurrentFile }) => {
                 })}
                 className='p-1 flex justify-start items-center cursor-pointer gap-1 hover:bg-[#B0C0BC]'
               >
-                <RiFile2Line size={16} />
+                {generatingCode == file.name ?
+                  <Loader size={16} className='animate-spin'/>
+                  :
+                  <RiFile2Line size={16} />
+                }
                 <p key={index}>{file.name}</p>
               </div>
             )

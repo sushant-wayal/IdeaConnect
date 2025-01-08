@@ -14,6 +14,8 @@ const AICode = () => {
   const [codes, setCodes] = useState([]);
   const [webContainer, setWebContainer] = useState(null);
   const [isFirstPreview, setIsFirstPreview] = useState(true);
+  const [currentFile, setCurrentFile] = useState(null);
+  const [generatingCode, setGeneratingCode] = useState(null);
 
   const initialize = async () => {
     console.log("Initializing WebContainer...")
@@ -42,9 +44,26 @@ const AICode = () => {
   }, [codeId]);
   return (
     <div className="h-lvh w-lvw p-2 flex gap-2">
+      {/* <button
+        onClick={async () => {
+          const eventSource = new EventSource(`http://localhost:3000/stream-code?prompt=create a simple todo app`);
+
+          eventSource.onmessage = (event) => {
+            console.log("event.data", event.data);
+          };
+
+          eventSource.onerror = (error) => {
+            console.log("error", error);
+          };
+
+          eventSource.onopen = () => {
+            console.log("eventSource open");
+          };
+        }}
+      >Get Stream</button> */}
       <CodeHistory codes={codes}  setCodes={setCodes} setCodeId={setCodeId} setCodeTitle={setCodeTitle}/>
-      <CodeChat currCodeId={codeId} codeChats={codeChats} setCodeChats={setCodeChats} codes={codes} setCodeFiles={setCodeFiles} setCodeTitle={setCodeTitle} codeStatus={codeStatus} setCodeId={setCodeId} setCodes={setCodes} setIsFirstPreview={setIsFirstPreview}/>
-      <CodeFiles key={codeId} codeFiles={codeFiles} codeTitle={codeTitle} setCodeStatus={setCodeStatus} webContainer={webContainer} isFirstPreview={isFirstPreview} setIsFirstPreview={setIsFirstPreview}/>
+      <CodeChat currCodeId={codeId} codeChats={codeChats} setCodeChats={setCodeChats} codes={codes} setCodeFiles={setCodeFiles} setCodeTitle={setCodeTitle} codeStatus={codeStatus} setCodeId={setCodeId} setCodes={setCodes} setIsFirstPreview={setIsFirstPreview} setCurrentFile={setCurrentFile} currentFile={currentFile} setGeneratingCode={setGeneratingCode}/>
+      <CodeFiles key={codeId} codeFiles={codeFiles} codeTitle={codeTitle} setCodeStatus={setCodeStatus} webContainer={webContainer} isFirstPreview={isFirstPreview} setIsFirstPreview={setIsFirstPreview} currentFile={currentFile} setCurrentFile={setCurrentFile} generatingCode={generatingCode}/>
     </div>
   );
 };
