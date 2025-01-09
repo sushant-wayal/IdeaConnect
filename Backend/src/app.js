@@ -120,7 +120,7 @@ app.get('/auth/google/callback', passport.authenticate('google', {
 
 // streaming
 
-import { streamResponse } from './stream/code.stream.js';
+import { createCode, updateCode } from './stream/code.stream.js';
 import jwt from 'jsonwebtoken';
 
 app.get('/stream-code', async (req, res) => {
@@ -128,7 +128,7 @@ app.get('/stream-code', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  const { token } = req.query;
+  const { token, codeId } = req.query;
 
   if (token) {
 		try {
@@ -148,7 +148,8 @@ app.get('/stream-code', async (req, res) => {
     res.end();
   }
 
-  streamResponse(req, res);
+  if (codeId) updateCode(req, res);
+  else createCode(req, res);
 
   req.on('close', () => {
     res.end();

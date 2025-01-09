@@ -1,6 +1,5 @@
 import { Loader2, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 
 const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setCodeFiles, setCodeTitle, setCodeId, setCodes, setIsFirstPreview, setCurrentFile, setGeneratingCode }) => {
   const [question, setQuestion] = useState("");
@@ -13,38 +12,6 @@ const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setC
   }, [codeChats]);
   const handleSend = async () => {
     if (question) {
-      // let updateCode = codes.length > 0;
-      // let { data : { data : { files, title, codeId, answer }} } = await axios.post(`http://localhost:3000/api/v1/codes/${updateCode ? `updateCode/${currCodeId}` : "createCode"}`, { prompt : question }, { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
-      // files = files.map((file) => ({ ...file, name : file.name.split("/").pop() }));
-      // console.log("files :", files);
-      // console.log("title :", title);
-      // setCodeFiles(files);
-      // if (title) setCodeTitle(title);
-      // if (codeId) setCodeId(codeId);
-      // setIsFirstPreview(true);
-      // const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
-      // if (!alreadyExists) setCodes(prev => [{ codeId, title }, ...prev]);
-      // else setCodes(prev => {
-      //   const updatedCodes = [...prev];
-      //   const index = updatedCodes.findIndex(({ codeId : id }) => id === codeId);
-      //   const thisCode = updatedCodes[index];
-      //   updatedCodes.splice(index, 1);
-      //   updatedCodes.unshift(thisCode);
-      //   return updatedCodes;
-      // })
-      // console.log("question :", question);
-      // console.log("answer :", answer);
-      // setCodeChats(prev => [
-      //   ...prev,
-      //   {
-      //     chatType: "question",
-      //     content: question
-      //   },
-      //   {
-      //     chatType: "answer",
-      //     content: answer
-      //   }
-      // ]);
       setCodeChats(prev => [
         ...prev,
         {
@@ -53,7 +20,7 @@ const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setC
         }
       ]);
 
-      let eventSource = new EventSource(`http://localhost:3000/stream-code?prompt=${question}&token=${localStorage.getItem("accessToken")}`);
+      let eventSource = new EventSource(`http://localhost:3000/stream-code?prompt=${question}&token=${localStorage.getItem("accessToken")}${currCodeId ? `&codeId=${currCodeId}` : ""}`);
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);

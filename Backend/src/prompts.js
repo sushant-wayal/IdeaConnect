@@ -144,6 +144,7 @@ export const basePrompt = (template) => `
 
 export const modificationPrompt = (codes) => `
   ${basePrompt()} Modify the following code to statisfy some demands.
+  Remember, to only return the files which are modified, and files which are to be added. Do not remove any file.
   ${codes}
   Demands are : 
 `
