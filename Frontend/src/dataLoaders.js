@@ -15,7 +15,7 @@ export const getHeaders = () => {
   }
 }
 
-const backendUrl = "http://localhost:3000/api/v1";
+export const backendUrl = "http://localhost:3000/api/v1";
 
 export const getData = async (url, request, authorized, body) => {
   url = `${backendUrl}${url}`

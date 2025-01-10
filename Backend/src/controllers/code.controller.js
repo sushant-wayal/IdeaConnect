@@ -1,8 +1,11 @@
+import path from "path";
 import { model } from "../app.js";
 import { Code } from "../models/code.model.js";
 import { basePrompt, modificationPrompt, templatePrompt } from "../prompts.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import fs from "fs";
+import { fileURLToPath, URL } from 'url';
+import archiver from 'archiver';
 
 export const getCodes = async (req, res) => {
   const userId = req.user.id;
@@ -150,3 +153,41 @@ export const updateCode = async (req, res) => {
   }, { new: true });
   return res.status(200).json(new ApiResponse(200, { files, answer }));
 }
+
+export const downloadCode = async (req, res) => {
+  const { codeId } = req.params;
+  const { title, codeFiles } = await Code.findOne({ _id: codeId });
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  console.log("dirname", __dirname); 
+  const codePath = path.join(__dirname, '../../userCodes', codeId); 
+  console.log("codePath", codePath);
+  await fs.promises.mkdir(codePath, { recursive: true });
+  for (const { path: codeFilePath, content } of codeFiles) {
+    const filePath = path.join(codePath, codeFilePath);
+    console.log("filePath:", filePath);
+    await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.promises.writeFile(filePath, content);
+  }
+  const outputPath = path.join(__dirname, '../../userCodes', codeId + '.zip');
+  const output = fs.createWriteStream(outputPath);
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  output.on('close', function() {
+    res.download(outputPath, `${title}.zip`, (err) => {
+      if (err) {
+        console.error('Error while downloading the file:', err);
+        res.status(500).send('Server error');
+      } else {
+        fs.rmdirSync(codePath, { recursive: true });
+        fs.unlinkSync(outputPath);
+      }
+    });
+  });
+  archive.on('error', function(err) {
+    throw err;
+  });
+  archive.pipe(output);
+  archive.directory(codePath, false);
+  archive.finalize();
+};
+

@@ -63,7 +63,7 @@ const AICode = () => {
       >Get Stream</button> */}
       <CodeHistory codes={codes}  setCodes={setCodes} setCodeId={setCodeId} setCodeTitle={setCodeTitle}/>
       <CodeChat currCodeId={codeId} codeChats={codeChats} setCodeChats={setCodeChats} codes={codes} setCodeFiles={setCodeFiles} setCodeTitle={setCodeTitle} codeStatus={codeStatus} setCodeId={setCodeId} setCodes={setCodes} setIsFirstPreview={setIsFirstPreview} setCurrentFile={setCurrentFile} currentFile={currentFile} setGeneratingCode={setGeneratingCode}/>
-      <CodeFiles key={codeId} codeFiles={codeFiles} codeTitle={codeTitle} setCodeStatus={setCodeStatus} webContainer={webContainer} isFirstPreview={isFirstPreview} setIsFirstPreview={setIsFirstPreview} currentFile={currentFile} setCurrentFile={setCurrentFile} generatingCode={generatingCode}/>
+      <CodeFiles key={codeId} codeFiles={codeFiles} codeTitle={codeTitle} setCodeStatus={setCodeStatus} webContainer={webContainer} isFirstPreview={isFirstPreview} setIsFirstPreview={setIsFirstPreview} currentFile={currentFile} setCurrentFile={setCurrentFile} generatingCode={generatingCode} codeId={codeId}/>
     </div>
   );
 };

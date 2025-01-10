@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import FileSystem from "./fileSystem";
 import Editor from '@monaco-editor/react';
-import { Loader } from "lucide-react";
+import { Download, Loader } from "lucide-react";
+import { backendUrl, getData } from "../../../dataLoaders";
+import axios from "axios";
 
 export const updateFileSystem = (fileSystem, pathArray, name, content, start) => {
   const newFileSystem = [...fileSystem];
@@ -92,11 +94,12 @@ const getFileLanguage = (name) => {
   }
 }
 
-const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, setCodeStatus, webContainer, currentFile, setCurrentFile, generatingCode }) => {
+const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, setCodeStatus, webContainer, currentFile, setCurrentFile, generatingCode, codeId }) => {
   const [fileSystem, setFileSystem] = useState([]);
   // const [currentFile, setCurrentFile] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -189,6 +192,28 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
     })
     console.log("File system updated", updatedFileSystem);
   }
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const response = await axios.get(`${backendUrl}/codes/downloadCode/${codeId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], { type: 'application/zip' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${codeTitle}.zip`;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error downloading the app:', error);
+    }
+    setDownloading(false);
+  }
   
   if (codeFiles.length === 0) {
     return (
@@ -199,7 +224,15 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
   }
   return (
     <div className="bg-[#797270] rounded-2xl flex-grow h-full p-2 flex flex-col justify-between items-center">
-      <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center">
+      <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center relative">
+        <button className={`absolute left-2 px-2 py-1 rounded-2xl text-white bg-[#333333] flex gap-1 items-center ${downloading ? "cursor-not-allowed" : ""}`} onClick={handleDownload} disabled={downloading}>
+          {downloading ?
+            <Loader size={24} className="animate-spin" color="white"/>
+            :
+            <Download size={24} color="white"/>
+          }
+          {downloading ? "Downloading" : "Download Code"}
+        </button>
         <p className="text-2xl font-semibold text-center">
           {codeTitle || "Code Files"}
         </p>

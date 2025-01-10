@@ -6,6 +6,7 @@
   "scripts": {
     "backend": "nodemon -r dotenv/config --experimental-json-modules Backend/src/index.js",
     "frontend": "cd Frontend && vite",
+    "sfu": "nodemon -r dotenv/config --experimental-json-modules SFU/src/index.js",
     "build": "npm install",
     "start": "node -r dotenv/config --experimental-json-modules Backend/src/index.js",
     "devbuild": "npm install && cd Frontend && vite build",
@@ -20,6 +21,7 @@
     "@reduxjs/toolkit": "^2.2.1",
     "@remixicon/react": "^4.2.0",
     "@webcontainer/api": "^1.5.1-internal.3",
+    "archiver": "^7.0.1",
     "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.0.2",
@@ -49,7 +51,8 @@
     "socket.io": "^4.7.4",
     "socket.io-client": "^4.7.4",
     "sonner": "^1.5.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "wrtc": "^0.4.7"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.7",
