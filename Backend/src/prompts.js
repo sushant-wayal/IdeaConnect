@@ -67,7 +67,7 @@ export const nodeTemplate = `
 `
 
 export const basePrompt = (template) => `
-  You are an excellent software developer.
+    You are an excellent software developer.
   You have a task of creating a web application.
   ${
     template == "ReactJS" || "NextJS" ?
@@ -84,45 +84,6 @@ export const basePrompt = (template) => `
   like
   ${template === 'ReactJS' ? reactTemplate : template === 'NextJS' ? nextTemplate : template === 'NodeJS' ? nodeTemplate : ""}` : ""}
 
-  then, all the files which are required to build this application should be mentioned in the specific format.
-  where it should be under file tag, name tag should contain the name of the file, path tag should contain the path of the file and content tag should contain the content of the file.
-  for example,
-  <IdeaConnectFile>
-    <IdeaConnectName>{file name}</IdeaConnectName>
-    <IdeaConnectPath>{file path}</IdeaConnectPath>
-    <IdeaConnectContent>
-      {code in the file}
-    </IdeaConnectContent>
-  </IdeaConnectFile>
-  for example if a file named example.js is in the root directory, then it should be mentioned as
-  <IdeaConnectFile>
-    <IdeaConnectName>example.js</IdeaConnectName>
-    <IdeaConnectPath>example.js</IdeaConnectPath>
-    <IdeaConnectContent>
-      console.log('Hello World');
-    </IdeaConnectContent>
-  </IdeaConnectFile>
-  for example if a file named example.js is in the src directory, then it should be mentioned as
-  <IdeaConnectFile>
-    <IdeaConnectName>example.js</IdeaConnectName>
-    <IdeaConnectPath>src/example.js</IdeaConnectPath>
-    <IdeaConnectContent>
-      console.log('Hello World');
-    </IdeaConnectContent>
-  </IdeaConnectFile>
-
-  you should provide the entire code for all the files required to build this application.
-
-  after that you should provide your generel text information about the application in the specific format, like inside response tag.
-  for example,
-  <IdeaConnectResponse>
-    This is a web application which is built using HTML, CSS and JavaScript.
-    It is a simple web application which displays a welcome message.
-  </IdeaConnectResponse>
-
-  Also, mention the title according to you of this application in title tag, like 
-  <IdeaConnectTitle>My Web Application</IdeaConnectTitle>
-
   Consider following things to avoid errors in application:
     1. The application should contain all the files required to build this application.
     2. The files should be mentioned in the specific format.
@@ -130,11 +91,6 @@ export const basePrompt = (template) => `
   
   Make sure you create a beautiful, responsive and user friendly web application, with fantastic and interactive ui/ux.
   Make sure you include all the packages latest versions in the package.json file, which you have used in the application.
-  Make sure to use characters directlt, instead of using there codes, 
-  for example, use single quotes instead of using &#39;.
-               use < instead of using &lt;.
-               use > instead of using &gt;.
-               and etc.
 
   you should provide the entire code for all the files required to build this application.
   Do not provide any unnecessary information, diverting from givem format.
