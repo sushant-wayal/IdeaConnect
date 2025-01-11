@@ -100,6 +100,7 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -176,9 +177,24 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
     });
   }, [codeFiles, webContainer]);
 
+  useEffect(() => {
+    setPreviewUrl("");
+  }, [codeFiles]);
+
+  useEffect(() => {
+    setShowPreview(false);
+  }, [generatingCode])
+
   const handlePreview = async () => {
-    if (!showPreview) await startDevServer();
-    setShowPreview((prev) => !prev);
+    // if (!showPreview) await startDevServer();
+    // setShowPreview((prev) => !prev);
+    if (!showPreview && !previewUrl) {
+      setShowPreview((prev) => !prev);
+      setLoadingPreview(true);
+      const { url } = await getData(`/codes/runCode/${codeId}`, "get", true);
+      setPreviewUrl(url);
+      setLoadingPreview(false);
+    } else setShowPreview((prev) => !prev);
   };
 
   const handleFileContentChange = (newContent) => {
@@ -186,6 +202,7 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
     setIsFirstPreview(true);
     const updatedFileSystem = updateContent(fileSystem, currentFile.name, newContent);
     setFileSystem(updatedFileSystem);
+    setShowPreview(false);
     setCurrentFile({
       ...currentFile,
       content: newContent,
@@ -223,7 +240,7 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
     );
   }
   return (
-    <div className="bg-[#797270] rounded-2xl flex-grow h-full p-2 flex flex-col justify-between items-center">
+    <div className={`bg-[#797270] rounded-2xl flex-grow h-full p-2 flex flex-col justify-between items-center ${generatingCode ? "pointer-events-none cursor-not-allowed" : ""}`}>
       <div className="w-full h-10 bg-[#C1EDCC] rounded-2xl flex justify-center items-center relative">
         <button className={`absolute left-2 px-2 py-1 rounded-2xl text-white bg-[#333333] flex gap-1 items-center ${downloading ? "cursor-not-allowed" : ""}`} onClick={handleDownload} disabled={downloading}>
           {downloading ?
@@ -239,25 +256,30 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
       </div>
       <div className="w-full flex-grow flex p-2 justify-between gap-2 overflow-y-scroll">
         <div className="bg-[#908D8D] h-full w-64 overflow-scroll rounded-2xl">
-          <FileSystem system={fileSystem} setCurrentFile={setCurrentFile} currentFile={currentFile} generatingCode={generatingCode}/>
+          <FileSystem system={fileSystem} setCurrentFile={setCurrentFile} currentFile={currentFile} generatingCode={generatingCode} setShowPreview={setShowPreview}/>
         </div>
         <div className="h-full flex-grow flex flex-col items-center justify-start gap-2">
           <div className="w-full h-10 rounded-2xl items-center bg-[#C1EDCC] flex justify-between p-2">
             <h3 className="text-xl h-full text-center ">{currentFile?.name}</h3>
-            {/* <div className="flex gap-1">
+            <div className="flex gap-1">
               <button
                 onClick={handlePreview}
                 className="px-2 py-1 rounded-2xl text-white bg-[#333333]"
               >
                 {showPreview ? "Go to Code" : "See Preview"}
               </button>
-            </div> */}
+            </div>
           </div>
           <div className={`${showPreview ? "" : "bg-[#333333]"} w-full rounded-2xl flex-grow overflow-y-scroll`}>
-            {showPreview ? 
-              <iframe src={previewUrl} className="w-full h-full border-2 border-black rounded-2xl"/>
-              :
-              currentFile && (
+              {loadingPreview ?
+                <div className="w-full h-full border-2 border-black rounded-2xl bg-white flex justify-center items-center">
+                  <Loader size={24} className="animate-spin" color="black"/>
+                  <p>Loading Preview...</p>
+                </div>
+                :
+                <iframe src={previewUrl} className={`w-full h-full border-2 border-black rounded-2xl bg-white ${showPreview ? "" : "hidden"}`}/>
+              }
+              {currentFile && (
                 <Editor
                   value={currentFile.content}
                   onChange={(code) => handleFileContentChange(code)}
@@ -267,10 +289,9 @@ const CodeFiles = ({ isFirstPreview, setIsFirstPreview, codeFiles, codeTitle, se
                   language={getFileLanguage(currentFile.name)}
                   padding={10}
                   theme="vs-dark"
-                  className="text-white w-[650px] whitespace-pre-wrap focus:outline-none focus:border-none"
+                  className={`text-white w-[650px] whitespace-pre-wrap focus:outline-none focus:border-none ${showPreview ? "hidden" : ""}`}
                 />
-              )
-            }
+              )}
           </div>
         </div>
       </div>

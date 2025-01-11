@@ -191,7 +191,7 @@ export const updateCode = async (req, res) => {
     _id: codeId,
     userId
   }, {
-    title: response.title,
+    title: response.title || code.title,
     codeFiles,
     chats: codeChats
   });

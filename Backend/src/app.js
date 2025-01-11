@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import session from 'express-session';
 import { googleAuth, googleAuthResponse } from './authStratergies/google.js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import path from "path";
+import { fileURLToPath } from 'url';
 
 const genAi = new GoogleGenerativeAI(process.env.GOOGLE_GEN_AI_API_KEY);
 export const model = genAi.getGenerativeModel({model: "gemini-1.5-flash"})
@@ -42,9 +44,12 @@ app.use(cors({
   credentials: true,
 }));
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static('public'));
+app.use('/userCodes', express.static(path.join(__dirname, '../public/userCodes')));
 app.use(cookieParser());
 
 // import routes

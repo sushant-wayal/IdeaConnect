@@ -30,7 +30,7 @@ const CodeChat = ({ currCodeId, codeStatus, codeChats, codes, setCodeChats, setC
           setCodeId(data.codeId);
           setIsFirstPreview(true);
           const { codeId , title } = data;
-          const alreadyExists = codes.find(({ codeId : id }) => id === codeId);
+          const alreadyExists = codes.find(({ codeId : id }) => id == codeId);
           if (!alreadyExists) {
             setCodes(prev => [{ codeId, title }, ...prev]);
             console.log("codes :", codes);

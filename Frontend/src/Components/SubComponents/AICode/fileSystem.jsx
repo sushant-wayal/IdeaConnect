@@ -2,7 +2,7 @@ import { RiFile2Line } from '@remixicon/react';
 import { Folder, Loader } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 
-const FileSystem = ({ name, system, setCurrentFile, generatingCode }) => {
+const FileSystem = ({ name, system, setCurrentFile, generatingCode, setShowPreview }) => {
   const subPathRef = useRef(null);
   const handleClick = () => {
     if (subPathRef.current) {
@@ -27,15 +27,18 @@ const FileSystem = ({ name, system, setCurrentFile, generatingCode }) => {
         {system && system.map((file, index) => {
           if (file.files) {
             return (
-              <FileSystem key={index} name={file.name} system={file.files} setCurrentFile={setCurrentFile} generatingCode={generatingCode}/>
+              <FileSystem key={index} name={file.name} system={file.files} setCurrentFile={setCurrentFile} generatingCode={generatingCode} setShowPreview={setShowPreview}/>
             )
           } else {
             return (
               <div
-                onClick={() => setCurrentFile({
-                  name: file.name,
-                  content: file.content
-                })}
+                onClick={() => {
+                  setCurrentFile({
+                    name: file.name,
+                    content: file.content
+                  })
+                  setShowPreview(false);
+                }}
                 className='p-1 flex justify-start items-center cursor-pointer gap-1 hover:bg-[#B0C0BC]'
               >
                 {generatingCode == file.name ?

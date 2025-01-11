@@ -29,7 +29,7 @@ export const getData = async (url, request, authorized, body) => {
       const { data : { data } } = await axios.get(url, headers);
       return data;
     } else if (request == "post") {
-      const { data : { data } } = await axios.post(url, headers, body);
+      const { data : { data } } = await axios.post(url, body, headers);
       return data;
     } else if (request == "put") {
       const { data : { data } } = await axios.put(url, headers);

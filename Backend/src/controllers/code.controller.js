@@ -4,8 +4,9 @@ import { Code } from "../models/code.model.js";
 import { basePrompt, modificationPrompt, templatePrompt } from "../prompts.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import fs from "fs";
-import { fileURLToPath, URL } from 'url';
+import { fileURLToPath } from 'url';
 import archiver from 'archiver';
+import { exec } from "child_process";
 
 export const getCodes = async (req, res) => {
   const userId = req.user.id;
@@ -154,22 +155,24 @@ export const updateCode = async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { files, answer }));
 }
 
-export const downloadCode = async (req, res) => {
-  const { codeId } = req.params;
+export const getUserCode = async (__dirname, codeId) => {
   const { title, codeFiles } = await Code.findOne({ _id: codeId });
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  console.log("dirname", __dirname); 
-  const codePath = path.join(__dirname, '../../userCodes', codeId); 
-  console.log("codePath", codePath);
+  const codePath = path.join(__dirname, '../../public/userCodes', codeId); 
   await fs.promises.mkdir(codePath, { recursive: true });
   for (const { path: codeFilePath, content } of codeFiles) {
     const filePath = path.join(codePath, codeFilePath);
-    console.log("filePath:", filePath);
     await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
     await fs.promises.writeFile(filePath, content);
   }
-  const outputPath = path.join(__dirname, '../../userCodes', codeId + '.zip');
+  return { title, codePath };
+}
+
+export const downloadCode = async (req, res) => {
+  const { codeId } = req.params;
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const { title, codePath } = await getUserCode(__dirname, codeId);
+  const outputPath = path.join(__dirname, '../../public/userCodes', codeId + '.zip');
   const output = fs.createWriteStream(outputPath);
   const archive = archiver('zip', { zlib: { level: 9 } });
   output.on('close', function() {
@@ -191,3 +194,43 @@ export const downloadCode = async (req, res) => {
   archive.finalize();
 };
 
+export const runCode = async (req, res) => {
+  try {
+    const { codeId } = req.params;
+    console.log("Running code", codeId);
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const { codePath } = await getUserCode(__dirname, codeId);
+    exec(`cd ${codePath} && npm install && npm run build`, (_error, stdout, stderr) => {
+      console.log(`stdout: ${stdout}`);
+      if (stderr) console.error(`stderr: ${stderr}`);
+      const indexPath = path.join(codePath, 'dist', 'index.html');
+      const indexHtml = fs.readFileSync(indexPath, 'utf8').replaceAll('/assets', `/userCodes/${codeId}/dist/assets`).replace('/vite.svg', `/userCodes/${codeId}/dist/vite.svg`);
+      fs.writeFileSync(indexPath, indexHtml);
+      setTimeout(() => {
+        fs.rmSync(codePath, { recursive: true });
+      }, 5000);
+      res.status(200).json(new ApiResponse(200, { url: `http://localhost:3000/api/v1/codes/userCodes/${codeId}` }));
+    });
+    
+  } catch (error) {
+    console.error(`Execution error: ${error.message}`);
+    res.status(500).json({ message: `Error running code: ${error.message}` });
+  }
+};
+
+export const exposeHtml = async (req, res) => {
+  const { codeId } = req.params;
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  res.sendFile(path.join(__dirname, '../../public/userCodes', codeId, 'dist', 'index.html'));
+}
+
+export const eraseCode = async (req, res) => {
+  const { codeId } = req.params;
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const codePath = path.join(__dirname, '../../public/userCodes', codeId);
+  fs.rmSync(codePath, { recursive: true });
+  res.status(200).json(new ApiResponse(200, { message: "Code erased successfully" }));
+}

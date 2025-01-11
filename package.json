@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "backend": "nodemon -r dotenv/config --experimental-json-modules Backend/src/index.js",
+    "backend": "node -r dotenv/config --experimental-json-modules Backend/src/index.js",
     "frontend": "cd Frontend && vite",
     "sfu": "nodemon -r dotenv/config --experimental-json-modules SFU/src/index.js",
     "build": "npm install",
