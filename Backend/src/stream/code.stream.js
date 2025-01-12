@@ -8,7 +8,7 @@ const writeResponse = (res, data) => {
 }
 
 const generateresponse = async (prompt, res) => {
-  const codeParser = new GeminiCodeParser(process.env.GOOGLE_GEN_AI_API_KEY);
+  const codeParser = new GeminiCodeParser(process.env.GOOGLE_GEN_AI_API_KEY, "gemini-1.5-flash");
   codeParser.on('title', (data) => writeResponse(res, data));
   codeParser.on('file', (data) => {
     data.name = data.name.split('/').pop();
