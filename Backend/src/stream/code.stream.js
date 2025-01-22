@@ -16,7 +16,7 @@ const generateresponse = async (prompt, res) => {
   });
   codeParser.on('response', (data) => writeResponse(res, data));
   const response = await codeParser.generateParsedCodeStream(prompt);
-  return response;
+  return {...response, files: response.files.map(file => ({ ...file, name: file.name.split('/').pop() }))};
 }
 
 export const createCode = async (req, res) =>{
